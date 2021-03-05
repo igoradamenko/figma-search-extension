@@ -23,7 +23,7 @@
   }
 
   function processFocus(nodeId) {
-    const item = figma.root.findAll(item => item.id === nodeId)[0];
+    const item = figma.root.findOne(item => item.id === nodeId)[0];
     let page = item;
 
     while (page.type !== 'PAGE') {
@@ -32,5 +32,6 @@
 
     figma.currentPage = page;
     figma.viewport.scrollAndZoomIntoView([item]);
+    figma.currentPage.selection = [item];
   }
 })();
