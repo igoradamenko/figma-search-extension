@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Figma Search",
+  "version": "0.1.0",
+  "description": "Search through Figma objects even in “View only” mode",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "256": "icon.png"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "MacCtrl+Shift+F"
+      },
+      "description": "Opens the extension"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.figma.com/*"],
+      "js": ["figma-bg.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["figma-bridge.js"],
+      "matches": []
+    }
+  ],
+  "externally_connectable": {
+    "matches": ["*://*.figma.com/*"]
+  }
+}

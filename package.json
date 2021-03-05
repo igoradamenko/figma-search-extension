@@ -1,0 +1,10 @@
+{
+  "name": "figma-search-extension",
+  "version": "0.1.0",
+  "description": "Search though Figma objects even in “View only” mode",
+  "private": true,
+  "devDependencies": {
+    "@types/chrome": "0.0.133",
+    "@types/figma": "1.0.3"
+  }
+}
