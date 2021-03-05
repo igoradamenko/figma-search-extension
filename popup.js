@@ -1,14 +1,12 @@
 const requestNode = document.getElementById('request');
 const resultsNode = document.getElementById('results');
 
+const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
+
 requestNode.addEventListener('input', e => {
   console.log('input changed', e.target.value);
 
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    const search = e.target.value.toLocaleLowerCase();
-    chrome.tabs.sendMessage(tabs[0].id, { type: 'SEARCH', data: search });
-    console.log('popup sent search request', search);
-  });
+  debouncedSendSearchRequest(e.target.value);
 });
 
 chrome.runtime.onMessageExternal.addListener(message => {
@@ -16,14 +14,34 @@ chrome.runtime.onMessageExternal.addListener(message => {
 
   if (message.type !== 'SHOW_RESULT') return;
 
-  resultsNode.innerHTML = buildResultsMarkup(message.data);
+  showResult(message.data);
+});
+
+function sendSearchRequest(searchString) {
+  if (!searchString) {
+    showResult([]);
+    return;
+  }
+
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    const search = searchString.toLocaleLowerCase();
+    chrome.tabs.sendMessage(tabs[0].id, { type: 'SEARCH', data: search });
+    console.log('popup sent search request', search);
+    showLoader();
+  });
+}
+
+function showResult(result) {
+  resultsNode.innerHTML = buildResultsMarkup(result);
 
   [...document.querySelectorAll('#results button')].forEach(item => {
     item.addEventListener('click', e => {
       focus(e.target.dataset.id);
     });
   })
-});
+
+  hideLoader();
+}
 
 function focus(id) {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
@@ -38,4 +56,20 @@ function buildResultsMarkup(items = []) {
   return items.map(i => {
     return `<li><button type="button" data-id="${i.id}">${i.name}</button></li>`
   }).join('');
+}
+
+function debounce(fn, ms) {
+  let timeoutId = null;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(fn, ms, ...rest);
+  };
+}
+
+function showLoader() {
+  resultsNode.classList.add('loading');
+}
+
+function hideLoader() {
+  resultsNode.classList.remove('loading');
 }

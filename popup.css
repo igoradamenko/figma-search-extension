@@ -6,7 +6,6 @@ html,body {
 body {
   width: 280px;
   height: 400px;
-  padding: 0;
   overflow: hidden;
   font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
   color: #333;
@@ -42,7 +41,8 @@ ul {
   padding: 0;
   margin: 0;
   overflow: auto;
-  max-height: 350px;
+  height: 100%;
+  max-height: 100%;
 }
 
 button {
@@ -69,4 +69,41 @@ button {
 
 button:hover {
   background: #f0f0f0;
+}
+
+.loading {
+  position: relative;
+}
+
+.loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0,.1);
+}
+
+.loading::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
+  border: 6px solid transparent;
+  border-right-color: #fff;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .5s infinite linear;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
 }
