@@ -4,7 +4,8 @@
   "description": "Search though Figma objects even in “View only” mode",
   "private": true,
   "scripts": {
-    "build": "tasks/build.sh"
+    "build": "tasks/build.sh",
+    "generate-icon-styles": "tasks/generate-icon-styles.js"
   },
   "devDependencies": {
     "@types/chrome": "0.0.133",
