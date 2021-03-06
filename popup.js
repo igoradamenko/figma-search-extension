@@ -34,7 +34,7 @@ function sendSearchRequest(searchString) {
 function showResult(result) {
   resultsNode.innerHTML = buildResultsMarkup(result);
 
-  [...document.querySelectorAll('#results button')].forEach(item => {
+  [...document.querySelectorAll('.list__item')].forEach(item => {
     item.addEventListener('click', e => {
       focus(e.target.dataset.id);
     });
@@ -54,7 +54,7 @@ function buildResultsMarkup(items = []) {
   if (!items.length) return '';
 
   return items.map(i => {
-    return `<li><button type="button" data-id="${i.id}">${i.name}</button></li>`
+    return `<li><button class="list__item" type="button" data-id="${i.id}">${i.name}</button></li>`
   }).join('');
 }
 
@@ -67,9 +67,9 @@ function debounce(fn, ms) {
 }
 
 function showLoader() {
-  resultsNode.classList.add('loading');
+  resultsNode.classList.add('list_loading');
 }
 
 function hideLoader() {
-  resultsNode.classList.remove('loading');
+  resultsNode.classList.remove('list_loading');
 }
