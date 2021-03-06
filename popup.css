@@ -102,7 +102,7 @@ button {
 .list__item {
   display: block;
   width: 100%;
-  padding: 8px 16px;
+  padding: 8px 16px 8px 34px;
   text-align: left;
   font-size: 14px;
   line-height: 20px;
@@ -110,4 +110,15 @@ button {
 
 .list__item:hover {
   background: #f0f0f0;
+}
+
+.list__item::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: -18px;
+  margin-right: 2px;
+  vertical-align: -2px;
+  background: #000;
 }

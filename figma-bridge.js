@@ -17,7 +17,7 @@
   function processSearch(substr, extId) {
     const result = figma.root
       .findAll(item => item.name.toLocaleLowerCase().includes(substr))
-      .map(({ id, name }) => ({ id, name }));
+      .map(({ id, name, type }) => ({ id, name, type: type.toLocaleLowerCase().replace(/_/g, '-') }));
 
     chrome.runtime.sendMessage(extId, { type: 'SHOW_RESULT', data: result });
   }

@@ -54,7 +54,7 @@ function buildResultsMarkup(items = []) {
   if (!items.length) return '';
 
   return items.map(i => {
-    return `<li><button class="list__item" type="button" data-id="${i.id}">${i.name}</button></li>`
+    return `<li><button class="list__item list__type_type_${i.type}" type="button" data-id="${i.id}">${i.name}</button></li>`
   }).join('');
 }
 
