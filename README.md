@@ -22,3 +22,6 @@ But you can download the repo and install the extension as ”unpacked”:
 - Check Chrome & Firefox support
 - Add keyboard navigation
 - Check if all the pages are loaded. If not search for them through figma.root.children[i], open each and wait for loading. Then search.
+- Add separate icon for arrow?
+- Fix polygon icon
+- Optimize component & component set icons (duplicates)
