@@ -21,3 +21,5 @@ But you can download the repo and install the extension as ”unpacked”:
 - Add more styles for items
 - Improve icon
 - Check Chrome & Firefox support
+- Add keyboard navigation
+- Check if all the pages are loaded. If not search for them through figma.root.children[i], open each and wait for loading. Then search.

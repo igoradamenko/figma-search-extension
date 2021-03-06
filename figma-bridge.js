@@ -23,7 +23,7 @@
   }
 
   function processFocus(nodeId) {
-    const item = figma.root.findOne(item => item.id === nodeId)[0];
+    const item = figma.root.findOne(item => item.id === nodeId);
     let page = item;
 
     while (page.type !== 'PAGE') {
