@@ -66,10 +66,13 @@ function debounce(fn, ms) {
   };
 }
 
+let loaderTimeout = null;
 function showLoader() {
-  resultsNode.classList.add('list_loading');
+  clearTimeout(loaderTimeout);
+  loaderTimeout = setTimeout(() => resultsNode.classList.add('list_loading'), 50);
 }
 
 function hideLoader() {
+  clearTimeout(loaderTimeout);
   resultsNode.classList.remove('list_loading');
 }
