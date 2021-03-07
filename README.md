@@ -15,7 +15,6 @@ But you can download the repo and install the extension as ”unpacked”:
 
 ## TODO
 
-- Fix shortcut
 - Omnibox: https://developer.chrome.com/docs/extensions/mv3/user_interface/#omnibox?
 - Add more styles for items
 - Improve icon
