@@ -1,8 +1,11 @@
 const requestNode = document.getElementById('request');
 const resultsNode = document.getElementById('results');
 const listNode = document.getElementById('list');
+const deepSearchNode = document.getElementById('deep-search');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
+
+let DID_DEEP_SEARCH = false;
 
 requestNode.addEventListener('input', e => {
   console.log('input changed', e.target.value);
@@ -10,12 +13,27 @@ requestNode.addEventListener('input', e => {
   debouncedSendSearchRequest(e.target.value);
 });
 
+deepSearchNode.addEventListener('click', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, { type: 'LOAD_PAGES' });
+    console.log('popup sent load pages request');
+    showLoader();
+    DID_DEEP_SEARCH = true;
+  });
+});
+
 chrome.runtime.onMessageExternal.addListener(message => {
   console.log('popup got ext message', message);
 
-  if (message.type !== 'SHOW_RESULT') return;
+  switch (message.type) {
+    case 'SHOW_RESULT':
+      showResult(message.data);
+      return;
 
-  showResult(message.data);
+    case 'RETRY_SEARCH':
+      sendSearchRequest(requestNode.value);
+      return;
+  }
 });
 
 function sendSearchRequest(searchString) {
@@ -32,8 +50,14 @@ function sendSearchRequest(searchString) {
   });
 }
 
-function showResult(result) {
-  const resultsMarkup = buildResultsMarkup(result);
+function showResult(data) {
+  const resultsMarkup = buildResultsMarkup(data.searchResult);
+
+  if (data.notLoadedPagesNumber && !DID_DEEP_SEARCH) {
+    showDeepSearch();
+  } else {
+    hideDeepSearch();
+  }
 
   if (!resultsMarkup) {
     listNode.innerHTML = '';
@@ -94,4 +118,12 @@ function showEmptyNotice() {
 
 function hideEmptyNotice() {
   resultsNode.classList.remove('results_empty');
+}
+
+function showDeepSearch() {
+  resultsNode.classList.add('results_deep-search-available');
+}
+
+function hideDeepSearch() {
+  resultsNode.classList.remove('results_deep-search-available');
 }

@@ -12,6 +12,9 @@
     case 'FOCUS':
       processFocus(data);
       return;
+    case 'LOAD_PAGES':
+      processPagesLoad(extId);
+      return;
   }
 
   function processSearch(substr, extId) {
@@ -22,7 +25,7 @@
       'page',
     ];
 
-    const result = figma.root
+    const searchResult = figma.root
       .findAll(item => item.name.toLocaleLowerCase().includes(substr))
       .map(({ id, name, type }) => {
         return {
@@ -37,6 +40,7 @@
 
         if (nameDiff) return nameDiff;
 
+        // TODO: maybe to show pages always on top?
         const aTypeOrder = REVERSED_TYPES_ORDER.indexOf(a.type);
         const bTypeOrder = REVERSED_TYPES_ORDER.indexOf(b.type);
 
@@ -45,7 +49,9 @@
         return bTypeOrder - aTypeOrder;
       });
 
-    chrome.runtime.sendMessage(extId, { type: 'SHOW_RESULT', data: result });
+    const notLoadedPagesNumber = figma.root.children.filter(x => x.children.length === 0).length;
+
+    chrome.runtime.sendMessage(extId, { type: 'SHOW_RESULT', data: { searchResult, notLoadedPagesNumber } });
   }
 
   function processFocus(nodeId) {
@@ -59,5 +65,59 @@
     figma.currentPage = page;
     figma.viewport.scrollAndZoomIntoView([item]);
     figma.currentPage.selection = [item];
+  }
+
+  function processPagesLoad(extId) {
+    const currentPage = figma.currentPage;
+    const currentSelection = figma.currentPage.selection;
+
+    const pagesToLoad = figma.root.children.filter(x => x.children.length === 0);
+    let loadedPagesNumber = 0;
+
+    figma.on('currentpagechange', pageLoadHandler);
+
+    loadNextPage();
+
+    function pageLoadHandler() {
+      console.log('page changed', figma.root.findAll().length);
+
+      // TODO: send process notifications?
+      loadedPagesNumber += 1;
+
+      // all pages are loaded
+      if (loadedPagesNumber === pagesToLoad.length) {
+        figma.currentPage = currentPage;
+        figma.currentPage.selection = currentSelection;
+        return;
+      }
+
+      // currentPage changed to the original one
+      if (loadedPagesNumber === pagesToLoad.length + 1) {
+        figma.off('currentpagechange', pageLoadHandler);
+        chrome.runtime.sendMessage(extId, { type: 'RETRY_SEARCH' });
+        return;
+      }
+
+      waitAndLoadNextPage();
+    }
+
+    function loadNextPage() {
+      figma.currentPage = pagesToLoad[loadedPagesNumber];
+    }
+
+    const MAX_WAITING_MS = 2000;
+    function waitAndLoadNextPage(alreadyWaitedMS = 0) {
+      if (alreadyWaitedMS === MAX_WAITING_MS) {
+        loadNextPage();
+        return;
+      }
+
+      if (figma.currentPage.findAll().length) {
+        loadNextPage();
+        return;
+      }
+
+      setTimeout(waitAndLoadNextPage.bind(null, alreadyWaitedMS + 100), 100);
+    }
   }
 })();

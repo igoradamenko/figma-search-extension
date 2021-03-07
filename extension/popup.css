@@ -104,6 +104,14 @@ button {
   padding: 8px 16px;
 }
 
+.results__deep-search-button {
+  display: none;
+}
+
+.results_deep-search-available .results__deep-search-button {
+  display: inline-block;
+}
+
 .results_empty:not(.results_loading) .results__empty-notice {
   display: block;
 }
