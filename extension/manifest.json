@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Figma Search",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Search through Figma objects even in “View only” mode",
   "action": {
     "default_popup": "popup.html",

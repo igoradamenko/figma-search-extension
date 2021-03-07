@@ -21,3 +21,4 @@ But you can download the repo and install the extension as ”unpacked”:
 - Fix polygon icon and others
 - Optimize component & component set icons (duplicates)
 - Remember last search?
+- Hide console.logs behind `debug` option
