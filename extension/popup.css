@@ -106,6 +106,15 @@ button {
 
 .results__deep-search-button {
   display: none;
+  background: #18a0fb;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #fff;
+  margin: 0 16px;
+}
+
+.results__deep-search-button:hover {
+  background: #44b3fc;
 }
 
 .results_deep-search-available .results__deep-search-button {
