@@ -117,7 +117,7 @@ button {
 .list__item {
   display: block;
   width: 100%;
-  padding: 8px 16px 8px 32px;
+  padding: 8px 16px 8px 36px;
   text-align: left;
   font-size: 14px;
   line-height: 20px;
@@ -132,7 +132,7 @@ button {
   display: inline-block;
   width: 16px;
   height: 16px;
-  margin-left: -16px;
+  margin-left: -20px;
   margin-right: 4px;
   vertical-align: -3px;
   background: transparent center no-repeat;
