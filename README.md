@@ -16,9 +16,9 @@ But you can download the repo and install the extension as ”unpacked”:
 ## TODO
 
 - Improve icon
-- Check Chrome & Firefox support
 - Add separate icon for arrow?
 - Fix polygon icon and others
 - Optimize component & component set icons (duplicates)
 - Remember last search?
 - Hide console.logs behind `debug` option
+- `ё` → `е` replacement? Special symbols ignoring?

@@ -23,8 +23,8 @@ deepSearchNode.addEventListener('click', () => {
   });
 });
 
-chrome.runtime.onMessageExternal.addListener(message => {
-  console.log('popup got ext message', message);
+chrome.runtime.onMessage.addListener(message => {
+  console.log('popup got message', message);
 
   switch (message.type) {
     case 'SHOW_RESULT':

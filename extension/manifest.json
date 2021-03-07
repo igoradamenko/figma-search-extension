@@ -1,9 +1,9 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Figma Search",
   "version": "0.3.0",
   "description": "Search through Figma objects even in “View only” mode",
-  "action": {
+  "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "icon.png"
   },
@@ -26,10 +26,7 @@
     }
   ],
   "web_accessible_resources": [
-    {
-      "resources": ["figma-bridge.js"],
-      "matches": ["*://*.figma.com/*"]
-    }
+    "figma-bridge.js"
   ],
   "externally_connectable": {
     "matches": ["*://*.figma.com/*"]

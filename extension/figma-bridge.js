@@ -1,23 +1,22 @@
 (() => {
   const scriptNode = document.getElementById('figma-search-extension-request');
 
-  const extId = scriptNode.dataset.extId;
   const type = scriptNode.dataset.type;
   const data = scriptNode.dataset.data;
 
   switch (type) {
     case 'SEARCH':
-      processSearch(data, extId);
+      processSearch(data);
       return;
     case 'FOCUS':
       processFocus(data);
       return;
     case 'LOAD_PAGES':
-      processPagesLoad(extId);
+      processPagesLoad();
       return;
   }
 
-  function processSearch(substr, extId) {
+  function processSearch(substr) {
     const REVERSED_TYPES_ORDER = [
       'component-set',
       'component',
@@ -51,7 +50,7 @@
 
     const notLoadedPagesNumber = figma.root.children.filter(x => x.children.length === 0).length;
 
-    chrome.runtime.sendMessage(extId, { type: 'SHOW_RESULT', data: { searchResult, notLoadedPagesNumber } });
+    sendMessage({ type: 'SHOW_RESULT', data: { searchResult, notLoadedPagesNumber } });
   }
 
   function processFocus(nodeId) {
@@ -64,10 +63,10 @@
 
     figma.currentPage = page;
     figma.viewport.scrollAndZoomIntoView([item]);
-    figma.currentPage.selection = [item];
+    figma.currentPage.selection = [item]; // TODO: cannot select a page node
   }
 
-  function processPagesLoad(extId) {
+  function processPagesLoad() {
     const currentPage = figma.currentPage;
     const currentSelection = figma.currentPage.selection;
 
@@ -94,7 +93,7 @@
       // currentPage changed to the original one
       if (loadedPagesNumber === pagesToLoad.length + 1) {
         figma.off('currentpagechange', pageLoadHandler);
-        chrome.runtime.sendMessage(extId, { type: 'RETRY_SEARCH' });
+        sendMessage({ type: 'RETRY_SEARCH' });
         return;
       }
 
@@ -119,5 +118,12 @@
 
       setTimeout(waitAndLoadNextPage.bind(null, alreadyWaitedMS + 100), 100);
     }
+  }
+
+  function sendMessage(message) {
+    const event = new CustomEvent('figma-search-extension-event', {
+      detail: message
+    });
+    scriptNode.dispatchEvent(event);
   }
 })();

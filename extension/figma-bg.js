@@ -25,9 +25,14 @@ function runBridge(message) {
   script = document.createElement('script');
   script.src = chrome.runtime.getURL('figma-bridge.js');
   script.id = SCRIPT_ID;
-  script.dataset.extId = chrome.runtime.id;
   script.dataset.type = message.type;
   script.dataset.data = message.data;
+
+  script.addEventListener('figma-search-extension-event', e => {
+    if (!e?.detail?.type) return;
+
+    chrome.runtime.sendMessage(e.detail);
+  });
 
   document.body.appendChild(script);
 }
