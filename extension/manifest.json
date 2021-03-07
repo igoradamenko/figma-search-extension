@@ -29,7 +29,7 @@
   "web_accessible_resources": [
     {
       "resources": ["figma-bridge.js"],
-      "matches": []
+      "matches": ["*://*.figma.com/*"]
     }
   ],
   "externally_connectable": {
