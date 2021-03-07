@@ -1,5 +1,6 @@
 const requestNode = document.getElementById('request');
 const resultsNode = document.getElementById('results');
+const listNode = document.getElementById('list');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
@@ -32,14 +33,24 @@ function sendSearchRequest(searchString) {
 }
 
 function showResult(result) {
-  resultsNode.innerHTML = buildResultsMarkup(result);
+  const resultsMarkup = buildResultsMarkup(result);
+
+  if (!resultsMarkup) {
+    listNode.innerHTML = '';
+    showEmptyNotice();
+    hideLoader();
+    return;
+  }
+
+  listNode.innerHTML = resultsMarkup;
 
   [...document.querySelectorAll('.list__item')].forEach(item => {
     item.addEventListener('click', e => {
       focus(e.target.dataset.id);
     });
-  })
+  });
 
+  hideEmptyNotice();
   hideLoader();
 }
 
@@ -69,10 +80,18 @@ function debounce(fn, ms) {
 let loaderTimeout = null;
 function showLoader() {
   clearTimeout(loaderTimeout);
-  loaderTimeout = setTimeout(() => resultsNode.classList.add('list_loading'), 50);
+  loaderTimeout = setTimeout(() => resultsNode.classList.add('results_loading'), 50);
 }
 
 function hideLoader() {
   clearTimeout(loaderTimeout);
-  resultsNode.classList.remove('list_loading');
+  resultsNode.classList.remove('results_loading');
+}
+
+function showEmptyNotice() {
+  resultsNode.classList.add('results_empty');
+}
+
+function hideEmptyNotice() {
+  resultsNode.classList.remove('results_empty');
 }
