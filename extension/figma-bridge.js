@@ -15,9 +15,35 @@
   }
 
   function processSearch(substr, extId) {
+    const REVERSED_TYPES_ORDER = [
+      'component-set',
+      'component',
+      'frame',
+      'page',
+    ];
+
     const result = figma.root
       .findAll(item => item.name.toLocaleLowerCase().includes(substr))
-      .map(({ id, name, type }) => ({ id, name, type: type.toLocaleLowerCase().replace(/_/g, '-') }));
+      .map(({ id, name, type }) => {
+        return {
+          id,
+          name,
+          loweredName: name.toLocaleLowerCase(),
+          type: type.toLocaleLowerCase().replace(/_/g, '-'),
+        }
+      })
+      .sort((a, b) => {
+        const nameDiff = a.loweredName.indexOf(substr) - b.loweredName.indexOf(substr);
+
+        if (nameDiff) return nameDiff;
+
+        const aTypeOrder = REVERSED_TYPES_ORDER.indexOf(a.type);
+        const bTypeOrder = REVERSED_TYPES_ORDER.indexOf(b.type);
+
+        // type order is reversed to cover -1 case,
+        // so we calc B - A, but it's still ASC, not DESC
+        return bTypeOrder - aTypeOrder;
+      });
 
     chrome.runtime.sendMessage(extId, { type: 'SHOW_RESULT', data: result });
   }
