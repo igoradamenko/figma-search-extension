@@ -40,8 +40,10 @@ chrome.runtime.onMessage.addListener(message => {
 let listItems = [];
 let selectedListItemIndex;
 rootNode.addEventListener('keydown', e => {
-  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-  if (listItems.length === 0) return;
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' || listItems.length === 0) {
+    requestNode.focus();
+    return;
+  }
 
   requestNode.blur();
 
