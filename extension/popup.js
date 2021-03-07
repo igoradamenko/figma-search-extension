@@ -59,13 +59,19 @@ rootNode.addEventListener('keydown', e => {
   e.preventDefault();
 });
 
+listNode.addEventListener('click', e => {
+  const item = e.target.closest('.list__item');
+  if (!item) return;
+
+  focus(item.dataset.id);
+});
+
 function handleArrowDown() {
   selectedListItemIndex ??= -1;
   selectedListItemIndex = (selectedListItemIndex + 1) % listItems.length;
   const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
   item.focus();
 }
-
 
 function handleArrowUp() {
   selectedListItemIndex ??= 0;
@@ -108,12 +114,6 @@ function showResult(data) {
 
   listItems = [...document.querySelectorAll('.list__item')];
   selectedListItemIndex = undefined;
-
-  listItems.forEach(item => {
-    item.addEventListener('click', e => {
-      focus(e.target.dataset.id);
-    });
-  });
 
   hideEmptyNotice();
   hideLoader();
