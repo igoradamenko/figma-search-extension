@@ -15,11 +15,8 @@ But you can download the repo and install the extension as ”unpacked”:
 
 ## TODO
 
-- Omnibox: https://developer.chrome.com/docs/extensions/mv3/user_interface/#omnibox?
-- Add more styles for items
 - Improve icon
 - Check Chrome & Firefox support
-- Add keyboard navigation
 - Add separate icon for arrow?
 - Fix polygon icon and others
 - Optimize component & component set icons (duplicates)

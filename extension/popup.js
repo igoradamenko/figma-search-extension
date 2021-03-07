@@ -1,3 +1,4 @@
+const rootNode = document.getElementById('root');
 const requestNode = document.getElementById('request');
 const resultsNode = document.getElementById('results');
 const listNode = document.getElementById('list');
@@ -36,6 +37,43 @@ chrome.runtime.onMessageExternal.addListener(message => {
   }
 });
 
+let listItems = [];
+let selectedListItemIndex;
+rootNode.addEventListener('keydown', e => {
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+  if (listItems.length === 0) return;
+
+  requestNode.blur();
+
+  switch (e.key) {
+    case 'ArrowDown':
+      handleArrowDown();
+      break;
+
+    case 'ArrowUp':
+      handleArrowUp();
+      break;
+  }
+
+  // do not scroll the scrolling area
+  e.preventDefault();
+});
+
+function handleArrowDown() {
+  selectedListItemIndex ??= -1;
+  selectedListItemIndex = (selectedListItemIndex + 1) % listItems.length;
+  const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
+  item.focus();
+}
+
+
+function handleArrowUp() {
+  selectedListItemIndex ??= 0;
+  selectedListItemIndex = (selectedListItemIndex - 1 + listItems.length) % listItems.length;
+  const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
+  item.focus();
+}
+
 function sendSearchRequest(searchString) {
   if (!searchString) {
     showResult([]);
@@ -68,7 +106,10 @@ function showResult(data) {
 
   listNode.innerHTML = resultsMarkup;
 
-  [...document.querySelectorAll('.list__item')].forEach(item => {
+  listItems = [...document.querySelectorAll('.list__item')];
+  selectedListItemIndex = undefined;
+
+  listItems.forEach(item => {
     item.addEventListener('click', e => {
       focus(e.target.dataset.id);
     });
