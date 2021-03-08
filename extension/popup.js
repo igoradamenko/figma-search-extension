@@ -8,6 +8,8 @@ const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
 let CACHE = {
   request: '',
+  searchResult: [],
+  notLoadedPagesNumber: 0,
 };
 let DID_DEEP_SEARCH = false;
 
@@ -37,6 +39,10 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
   switch (message.type) {
     case 'SHOW_RESULT':
+      updateCache({
+        searchResult: message.data.searchResult,
+        notLoadedPagesNumber: message.data.notLoadedPagesNumber,
+      });
       showResult(message.data);
       return;
 
@@ -203,4 +209,6 @@ function loadCache(cache) {
 
   requestNode.value = cache.request;
   requestNode.setSelectionRange(0, cache.request.length);
+
+  showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
 }
