@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 (08.03.2021)
+
+Added Firefox support.
+
+Added state caching. 
+
+Fixed shortcut registration.
+
+
 ## 0.3.0 (07.03.2021)
 
 Added icons for found items to make them more recognizable.
