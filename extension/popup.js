@@ -6,12 +6,21 @@ const deepSearchNode = document.getElementById('deep-search');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
+let CACHE = {
+  request: '',
+};
 let DID_DEEP_SEARCH = false;
 
-requestNode.addEventListener('input', e => {
-  console.log('input changed', e.target.value);
+chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+  chrome.tabs.sendMessage(tabs[0].id, { type: 'FETCH_CACHE' });
+});
 
-  debouncedSendSearchRequest(e.target.value);
+requestNode.addEventListener('input', e => {
+  const value = e.target.value;
+  console.log('input changed', value);
+  updateCache({ request: value });
+
+  debouncedSendSearchRequest(value);
 });
 
 deepSearchNode.addEventListener('click', () => {
@@ -23,8 +32,8 @@ deepSearchNode.addEventListener('click', () => {
   });
 });
 
-chrome.runtime.onMessage.addListener(message => {
-  console.log('popup got message', message);
+chrome.runtime.onMessage.addListener((message, sender) => {
+  console.log('popup got message', message, sender);
 
   switch (message.type) {
     case 'SHOW_RESULT':
@@ -33,6 +42,10 @@ chrome.runtime.onMessage.addListener(message => {
 
     case 'RETRY_SEARCH':
       sendSearchRequest(requestNode.value);
+      return;
+
+    case 'LOAD_CACHE':
+      loadCache(message.data);
       return;
   }
 });
@@ -90,7 +103,7 @@ function sendSearchRequest(searchString) {
 
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     const search = searchString.toLocaleLowerCase();
-    chrome.tabs.sendMessage(tabs[0].id, { type: 'SEARCH', data: search });
+    chrome.tabs.sendMessage(tabs[0].id, { type: 'SEARCH', data: search }); // TODO: make all datas objects?
     console.log('popup sent search request', search);
     showLoader();
   });
@@ -169,4 +182,25 @@ function showDeepSearch() {
 
 function hideDeepSearch() {
   resultsNode.classList.remove('results_deep-search-available');
+}
+
+function updateCache(obj) {
+  CACHE = {
+    ...CACHE,
+    ...obj,
+  };
+
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      type: 'SAVE_CACHE',
+      data: CACHE,
+    });
+  });
+}
+
+function loadCache(cache) {
+  if (!cache) return;
+
+  requestNode.value = cache.request;
+  requestNode.setSelectionRange(0, cache.request.length);
 }

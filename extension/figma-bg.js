@@ -1,5 +1,7 @@
 console.log('bg here');
 
+let CACHE;
+
 chrome.runtime.onMessage.addListener((message, sender) => {
   if (sender.tab) {
     console.log('bg got message, but not from the popup');
@@ -7,6 +9,20 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   }
 
   console.log('bg got message from the popup', message);
+
+  if (message.type === 'FETCH_CACHE') {
+    chrome.runtime.sendMessage({
+      type: 'LOAD_CACHE',
+      data: CACHE,
+    });
+
+    return;
+  }
+
+  if (message.type === 'SAVE_CACHE') {
+    CACHE = message.data;
+    return;
+  }
 
   runBridge(message);
 
