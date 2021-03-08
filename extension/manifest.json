@@ -11,11 +11,11 @@
     "256": "icon.png"
   },
   "commands": {
-    "_execute_action": {
+    "_execute_browser_action": {
       "suggested_key": {
         "default": "Alt+Shift+F"
       },
-      "description": "Opens the extension"
+      "description": "Open the extension"
     }
   },
   "content_scripts": [
