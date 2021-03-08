@@ -67,7 +67,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 let listItems = [];
 let selectedListItemIndex;
 rootNode.addEventListener('keydown', e => {
-  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' || listItems.length === 0) {
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' || listItems.length === 0) {
     requestNode.focus();
     return;
   }
@@ -75,7 +75,12 @@ rootNode.addEventListener('keydown', e => {
   requestNode.blur();
 
   switch (e.key) {
-    case 'ArrowDown':
+    case 'Enter':
+      // handled by this fn just to prevent handling on input
+      // we don't need to preventDefault, so just return
+      return;
+
+      case 'ArrowDown':
       handleArrowDown();
       break;
 
@@ -238,5 +243,7 @@ function loadCache(cache) {
 
   // TODO: showResult updates it, so we update it again
   //  have to split caching and rendering (and restoring for sure)
+  // TODO: probably does not work correctly; fails to load cache after several
+  //  clicks on the icon
   updateCache(cache);
 }
