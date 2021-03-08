@@ -6,12 +6,15 @@ const deepSearchNode = document.getElementById('deep-search');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
+let DID_DEEP_SEARCH = false;
 let CACHE = {
   request: '',
   searchResult: [],
   notLoadedPagesNumber: 0,
+  didDeepSearch: false,
+  selectedListItemIndex: undefined,
+  resultsScrollTop: 0,
 };
-let DID_DEEP_SEARCH = false;
 
 chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
   chrome.tabs.sendMessage(tabs[0].id, { type: 'FETCH_CACHE' });
@@ -25,12 +28,17 @@ requestNode.addEventListener('input', e => {
   debouncedSendSearchRequest(value);
 });
 
+resultsNode.addEventListener('scroll', () => {
+  updateCache({ resultsScrollTop: resultsNode.scrollTop });
+});
+
 deepSearchNode.addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     chrome.tabs.sendMessage(tabs[0].id, { type: 'LOAD_PAGES' });
     console.log('popup sent load pages request');
     showLoader();
     DID_DEEP_SEARCH = true;
+    updateCache({ didDeepSearch: DID_DEEP_SEARCH });
   });
 });
 
@@ -92,6 +100,7 @@ function handleArrowDown() {
   selectedListItemIndex = (selectedListItemIndex + 1) % listItems.length;
   const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
   item.focus();
+  updateCache({ selectedListItemIndex });
 }
 
 function handleArrowUp() {
@@ -99,6 +108,7 @@ function handleArrowUp() {
   selectedListItemIndex = (selectedListItemIndex - 1 + listItems.length) % listItems.length;
   const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
   item.focus();
+  updateCache({ selectedListItemIndex });
 }
 
 function sendSearchRequest(searchString) {
@@ -135,6 +145,7 @@ function showResult(data) {
 
   listItems = [...document.querySelectorAll('.list__item')];
   selectedListItemIndex = undefined;
+  updateCache({ selectedListItemIndex, resultsScrollTop: 0 });
 
   hideEmptyNotice();
   hideLoader();
@@ -208,7 +219,24 @@ function loadCache(cache) {
   if (!cache) return;
 
   requestNode.value = cache.request;
-  requestNode.setSelectionRange(0, cache.request.length);
+
+  // TODO: think about it
+  //  now it conflicts with item.focus(), probably we have to choose between them
+  // requestNode.setSelectionRange(0, cache.request.length);
+
+  DID_DEEP_SEARCH = cache.didDeepSearch;
 
   showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
+
+  selectedListItemIndex = cache.selectedListItemIndex;
+
+  const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
+  item.focus();
+
+  resultsNode.scrollTop = cache.resultsScrollTop;
+
+
+  // TODO: showResult updates it, so we update it again
+  //  have to split caching and rendering (and restoring for sure)
+  updateCache(cache);
 }
