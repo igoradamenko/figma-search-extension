@@ -27,8 +27,5 @@
   ],
   "web_accessible_resources": [
     "figma-bridge.js"
-  ],
-  "externally_connectable": {
-    "matches": ["*://*.figma.com/*"]
-  }
+  ]
 }
