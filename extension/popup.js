@@ -37,7 +37,6 @@ deepSearchNode.addEventListener('click', () => {
     chrome.tabs.sendMessage(tabs[0].id, { type: 'LOAD_PAGES' });
     console.log('popup sent load pages request');
     showLoader();
-    DID_DEEP_SEARCH = true;
     updateCache({ didDeepSearch: DID_DEEP_SEARCH });
   });
 });
@@ -55,6 +54,9 @@ chrome.runtime.onMessage.addListener((message, sender) => {
       return;
 
     case 'RETRY_SEARCH':
+      // TODO: probably not the best place to make it,
+      //  because RETRY_SEARCH knows nothing about deep search
+      DID_DEEP_SEARCH = true;
       sendSearchRequest(requestNode.value);
       return;
 
