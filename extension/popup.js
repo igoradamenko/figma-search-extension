@@ -225,21 +225,16 @@ function loadCache(cache) {
 
   requestNode.value = cache.request;
 
-  // TODO: think about it
-  //  now it conflicts with item.focus(), probably we have to choose between them
-  // requestNode.setSelectionRange(0, cache.request.length);
+  requestNode.setSelectionRange(0, cache.request.length);
 
   DID_DEEP_SEARCH = cache.didDeepSearch;
 
   showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
 
+  // TODO: add focused state to the selected item
   selectedListItemIndex = cache.selectedListItemIndex;
 
-  const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
-  item.focus();
-
   resultsNode.scrollTop = cache.resultsScrollTop;
-
 
   // TODO: showResult updates it, so we update it again
   //  have to split caching and rendering (and restoring for sure)
