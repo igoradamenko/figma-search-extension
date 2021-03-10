@@ -35,17 +35,23 @@
         }
       })
       .sort((a, b) => {
-        const nameDiff = a.loweredName.indexOf(substr) - b.loweredName.indexOf(substr);
-
-        if (nameDiff) return nameDiff;
-
-        // TODO: maybe to show pages always on top?
         const aTypeOrder = REVERSED_TYPES_ORDER.indexOf(a.type);
         const bTypeOrder = REVERSED_TYPES_ORDER.indexOf(b.type);
 
-        // type order is reversed to cover -1 case,
-        // so we calc B - A, but it's still ASC, not DESC
-        return bTypeOrder - aTypeOrder;
+        if (aTypeOrder !== bTypeOrder) {
+          // type order is reversed to cover -1 case,
+          // so we calc B - A, but it's still ASC, not DESC
+          return bTypeOrder - aTypeOrder;
+        }
+
+        const aIndex = a.loweredName.indexOf(substr);
+        const bIndex = b.loweredName.indexOf(substr);
+
+        if (aIndex !== bIndex) {
+          return aIndex - bIndex;
+        }
+
+        return a.name.localeCompare(b.name);
       });
 
     const notLoadedPagesNumber = figma.root.children.filter(x => x.children.length === 0).length;
