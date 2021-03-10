@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0 (10.03.2021)
+
+Search results sorting was improved. Not it's easier to find more valuable items: pages, frames, components, etc.
+
+Input value will be selected when user reopens the popup.
+
+Fixed deep search for rare case when it's activated on a first page, which is empty.
+
+
 ## 0.4.0 (08.03.2021)
 
 Added Firefox support.
