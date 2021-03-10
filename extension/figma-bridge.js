@@ -79,7 +79,16 @@
     const pagesToLoad = figma.root.children.filter(x => x.children.length === 0);
     let loadedPagesNumber = 0;
 
+    console.log('n of pages to load', pagesToLoad.length);
+
     figma.on('currentpagechange', pageLoadHandler);
+
+    if (pagesToLoad[0] === currentPage) {
+      // it means that current page is the first one to search,
+      // but it's already loaded and empty; so we skip it,
+      // because otherwise going to it won't trigger 'currentpagechange' event
+      loadedPagesNumber += 1;
+    }
 
     loadNextPage();
 
@@ -107,6 +116,7 @@
     }
 
     function loadNextPage() {
+      console.log('loading next page:', loadedPagesNumber)
       figma.currentPage = pagesToLoad[loadedPagesNumber];
     }
 
