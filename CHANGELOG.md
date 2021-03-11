@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 (11.03.2021)
+
+Fixed deep search marking as done. Now the button disappears only when repeated search request has been sent.
+
+Made the extension work with Firefox Nightly & Developer Edition on a regular basic. 
+Previously it was possible to use it as a temporary add-on only.
+
+
 ## 0.5.0 (10.03.2021)
 
 Search results sorting was improved. Not it's easier to find more valuable items: pages, frames, components, etc.
