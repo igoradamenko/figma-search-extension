@@ -63,7 +63,7 @@
     const item = figma.root.findOne(item => item.id === itemId);
 
     if (!item) {
-      console.error('Could not find item with ID', itemId);
+      log('Could not find item with ID', itemId);
       return;
     }
 
@@ -88,7 +88,7 @@
     const pagesToLoad = figma.root.children.filter(x => x.children.length === 0);
     let loadedPagesNumber = 0;
 
-    console.log('n of pages to load', pagesToLoad.length);
+    log(pagesToLoad.length, 'pages left to load');
 
     figma.on('currentpagechange', pageLoadHandler);
 
@@ -102,20 +102,18 @@
     loadNextPage();
 
     function pageLoadHandler() {
-      console.log('page changed', figma.root.findAll().length);
-
       // TODO: send process notifications?
       loadedPagesNumber += 1;
 
-      // all pages are loaded
       if (loadedPagesNumber === pagesToLoad.length) {
+        log('All pages loaded');
         figma.currentPage = currentPage;
         figma.currentPage.selection = currentSelection;
         return;
       }
 
-      // currentPage changed to the original one
       if (loadedPagesNumber === pagesToLoad.length + 1) {
+        log('Current page is the original one');
         figma.off('currentpagechange', pageLoadHandler);
         sendMessage({ type: 'RETRY_SEARCH' });
         return;
@@ -125,18 +123,21 @@
     }
 
     function loadNextPage() {
-      console.log('loading next page:', loadedPagesNumber)
+      log('Loading next page');
       figma.currentPage = pagesToLoad[loadedPagesNumber];
     }
 
     const MAX_WAITING_MS = 2000;
     function waitAndLoadNextPage(alreadyWaitedMS = 0) {
       if (alreadyWaitedMS === MAX_WAITING_MS) {
+        log('Waited for max allowed time, loading next page');
         loadNextPage();
         return;
       }
 
-      if (figma.currentPage.findAll().length) {
+      const currentPageItemsNumber = figma.currentPage.findAll().length;
+      if (currentPageItemsNumber) {
+        log(`Current page has ${currentPageItemsNumber} items, loading next page`);
         loadNextPage();
         return;
       }
@@ -150,5 +151,10 @@
       detail: message
     });
     scriptNode.dispatchEvent(event);
+    log(`Sent message ${message.type} to bg`);
+  }
+
+  function log(...rest) {
+    console.log('[FIGMA SEARCH: BRIDGE]', ...rest);
   }
 })();

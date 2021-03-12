@@ -1,14 +1,14 @@
-console.log('bg here');
+log('Inited');
 
 let CACHE;
 
 chrome.runtime.onMessage.addListener((message, sender) => {
   if (sender.tab) {
-    console.log('bg got message, but not from the popup');
+    log('Got message, but not from the popup');
     return;
   }
 
-  console.log('bg got message from the popup', message);
+  log(`Got message ${message.type} from the popup`);
 
   if (message.type === 'FETCH_CACHE') {
     chrome.runtime.sendMessage({
@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
   runBridge(message);
 
-  console.log('bg sent request to bridge');
+  log('Sent request to bridge');
 });
 
 function runBridge(message) {
@@ -46,7 +46,12 @@ function runBridge(message) {
 
   script.addEventListener('figma-search-extension-event', e => {
     chrome.runtime.sendMessage(e.detail);
+    log(`Resent message ${e.detail.type} from bridge to popup`);
   });
 
   document.body.appendChild(script);
+}
+
+function log(...rest) {
+  console.log('[FIGMA SEARCH: BG]', ...rest);
 }

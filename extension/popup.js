@@ -150,32 +150,8 @@ function handleArrowUp() {
   focusListItem(selectedListItemIndex);
 }
 
-function focusListItem(listItemId) {
-  pseudoBlurListItems();
 
-  const item = document.getElementsByClassName('list__item')[listItemId];
-  item.focus();
-  console.log(`Item #${listItemId} focused`);
-}
-
-function pseudoFocusListItem(listItemId) {
-  pseudoBlurListItems();
-
-  const item = document.getElementsByClassName('list__item')[listItemId];
-  item.classList.add('list__item_focused');
-  console.log(`Item #${listItemId} pseudo-focused`);
-}
-
-function pseudoBlurListItems() {
-  [...document.getElementsByClassName('list__item_focused')].forEach(i => i.classList.remove('list__item_focused'));
-  console.log('Pseudo-focused items blurred');
-}
-
-function resetContentState() {
-  contentNode.scrollTop = 0;
-  selectedListItemIndex = undefined;
-  updateCache({ selectedListItemIndex, contentScrollTop: 0 });
-}
+/* SEARCH */
 
 function sendSearchRequest(searchString) {
   if (!searchString) {
@@ -231,6 +207,35 @@ function buildResultsMarkup(items = []) {
 
 
 /* MARKUP STATES */
+
+function focusListItem(listItemId) {
+  pseudoBlurListItems();
+
+  const item = document.getElementsByClassName('list__item')[listItemId];
+  item.focus();
+  console.log(`Item #${listItemId} focused`);
+}
+
+function pseudoFocusListItem(listItemId) {
+  pseudoBlurListItems();
+
+  const item = document.getElementsByClassName('list__item')[listItemId];
+  item.classList.add('list__item_focused');
+  console.log(`Item #${listItemId} pseudo-focused`);
+}
+
+function pseudoBlurListItems() {
+  [...document.getElementsByClassName('list__item_focused')].forEach(i => i.classList.remove('list__item_focused'));
+  console.log('Pseudo-focused items blurred');
+}
+
+function resetContentState() {
+  contentNode.scrollTop = 0;
+  selectedListItemIndex = undefined;
+  updateCache({ selectedListItemIndex, contentScrollTop: 0 });
+
+  console.log('Content state reset');
+}
 
 let loaderTimeout = null;
 function showLoader() {
