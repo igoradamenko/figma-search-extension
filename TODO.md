@@ -1,0 +1,7 @@
+- Improve icon
+- Add separate icon for arrow?
+- Fix polygon icon and others
+- Optimize component & component set icons (duplicates)
+- Hide console.logs behind `debug` option
+- `ё` → `е` replacement? Special symbols ignoring?
+- Auto deep search?

@@ -1,7 +1,7 @@
 {
   "name": "figma-search-extension",
   "version": "0.6.0",
-  "description": "Search though Figma objects even in “View only” mode",
+  "description": "Search through Figma objects even in “View only” mode",
   "private": true,
   "scripts": {
     "build": "tasks/build.sh",
