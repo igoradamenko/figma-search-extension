@@ -10,16 +10,16 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
   log(`Got message ${message.type} from the popup`);
 
-  if (message.type === 'FETCH_CACHE') {
+  if (message.type === 'POPUP_OPEN') {
     chrome.runtime.sendMessage({
-      type: 'LOAD_CACHE',
+      type: 'CACHE_EXISTS',
       data: CACHE,
     });
 
     return;
   }
 
-  if (message.type === 'SAVE_CACHE') {
+  if (message.type === 'CACHE_UPDATED') {
     CACHE = message.data;
     return;
   }

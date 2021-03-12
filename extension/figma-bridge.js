@@ -5,13 +5,13 @@
   const data = JSON.parse(scriptNode.dataset.data);
 
   switch (type) {
-    case 'SEARCH':
+    case 'SEARCH_STARTED':
       processSearch(data);
       return;
-    case 'FOCUS':
+    case 'ITEM_FOCUSED':
       processFocus(data);
       return;
-    case 'LOAD_PAGES':
+    case 'DEEP_SEARCH_STARTED':
       processPagesLoad();
       return;
   }
@@ -56,7 +56,7 @@
 
     const notLoadedPagesNumber = figma.root.children.filter(x => x.children.length === 0).length;
 
-    sendMessage({ type: 'SHOW_RESULT', data: { searchResult, notLoadedPagesNumber } });
+    sendMessage({ type: 'SEARCH_COMPLETED', data: { searchResult, notLoadedPagesNumber } });
   }
 
   function processFocus({ itemId }) {
@@ -88,7 +88,7 @@
     const pagesToLoad = figma.root.children.filter(x => x.children.length === 0);
     let loadedPagesNumber = 0;
 
-    log(pagesToLoad.length, 'pages left to load');
+    log(pagesToLoad.length, 'pages to load');
 
     figma.on('currentpagechange', pageLoadHandler);
 
@@ -104,6 +104,7 @@
     function pageLoadHandler() {
       // TODO: send process notifications?
       loadedPagesNumber += 1;
+      log(loadedPagesNumber, 'pages loaded');
 
       if (loadedPagesNumber === pagesToLoad.length) {
         log('All pages loaded');
@@ -115,7 +116,7 @@
       if (loadedPagesNumber === pagesToLoad.length + 1) {
         log('Current page is the original one');
         figma.off('currentpagechange', pageLoadHandler);
-        sendMessage({ type: 'RETRY_SEARCH' });
+        sendMessage({ type: 'DEEP_SEARCH_COMPLETED' });
         return;
       }
 

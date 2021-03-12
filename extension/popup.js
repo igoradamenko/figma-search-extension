@@ -20,7 +20,7 @@ function run() {
   listNode.addEventListener('click', onListClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
-  sendMessage({ type: 'FETCH_CACHE' });
+  sendMessage({ type: 'POPUP_OPEN' });
 }
 
 
@@ -31,7 +31,7 @@ function onMessageGet(message) {
   console.log(`Popup got ${message.type}`);
 
   switch (message.type) {
-    case 'SHOW_RESULT':
+    case 'SEARCH_COMPLETED':
       updateCache({
         searchResult: message.data.searchResult,
         notLoadedPagesNumber: message.data.notLoadedPagesNumber,
@@ -40,15 +40,13 @@ function onMessageGet(message) {
       resetContentState();
       return;
 
-    case 'RETRY_SEARCH':
-      // TODO: probably not the best place to make it,
-      //  because RETRY_SEARCH knows nothing about deep search
+    case 'DEEP_SEARCH_COMPLETED':
       didDeepSearch = true;
       updateCache({ didDeepSearch });
       sendSearchRequest(inputNode.value);
       return;
 
-    case 'LOAD_CACHE':
+    case 'CACHE_EXISTS':
       loadCache(message.data);
       return;
   }
@@ -74,7 +72,7 @@ function onContentScroll(e) {
 
 function onDeepSearchButtonClick(e) {
   console.log('Deep search button clicked');
-  sendMessage({ type: 'LOAD_PAGES' });
+  sendMessage({ type: 'DEEP_SEARCH_STARTED' });
   showLoader();
 }
 
@@ -127,7 +125,7 @@ function onListClick(e) {
   updateCache({ selectedListItemIndex });
 
   sendMessage({
-    type: 'FOCUS',
+    type: 'ITEM_FOCUSED',
     data: {
       itemId: item.dataset.id,
     },
@@ -162,7 +160,7 @@ function sendSearchRequest(searchString) {
 
   searchString = searchString.toLocaleLowerCase();
   sendMessage({
-    type: 'SEARCH',
+    type: 'SEARCH_STARTED',
     data: { searchString },
   });
   showLoader();
@@ -283,7 +281,7 @@ function updateCache(obj) {
     ...obj,
   };
 
-  sendMessage({ type: 'SAVE_CACHE', data: cache });
+  sendMessage({ type: 'CACHE_UPDATED', data: cache });
 }
 
 function loadCache(loadedCache) {
