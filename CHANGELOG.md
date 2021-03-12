@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0 (12.03.2021)
+
+Now previously selected item is selected again when popup is reopen.
+
+Also fixed the bug when new search results didn't trigger scroll position reset.
+
+
 ## 0.6.0 (11.03.2021)
 
 Fixed deep search marking as done. Now the button disappears only when repeated search request has been sent.
