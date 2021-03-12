@@ -9,7 +9,6 @@
   },
   "devDependencies": {
     "@types/chrome": "0.0.133",
-    "@types/figma": "1.0.3",
-    "web-ext": "6.0.0"
+    "@types/figma": "1.0.3"
   }
 }
