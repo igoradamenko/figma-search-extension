@@ -120,7 +120,12 @@ function onListClick(e) {
 
   console.log('Clicked item found');
 
-  sendMessage({ type: 'FOCUS', data: item.dataset.id });
+  sendMessage({
+    type: 'FOCUS',
+    data: {
+      itemId: item.dataset.id,
+    },
+  });
 }
 
 function handleArrowDown() {
@@ -151,8 +156,11 @@ function sendSearchRequest(searchString) {
     return;
   }
 
-  const search = searchString.toLocaleLowerCase();
-  sendMessage({ type: 'SEARCH', data: search }); // TODO: make all datas objects?
+  searchString = searchString.toLocaleLowerCase();
+  sendMessage({
+    type: 'SEARCH',
+    data: { searchString },
+  });
   showLoader();
 }
 

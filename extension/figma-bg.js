@@ -42,7 +42,7 @@ function runBridge(message) {
   script.src = chrome.runtime.getURL('figma-bridge.js');
   script.id = SCRIPT_ID;
   script.dataset.type = message.type;
-  script.dataset.data = message.data;
+  script.dataset.data = JSON.stringify(message.data || {});
 
   script.addEventListener('figma-search-extension-event', e => {
     chrome.runtime.sendMessage(e.detail);

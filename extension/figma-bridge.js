@@ -2,7 +2,7 @@
   const scriptNode = document.getElementById('figma-search-extension-request');
 
   const type = scriptNode.dataset.type;
-  const data = scriptNode.dataset.data;
+  const data = JSON.parse(scriptNode.dataset.data);
 
   switch (type) {
     case 'SEARCH':
@@ -16,7 +16,7 @@
       return;
   }
 
-  function processSearch(substr) {
+  function processSearch({ searchString }) {
     const REVERSED_TYPES_ORDER = [
       'component-set',
       'component',
@@ -25,7 +25,7 @@
     ];
 
     const searchResult = figma.root
-      .findAll(item => item.name.toLocaleLowerCase().includes(substr))
+      .findAll(item => item.name.toLocaleLowerCase().includes(searchString))
       .map(({ id, name, type }) => {
         return {
           id,
@@ -44,8 +44,8 @@
           return bTypeOrder - aTypeOrder;
         }
 
-        const aIndex = a.loweredName.indexOf(substr);
-        const bIndex = b.loweredName.indexOf(substr);
+        const aIndex = a.loweredName.indexOf(searchString);
+        const bIndex = b.loweredName.indexOf(searchString);
 
         if (aIndex !== bIndex) {
           return aIndex - bIndex;
@@ -59,8 +59,14 @@
     sendMessage({ type: 'SHOW_RESULT', data: { searchResult, notLoadedPagesNumber } });
   }
 
-  function processFocus(nodeId) {
-    const item = figma.root.findOne(item => item.id === nodeId);
+  function processFocus({ itemId }) {
+    const item = figma.root.findOne(item => item.id === itemId);
+
+    if (!item) {
+      console.error('Could not find item with ID', itemId);
+      return;
+    }
+
     let page = item;
 
     while (page.type !== 'PAGE') {
