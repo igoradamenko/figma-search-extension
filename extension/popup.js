@@ -1,5 +1,5 @@
 const rootNode = document.getElementById('root');
-const requestNode = document.getElementById('request');
+const inputNode = document.getElementById('input');
 const resultsNode = document.getElementById('results');
 const listNode = document.getElementById('list');
 const deepSearchNode = document.getElementById('deep-search');
@@ -8,7 +8,7 @@ const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
 let DID_DEEP_SEARCH = false;
 let CACHE = {
-  request: '',
+  inputValue: '',
   searchResult: [],
   notLoadedPagesNumber: 0,
   didDeepSearch: false,
@@ -21,7 +21,7 @@ let selectedListItemIndex;
 run();
 
 function run() {
-  requestNode.addEventListener('input', onInputChange);
+  inputNode.addEventListener('input', onInputChange);
   resultsNode.addEventListener('scroll', onResultsScroll);
   deepSearchNode.addEventListener('click', onDeepSearchClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
@@ -36,7 +36,7 @@ function onInputChange(e) {
 
   console.log('Input changed', value);
 
-  updateCache({ request: value });
+  updateCache({ inputValue: value });
 
   debouncedSendSearchRequest(value);
 }
@@ -67,7 +67,7 @@ function onMessageGet(message) {
       //  because RETRY_SEARCH knows nothing about deep search
       DID_DEEP_SEARCH = true;
       updateCache({ didDeepSearch: DID_DEEP_SEARCH });
-      sendSearchRequest(requestNode.value);
+      sendSearchRequest(inputNode.value);
       return;
 
     case 'LOAD_CACHE':
@@ -78,11 +78,11 @@ function onMessageGet(message) {
 
 function onRootKeyDown(e) {
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' || listItems.length === 0) {
-    requestNode.focus();
+    inputNode.focus();
     return;
   }
 
-  requestNode.blur();
+  inputNode.blur();
 
   switch (e.key) {
     case 'Enter':
@@ -222,9 +222,9 @@ function updateCache(obj) {
 function loadCache(cache) {
   if (!cache) return;
 
-  requestNode.value = cache.request;
+  inputNode.value = cache.inputValue;
 
-  requestNode.setSelectionRange(0, cache.request.length);
+  inputNode.setSelectionRange(0, cache.inputValue.length);
 
   DID_DEEP_SEARCH = cache.didDeepSearch;
 
