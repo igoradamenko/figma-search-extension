@@ -15,10 +15,23 @@ let CACHE = {
   selectedListItemIndex: undefined,
   resultsScrollTop: 0,
 };
+let listItems = [];
+let selectedListItemIndex;
 
-sendMessage({ type: 'FETCH_CACHE '});
+run();
 
-requestNode.addEventListener('input', e => {
+function run() {
+  requestNode.addEventListener('input', onInputChange);
+  resultsNode.addEventListener('scroll', onResultsScroll);
+  deepSearchNode.addEventListener('click', onDeepSearchClick);
+  rootNode.addEventListener('keydown', onRootKeyDown);
+  listNode.addEventListener('click', onListClick);
+  chrome.runtime.onMessage.addListener(onMessageGet);
+
+  sendMessage({ type: 'FETCH_CACHE' });
+}
+
+function onInputChange(e) {
   const value = e.target.value;
 
   console.log('Input changed', value);
@@ -26,18 +39,18 @@ requestNode.addEventListener('input', e => {
   updateCache({ request: value });
 
   debouncedSendSearchRequest(value);
-});
+}
 
-resultsNode.addEventListener('scroll', () => {
+function onResultsScroll(e) {
   updateCache({ resultsScrollTop: resultsNode.scrollTop });
-});
+}
 
-deepSearchNode.addEventListener('click', () => {
+function onDeepSearchClick(e) {
   sendMessage({ type: 'LOAD_PAGES' });
   showLoader();
-});
+}
 
-chrome.runtime.onMessage.addListener(message => {
+function onMessageGet(message) {
   console.log(`Popup got ${message.type}`);
 
   switch (message.type) {
@@ -61,11 +74,9 @@ chrome.runtime.onMessage.addListener(message => {
       loadCache(message.data);
       return;
   }
-});
+}
 
-let listItems = [];
-let selectedListItemIndex;
-rootNode.addEventListener('keydown', e => {
+function onRootKeyDown(e) {
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' || listItems.length === 0) {
     requestNode.focus();
     return;
@@ -79,7 +90,7 @@ rootNode.addEventListener('keydown', e => {
       // we don't need to preventDefault, so just return
       return;
 
-      case 'ArrowDown':
+    case 'ArrowDown':
       handleArrowDown();
       break;
 
@@ -90,14 +101,14 @@ rootNode.addEventListener('keydown', e => {
 
   // do not scroll the scrolling area
   e.preventDefault();
-});
+}
 
-listNode.addEventListener('click', e => {
+function onListClick(e) {
   const item = e.target.closest('.list__item');
   if (!item) return;
 
   focus(item.dataset.id);
-});
+}
 
 function handleArrowDown() {
   selectedListItemIndex ??= -1;
