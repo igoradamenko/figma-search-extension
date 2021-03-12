@@ -37,13 +37,14 @@ function onMessageGet(message) {
         notLoadedPagesNumber: message.data.notLoadedPagesNumber,
       });
       showResult(message.data);
+      resetContentState();
       return;
 
     case 'RETRY_SEARCH':
       // TODO: probably not the best place to make it,
       //  because RETRY_SEARCH knows nothing about deep search
       didDeepSearch = true;
-      updateCache({ didDeepSearch: didDeepSearch });
+      updateCache({ didDeepSearch });
       sendSearchRequest(inputNode.value);
       return;
 
@@ -168,9 +169,16 @@ function pseudoBlurListItems() {
   console.log('Pseudo-focused items blurred');
 }
 
+function resetContentState() {
+  contentNode.scrollTop = 0;
+  selectedListItemIndex = undefined;
+  updateCache({ selectedListItemIndex, contentScrollTop: 0 });
+}
+
 function sendSearchRequest(searchString) {
   if (!searchString) {
     showResult([]);
+    resetContentState();
     return;
   }
 
@@ -205,8 +213,6 @@ function showResult(data) {
   listNode.innerHTML = contentMarkup;
 
   listItems = [...document.querySelectorAll('.list__item')];
-  selectedListItemIndex = undefined;
-  updateCache({ selectedListItemIndex, contentScrollTop: 0 });
 
   hideEmptyNotice();
   hideLoader();
@@ -273,11 +279,12 @@ function updateCache(obj) {
   sendMessage({ type: 'SAVE_CACHE', data: cache });
 }
 
-function loadCache(cache) {
-  if (!cache) return;
+function loadCache(loadedCache) {
+  if (!loadedCache) return;
+
+  cache = loadedCache;
 
   inputNode.value = cache.inputValue;
-
   inputNode.setSelectionRange(0, cache.inputValue.length);
 
   didDeepSearch = cache.didDeepSearch;
@@ -285,15 +292,12 @@ function loadCache(cache) {
   showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
 
   selectedListItemIndex = cache.selectedListItemIndex;
-  pseudoFocusListItem(selectedListItemIndex);
+
+  if (typeof selectedListItemIndex !== 'undefined') {
+    pseudoFocusListItem(selectedListItemIndex);
+  }
 
   contentNode.scrollTop = cache.contentScrollTop;
-
-  // TODO: showResult updates it, so we update it again
-  //  have to split caching and rendering (and restoring for sure)
-  // TODO: probably does not work correctly; fails to load cache after several
-  //  clicks on the icon
-  updateCache(cache);
 }
 
 
