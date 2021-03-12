@@ -2,7 +2,7 @@ const rootNode = document.getElementById('root');
 const inputNode = document.getElementById('input');
 const contentNode = document.getElementById('content');
 const listNode = document.getElementById('list');
-const deepSearchNode = document.getElementById('deep-search');
+const deepSearchButtonNode = document.getElementById('deep-search');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
@@ -23,7 +23,7 @@ run();
 function run() {
   inputNode.addEventListener('input', onInputChange);
   contentNode.addEventListener('scroll', onResultsScroll);
-  deepSearchNode.addEventListener('click', onDeepSearchClick);
+  deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
   listNode.addEventListener('click', onListClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
@@ -45,7 +45,7 @@ function onResultsScroll(e) {
   updateCache({ contentScrollTop: contentNode.scrollTop });
 }
 
-function onDeepSearchClick(e) {
+function onDeepSearchButtonClick(e) {
   sendMessage({ type: 'LOAD_PAGES' });
   showLoader();
 }
