@@ -14,7 +14,7 @@ run();
 
 function run() {
   inputNode.addEventListener('input', onInputChange);
-  contentNode.addEventListener('scroll', onResultsScroll);
+  contentNode.addEventListener('scroll', onContentScroll);
   deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
   listNode.addEventListener('click', onListClick);
@@ -66,21 +66,27 @@ function onInputChange(e) {
   debouncedSendSearchRequest(value);
 }
 
-function onResultsScroll(e) {
+function onContentScroll(e) {
+  console.log('Content scrolled');
   updateCache({ contentScrollTop: contentNode.scrollTop });
 }
 
 function onDeepSearchButtonClick(e) {
+  console.log('Deep search button clicked');
   sendMessage({ type: 'LOAD_PAGES' });
   showLoader();
 }
 
 function onRootKeyDown(e) {
+  console.log('Some key pressed');
+
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' || listItems.length === 0) {
+    console.log('Keypress left unhandled');
     inputNode.focus();
     return;
   }
 
+  console.log(`It is ${e.key} key`);
   inputNode.blur();
 
   switch (e.key) {
@@ -90,21 +96,29 @@ function onRootKeyDown(e) {
       return;
 
     case 'ArrowDown':
+      // do not scroll the scrolling area
+      e.preventDefault();
       handleArrowDown();
-      break;
+      return;
 
     case 'ArrowUp':
+      // do not scroll the scrolling area
+      e.preventDefault();
       handleArrowUp();
-      break;
+      return;
   }
-
-  // do not scroll the scrolling area
-  e.preventDefault();
 }
 
 function onListClick(e) {
+  console.log('List clicked');
+
   const item = e.target.closest('.list__item');
-  if (!item) return;
+  if (!item) {
+    console.log('Clicked item not found')
+    return;
+  }
+
+  console.log('Clicked item found');
 
   sendMessage({ type: 'FOCUS', data: item.dataset.id });
 }
@@ -112,16 +126,22 @@ function onListClick(e) {
 function handleArrowDown() {
   selectedListItemIndex ??= -1;
   selectedListItemIndex = (selectedListItemIndex + 1) % listItems.length;
+
   const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
   item.focus();
+  console.log(`Item #${selectedListItemIndex} focused`);
+
   updateCache({ selectedListItemIndex });
 }
 
 function handleArrowUp() {
   selectedListItemIndex ??= 0;
   selectedListItemIndex = (selectedListItemIndex - 1 + listItems.length) % listItems.length;
+
   const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
   item.focus();
+  console.log(`Item #${selectedListItemIndex} focused`);
+
   updateCache({ selectedListItemIndex });
 }
 
