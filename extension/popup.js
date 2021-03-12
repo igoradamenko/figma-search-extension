@@ -8,7 +8,7 @@ const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
 let listItems = [];
 let selectedListItemIndex;
-let DID_DEEP_SEARCH = false;
+let didDeepSearch = false;
 
 run();
 
@@ -42,8 +42,8 @@ function onMessageGet(message) {
     case 'RETRY_SEARCH':
       // TODO: probably not the best place to make it,
       //  because RETRY_SEARCH knows nothing about deep search
-      DID_DEEP_SEARCH = true;
-      updateCache({ didDeepSearch: DID_DEEP_SEARCH });
+      didDeepSearch = true;
+      updateCache({ didDeepSearch: didDeepSearch });
       sendSearchRequest(inputNode.value);
       return;
 
@@ -163,7 +163,7 @@ function sendSearchRequest(searchString) {
 function showResult(data) {
   const contentMarkup = buildResultsMarkup(data.searchResult);
 
-  if (data.notLoadedPagesNumber && !DID_DEEP_SEARCH) {
+  if (data.notLoadedPagesNumber && !didDeepSearch) {
     showDeepSearchButton();
   } else {
     hideDeepSearchButton();
@@ -254,7 +254,7 @@ function loadCache(cache) {
 
   inputNode.setSelectionRange(0, cache.inputValue.length);
 
-  DID_DEEP_SEARCH = cache.didDeepSearch;
+  didDeepSearch = cache.didDeepSearch;
 
   showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
 
