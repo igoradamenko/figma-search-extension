@@ -123,6 +123,8 @@ function onListClick(e) {
   console.log('Clicked item found');
 
   pseudoBlurListItems();
+  selectedListItemIndex = [...document.querySelectorAll('.list__item')].findIndex(i => i === item);
+  updateCache({ selectedListItemIndex });
 
   sendMessage({
     type: 'FOCUS',
