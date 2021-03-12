@@ -1,6 +1,6 @@
 const rootNode = document.getElementById('root');
 const inputNode = document.getElementById('input');
-const resultsNode = document.getElementById('results');
+const contentNode = document.getElementById('content');
 const listNode = document.getElementById('list');
 const deepSearchNode = document.getElementById('deep-search');
 
@@ -13,7 +13,7 @@ let CACHE = {
   notLoadedPagesNumber: 0,
   didDeepSearch: false,
   selectedListItemIndex: undefined,
-  resultsScrollTop: 0,
+  contentScrollTop: 0,
 };
 let listItems = [];
 let selectedListItemIndex;
@@ -22,7 +22,7 @@ run();
 
 function run() {
   inputNode.addEventListener('input', onInputChange);
-  resultsNode.addEventListener('scroll', onResultsScroll);
+  contentNode.addEventListener('scroll', onResultsScroll);
   deepSearchNode.addEventListener('click', onDeepSearchClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
   listNode.addEventListener('click', onListClick);
@@ -42,7 +42,7 @@ function onInputChange(e) {
 }
 
 function onResultsScroll(e) {
-  updateCache({ resultsScrollTop: resultsNode.scrollTop });
+  updateCache({ contentScrollTop: contentNode.scrollTop });
 }
 
 function onDeepSearchClick(e) {
@@ -138,7 +138,7 @@ function sendSearchRequest(searchString) {
 }
 
 function showResult(data) {
-  const resultsMarkup = buildResultsMarkup(data.searchResult);
+  const contentMarkup = buildResultsMarkup(data.searchResult);
 
   if (data.notLoadedPagesNumber && !DID_DEEP_SEARCH) {
     showDeepSearch();
@@ -146,18 +146,18 @@ function showResult(data) {
     hideDeepSearch();
   }
 
-  if (!resultsMarkup) {
+  if (!contentMarkup) {
     listNode.innerHTML = '';
     showEmptyNotice();
     hideLoader();
     return;
   }
 
-  listNode.innerHTML = resultsMarkup;
+  listNode.innerHTML = contentMarkup;
 
   listItems = [...document.querySelectorAll('.list__item')];
   selectedListItemIndex = undefined;
-  updateCache({ selectedListItemIndex, resultsScrollTop: 0 });
+  updateCache({ selectedListItemIndex, contentScrollTop: 0 });
 
   hideEmptyNotice();
   hideLoader();
@@ -186,28 +186,28 @@ function debounce(fn, ms) {
 let loaderTimeout = null;
 function showLoader() {
   clearTimeout(loaderTimeout);
-  loaderTimeout = setTimeout(() => resultsNode.classList.add('results_loading'), 50);
+  loaderTimeout = setTimeout(() => contentNode.classList.add('content_loading'), 50);
 }
 
 function hideLoader() {
   clearTimeout(loaderTimeout);
-  resultsNode.classList.remove('results_loading');
+  contentNode.classList.remove('content_loading');
 }
 
 function showEmptyNotice() {
-  resultsNode.classList.add('results_empty');
+  contentNode.classList.add('content_empty');
 }
 
 function hideEmptyNotice() {
-  resultsNode.classList.remove('results_empty');
+  contentNode.classList.remove('content_empty');
 }
 
 function showDeepSearch() {
-  resultsNode.classList.add('results_deep-search-available');
+  contentNode.classList.add('content_deep-search-available');
 }
 
 function hideDeepSearch() {
-  resultsNode.classList.remove('results_deep-search-available');
+  contentNode.classList.remove('content_deep-search-available');
 }
 
 function updateCache(obj) {
@@ -233,7 +233,7 @@ function loadCache(cache) {
   // TODO: add focused state to the selected item
   selectedListItemIndex = cache.selectedListItemIndex;
 
-  resultsNode.scrollTop = cache.resultsScrollTop;
+  contentNode.scrollTop = cache.contentScrollTop;
 
   // TODO: showResult updates it, so we update it again
   //  have to split caching and rendering (and restoring for sure)
