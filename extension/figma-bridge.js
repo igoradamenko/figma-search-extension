@@ -75,7 +75,10 @@
 
     figma.currentPage = page;
     figma.viewport.scrollAndZoomIntoView([item]);
-    figma.currentPage.selection = [item]; // TODO: cannot select a page node
+
+    if (item.type !== 'PAGE') {
+      figma.currentPage.selection = [item];
+    }
   }
 
   function processPagesLoad() {
