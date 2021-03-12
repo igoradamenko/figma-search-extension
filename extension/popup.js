@@ -6,17 +6,9 @@ const deepSearchButtonNode = document.getElementById('deep-search');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let DID_DEEP_SEARCH = false;
-let CACHE = {
-  inputValue: '',
-  searchResult: [],
-  notLoadedPagesNumber: 0,
-  didDeepSearch: false,
-  selectedListItemIndex: undefined,
-  contentScrollTop: 0,
-};
 let listItems = [];
 let selectedListItemIndex;
+let DID_DEEP_SEARCH = false;
 
 run();
 
@@ -31,24 +23,9 @@ function run() {
   sendMessage({ type: 'FETCH_CACHE' });
 }
 
-function onInputChange(e) {
-  const value = e.target.value;
 
-  console.log('Input changed', value);
 
-  updateCache({ inputValue: value });
-
-  debouncedSendSearchRequest(value);
-}
-
-function onResultsScroll(e) {
-  updateCache({ contentScrollTop: contentNode.scrollTop });
-}
-
-function onDeepSearchButtonClick(e) {
-  sendMessage({ type: 'LOAD_PAGES' });
-  showLoader();
-}
+/* COMMUNICATION */
 
 function onMessageGet(message) {
   console.log(`Popup got ${message.type}`);
@@ -74,6 +51,28 @@ function onMessageGet(message) {
       loadCache(message.data);
       return;
   }
+}
+
+
+/* DOM EVENTS HANDLERS */
+
+function onInputChange(e) {
+  const value = e.target.value;
+
+  console.log('Input changed', value);
+
+  updateCache({ inputValue: value });
+
+  debouncedSendSearchRequest(value);
+}
+
+function onResultsScroll(e) {
+  updateCache({ contentScrollTop: contentNode.scrollTop });
+}
+
+function onDeepSearchButtonClick(e) {
+  sendMessage({ type: 'LOAD_PAGES' });
+  showLoader();
 }
 
 function onRootKeyDown(e) {
@@ -107,7 +106,7 @@ function onListClick(e) {
   const item = e.target.closest('.list__item');
   if (!item) return;
 
-  focus(item.dataset.id);
+  sendMessage({ type: 'FOCUS', data: item.dataset.id });
 }
 
 function handleArrowDown() {
@@ -137,13 +136,17 @@ function sendSearchRequest(searchString) {
   showLoader();
 }
 
+
+
+/* MARKUP */
+
 function showResult(data) {
   const contentMarkup = buildResultsMarkup(data.searchResult);
 
   if (data.notLoadedPagesNumber && !DID_DEEP_SEARCH) {
-    showDeepSearch();
+    showDeepSearchButton();
   } else {
-    hideDeepSearch();
+    hideDeepSearchButton();
   }
 
   if (!contentMarkup) {
@@ -163,10 +166,6 @@ function showResult(data) {
   hideLoader();
 }
 
-function focus(id) {
-  sendMessage({ type: 'FOCUS', data: id });
-}
-
 function buildResultsMarkup(items = []) {
   if (!items.length) return '';
 
@@ -175,13 +174,9 @@ function buildResultsMarkup(items = []) {
   }).join('');
 }
 
-function debounce(fn, ms) {
-  let timeoutId = null;
-  return (...rest) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(fn, ms, ...rest);
-  };
-}
+
+
+/* MARKUP STATES */
 
 let loaderTimeout = null;
 function showLoader() {
@@ -202,21 +197,34 @@ function hideEmptyNotice() {
   contentNode.classList.remove('content_empty');
 }
 
-function showDeepSearch() {
+function showDeepSearchButton() {
   contentNode.classList.add('content_deep-search-available');
 }
 
-function hideDeepSearch() {
+function hideDeepSearchButton() {
   contentNode.classList.remove('content_deep-search-available');
 }
 
+
+
+/* CACHE */
+
+let cache = {
+  inputValue: '',
+  searchResult: [],
+  notLoadedPagesNumber: 0,
+  didDeepSearch: false,
+  selectedListItemIndex: undefined,
+  contentScrollTop: 0,
+};
+
 function updateCache(obj) {
-  CACHE = {
-    ...CACHE,
+  cache = {
+    ...cache,
     ...obj,
   };
 
-  sendMessage({ type: 'SAVE_CACHE', data: CACHE });
+  sendMessage({ type: 'SAVE_CACHE', data: cache });
 }
 
 function loadCache(cache) {
@@ -242,9 +250,21 @@ function loadCache(cache) {
   updateCache(cache);
 }
 
+
+
+/* HELPERS */
+
 function sendMessage(message) {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     chrome.tabs.sendMessage(tabs[0].id, message);
     console.log(`Popup sent ${message.type}`);
   });
+}
+
+function debounce(fn, ms) {
+  let timeoutId = null;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(fn, ms, ...rest);
+  };
 }
