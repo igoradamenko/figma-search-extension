@@ -82,6 +82,7 @@ function onRootKeyDown(e) {
 
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' || listItems.length === 0) {
     console.log('Keypress left unhandled');
+    pseudoBlurListItems();
     inputNode.focus();
     return;
   }
@@ -120,6 +121,8 @@ function onListClick(e) {
 
   console.log('Clicked item found');
 
+  pseudoBlurListItems();
+
   sendMessage({
     type: 'FOCUS',
     data: {
@@ -131,23 +134,38 @@ function onListClick(e) {
 function handleArrowDown() {
   selectedListItemIndex ??= -1;
   selectedListItemIndex = (selectedListItemIndex + 1) % listItems.length;
-
-  const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
-  item.focus();
-  console.log(`Item #${selectedListItemIndex} focused`);
-
   updateCache({ selectedListItemIndex });
+
+  focusListItem(selectedListItemIndex);
 }
 
 function handleArrowUp() {
   selectedListItemIndex ??= 0;
   selectedListItemIndex = (selectedListItemIndex - 1 + listItems.length) % listItems.length;
-
-  const item = document.getElementsByClassName('list__item')[selectedListItemIndex];
-  item.focus();
-  console.log(`Item #${selectedListItemIndex} focused`);
-
   updateCache({ selectedListItemIndex });
+
+  focusListItem(selectedListItemIndex);
+}
+
+function focusListItem(listItemId) {
+  pseudoBlurListItems();
+
+  const item = document.getElementsByClassName('list__item')[listItemId];
+  item.focus();
+  console.log(`Item #${listItemId} focused`);
+}
+
+function pseudoFocusListItem(listItemId) {
+  pseudoBlurListItems();
+
+  const item = document.getElementsByClassName('list__item')[listItemId];
+  item.classList.add('list__item_focused');
+  console.log(`Item #${listItemId} pseudo-focused`);
+}
+
+function pseudoBlurListItems() {
+  [...document.getElementsByClassName('list__item_focused')].forEach(i => i.classList.remove('list__item_focused'));
+  console.log('Pseudo-focused items blurred');
 }
 
 function sendSearchRequest(searchString) {
@@ -266,8 +284,8 @@ function loadCache(cache) {
 
   showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
 
-  // TODO: add focused state to the selected item
   selectedListItemIndex = cache.selectedListItemIndex;
+  pseudoFocusListItem(selectedListItemIndex);
 
   contentNode.scrollTop = cache.contentScrollTop;
 

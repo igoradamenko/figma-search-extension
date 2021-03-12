@@ -140,7 +140,7 @@ button {
   line-height: 20px;
 }
 
-.list__item:hover, .list__item:focus {
+.list__item:hover, .list__item:focus, .list__item_focused {
   background: #f0f0f0;
 }
 
