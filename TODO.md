@@ -5,3 +5,4 @@
 - Hide console.logs behind `debug` option
 - `ё` → `е` replacement? Special symbols ignoring?
 - Auto deep search?
+- Does it work in version history mode?

@@ -16,13 +16,13 @@ let CACHE = {
   resultsScrollTop: 0,
 };
 
-chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-  chrome.tabs.sendMessage(tabs[0].id, { type: 'FETCH_CACHE' });
-});
+sendMessage({ type: 'FETCH_CACHE '});
 
 requestNode.addEventListener('input', e => {
   const value = e.target.value;
-  console.log('input changed', value);
+
+  console.log('Input changed', value);
+
   updateCache({ request: value });
 
   debouncedSendSearchRequest(value);
@@ -33,16 +33,12 @@ resultsNode.addEventListener('scroll', () => {
 });
 
 deepSearchNode.addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    chrome.tabs.sendMessage(tabs[0].id, { type: 'LOAD_PAGES' });
-    console.log('popup sent load pages request');
-    showLoader();
-    updateCache({ didDeepSearch: DID_DEEP_SEARCH });
-  });
+  sendMessage({ type: 'LOAD_PAGES' });
+  showLoader();
 });
 
-chrome.runtime.onMessage.addListener((message, sender) => {
-  console.log('popup got message', message, sender);
+chrome.runtime.onMessage.addListener(message => {
+  console.log(`Popup got ${message.type}`);
 
   switch (message.type) {
     case 'SHOW_RESULT':
@@ -57,6 +53,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
       // TODO: probably not the best place to make it,
       //  because RETRY_SEARCH knows nothing about deep search
       DID_DEEP_SEARCH = true;
+      updateCache({ didDeepSearch: DID_DEEP_SEARCH });
       sendSearchRequest(requestNode.value);
       return;
 
@@ -124,12 +121,9 @@ function sendSearchRequest(searchString) {
     return;
   }
 
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    const search = searchString.toLocaleLowerCase();
-    chrome.tabs.sendMessage(tabs[0].id, { type: 'SEARCH', data: search }); // TODO: make all datas objects?
-    console.log('popup sent search request', search);
-    showLoader();
-  });
+  const search = searchString.toLocaleLowerCase();
+  sendMessage({ type: 'SEARCH', data: search }); // TODO: make all datas objects?
+  showLoader();
 }
 
 function showResult(data) {
@@ -159,10 +153,7 @@ function showResult(data) {
 }
 
 function focus(id) {
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    chrome.tabs.sendMessage(tabs[0].id, { type: 'FOCUS', data: id });
-    console.log('popup sent focus request', id);
-  });
+  sendMessage({ type: 'FOCUS', data: id });
 }
 
 function buildResultsMarkup(items = []) {
@@ -214,12 +205,7 @@ function updateCache(obj) {
     ...obj,
   };
 
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      type: 'SAVE_CACHE',
-      data: CACHE,
-    });
-  });
+  sendMessage({ type: 'SAVE_CACHE', data: CACHE });
 }
 
 function loadCache(cache) {
@@ -243,4 +229,11 @@ function loadCache(cache) {
   // TODO: probably does not work correctly; fails to load cache after several
   //  clicks on the icon
   updateCache(cache);
+}
+
+function sendMessage(message) {
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, message);
+    console.log(`Popup sent ${message.type}`);
+  });
 }

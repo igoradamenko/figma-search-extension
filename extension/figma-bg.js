@@ -45,8 +45,6 @@ function runBridge(message) {
   script.dataset.data = message.data;
 
   script.addEventListener('figma-search-extension-event', e => {
-    if (!e?.detail?.type) return;
-
     chrome.runtime.sendMessage(e.detail);
   });
 
