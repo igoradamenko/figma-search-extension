@@ -238,12 +238,12 @@ function resetContentState() {
 let loaderTimeout = null;
 function showLoader() {
   clearTimeout(loaderTimeout);
-  loaderTimeout = setTimeout(() => contentNode.classList.add('content_loading'), 50);
+  loaderTimeout = setTimeout(() => rootNode.classList.add('root_loading'), 50);
 }
 
 function hideLoader() {
   clearTimeout(loaderTimeout);
-  contentNode.classList.remove('content_loading');
+  rootNode.classList.remove('root_loading');
 }
 
 function showEmptyNotice() {
