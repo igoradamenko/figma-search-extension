@@ -1,3 +1,7 @@
+:root {
+  --search-height: 74px;
+}
+
 @font-face {
   src: url('./inter-medium.woff2') format('woff2');
   font-family: Inter;
@@ -37,6 +41,17 @@ button {
   color: #2D2D38;
 }
 
+.search {
+  box-sizing: border-box;
+  height: var(--search-height);
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid #E6E6EC;
+}
+
+.search__select {
+  margin-top: 8px;
+}
+
 .input {
   box-sizing: border-box;
   width: 100%;
@@ -60,6 +75,11 @@ button {
 
 .input:focus {
   outline: none;
+}
+
+.select {
+  font-size: 12px;
+  line-height: 15px;
 }
 
 .content {
