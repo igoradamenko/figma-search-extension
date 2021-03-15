@@ -1,3 +1,3 @@
-<svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-  <path fill="rgba(123,97,255,.4)" d="M.828 7L7 .828 13.172 7 7 13.172.828 7zM7 11.828L11.828 7 7 2.172 2.172 7 7 11.828z" fill-rule="evenodd" fill-opacity="1" stroke="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+  <path stroke="#181818" d="M12 3.707L20.293 12 12 20.293 3.707 12 12 3.707z"/>
 </svg>
