@@ -1,3 +1,10 @@
+@font-face {
+  src: url('./inter-medium.woff2') format('woff2');
+  font-family: Inter;
+  font-weight: 500;
+  font-style: normal;
+}
+
 html,body {
   margin: 0;
   padding: 0;
@@ -23,10 +30,11 @@ button {
   width: 280px;
   height: 400px;
   overflow: hidden;
-  font-size: 14px;
-  line-height: 20px;
-  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
-  color: #333;
+  font-size: 13px;
+  line-height: 16px;
+  font-family: Inter, "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
+  font-weight: 500;
+  color: #2D2D38;
 }
 
 .input {
