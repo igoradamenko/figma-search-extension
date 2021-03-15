@@ -98,9 +98,7 @@ button {
   border-radius: 0;
 }
 
-.input::-webkit-input-placeholder,
-.input::-moz-placeholder,
-.input::-ms-input-placeholder {
+.input::placeholder {
   color: #A5A5B1;
 }
 
@@ -174,9 +172,9 @@ button {
 .list__item::before {
   content: '';
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin-left: -20px;
+  width: 24px;
+  height: 24px;
+  margin-left: -28px;
   margin-right: 4px;
   vertical-align: -3px;
   background: transparent center no-repeat;
