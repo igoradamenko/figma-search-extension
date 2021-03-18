@@ -17,13 +17,6 @@
   }
 
   function processSearch({ searchString }) {
-    const REVERSED_TYPES_ORDER = [
-      'component-set',
-      'component',
-      'frame',
-      'page',
-    ];
-
     const searchResult = figma.root
       .findAll(item => item.name.toLocaleLowerCase().includes(searchString))
       .map(({ id, name, type }) => {
@@ -33,25 +26,6 @@
           loweredName: name.toLocaleLowerCase(),
           type: type.toLocaleLowerCase().replace(/_/g, '-'),
         }
-      })
-      .sort((a, b) => {
-        const aTypeOrder = REVERSED_TYPES_ORDER.indexOf(a.type);
-        const bTypeOrder = REVERSED_TYPES_ORDER.indexOf(b.type);
-
-        if (aTypeOrder !== bTypeOrder) {
-          // type order is reversed to cover -1 case,
-          // so we calc B - A, but it's still ASC, not DESC
-          return bTypeOrder - aTypeOrder;
-        }
-
-        const aIndex = a.loweredName.indexOf(searchString);
-        const bIndex = b.loweredName.indexOf(searchString);
-
-        if (aIndex !== bIndex) {
-          return aIndex - bIndex;
-        }
-
-        return a.name.localeCompare(b.name);
       });
 
     const notLoadedPagesNumber = figma.root.children.filter(x => x.children.length === 0).length;

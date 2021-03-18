@@ -194,12 +194,77 @@ function showResult(data) {
   hideLoader();
 }
 
+const groupsOrder = [
+  'Page',
+  'Frame',
+  'Component',
+  'Group',
+  'Instance',
+  'Slice',
+  'Vector',
+  'Ellipse',
+  'Polygon',
+  'Star',
+  'Line',
+  'Arrow',
+  'Text',
+  'Rectangle',
+  'Boolean',
+  'Other',
+];
+
 function buildResultsMarkup(items = []) {
   if (!items.length) return '';
 
-  return items.map(i => {
-    return `<li><button class="list__item list__item_type_${i.type}" type="button" data-id="${i.id}">${i.name}</button></li>`
-  }).join('');
+  items.sort((a, b) => {
+    const aGroup = typeToGroup(a.type);
+    const bGroup = typeToGroup(b.type);
+
+    const aGroupOrder = groupsOrder.indexOf(aGroup);
+    const bGroupOrder = groupsOrder.indexOf(bGroup);
+
+    if (aGroupOrder !== bGroupOrder) {
+      return aGroupOrder - bGroupOrder;
+    }
+
+    const aIndex = a.loweredName.indexOf(cache.inputValue);
+    const bIndex = b.loweredName.indexOf(cache.inputValue);
+
+    if (aIndex !== bIndex) {
+      return aIndex - bIndex;
+    }
+
+    return a.name.localeCompare(b.name);
+  })
+
+  const itemsByGroup = groupsOrder.map(groupName => ({ group: groupName, items: [] }));
+
+  items.forEach(item => {
+    const itemGroup = typeToGroup(item.type);
+
+    const groupToPut = itemsByGroup.find(obj => obj.group === itemGroup);
+    groupToPut.items.push(item);
+  });
+
+  return itemsByGroup
+    .filter(x => x.items.length)
+    .map(obj => {
+      const headline = `<div class="list__headline">${obj.group}</div>`;
+      const listItems = obj.items.map(i => {
+        return `<li><button class="list__item list__item_type_${i.type}" type="button" data-id="${i.id}">${i.name}</button></li>`
+      }).join('');
+
+      return `${headline}<ul>${listItems}</ul>`;
+    })
+    .join('');
+}
+
+function typeToGroup(type) {
+  type = type.split('-')[0];
+  const group = type[0].toUpperCase() + type.substr(1);
+
+  if (!groupsOrder.includes(group)) return 'Unknown';
+  return group;
 }
 
 
