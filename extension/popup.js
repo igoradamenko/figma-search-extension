@@ -1,7 +1,7 @@
 const rootNode = document.getElementById('root');
 const inputNode = document.getElementById('input');
 const contentNode = document.getElementById('content');
-const listNode = document.getElementById('list');
+const resultsNode = document.getElementById('results');
 const deepSearchButtonNode = document.getElementById('deep-search');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
@@ -17,7 +17,7 @@ function run() {
   contentNode.addEventListener('scroll', onContentScroll);
   deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
-  listNode.addEventListener('click', onListClick);
+  resultsNode.addEventListener('click', onResultsClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
   sendMessage({ type: 'POPUP_OPEN' });
@@ -109,8 +109,8 @@ function onRootKeyDown(e) {
   }
 }
 
-function onListClick(e) {
-  console.log('List clicked');
+function onResultsClick(e) {
+  console.log('Results clicked');
 
   const item = e.target.closest('.list__item');
   if (!item) {
@@ -121,6 +121,10 @@ function onListClick(e) {
   console.log('Clicked item found');
 
   pseudoBlurListItems();
+  deselectListItems();
+  scrollToItem(item);
+  selectListItem(item);
+
   selectedListItemIndex = [...document.querySelectorAll('.list__item')].findIndex(i => i === item);
   updateCache({ selectedListItemIndex });
 
@@ -180,13 +184,13 @@ function showResult(data) {
   }
 
   if (!contentMarkup) {
-    listNode.innerHTML = '';
+    resultsNode.innerHTML = '';
     showEmptyNotice();
     hideLoader();
     return;
   }
 
-  listNode.innerHTML = contentMarkup;
+  resultsNode.innerHTML = contentMarkup;
 
   listItems = [...document.querySelectorAll('.list__item')];
 
@@ -254,7 +258,7 @@ function buildResultsMarkup(items = []) {
         return `<li><button class="list__item list__item_type_${i.type}" type="button" data-id="${i.id}">${i.name}</button></li>`
       }).join('');
 
-      return `${headline}<ul>${listItems}</ul>`;
+      return `<div class="list">${headline}<ul class="list__items">${listItems}</ul></div>`;
     })
     .join('');
 }
@@ -272,11 +276,36 @@ function typeToGroup(type) {
 /* MARKUP STATES */
 
 function focusListItem(listItemId) {
-  pseudoBlurListItems();
-
   const item = document.getElementsByClassName('list__item')[listItemId];
+  scrollToItem(item);
+
   item.focus();
   console.log(`Item #${listItemId} focused`);
+}
+
+const contentTop = contentNode.getBoundingClientRect().top;
+const contentHeight = contentNode.offsetHeight;
+const headlineHeight = 28; // TODO: calc?
+
+function scrollToItem(item) {
+  const itemBounds = item.getBoundingClientRect();
+
+  const topBordersDiff = itemBounds.top - (contentTop + headlineHeight);
+  const bottomBordersDiff = (itemBounds.top + itemBounds.height) - (contentTop + contentHeight);
+  const isItemTopBorderOutside = topBordersDiff < 0;
+  const isItemBottomBorderOutside = bottomBordersDiff > 0;
+
+  if (isItemTopBorderOutside) {
+    contentNode.scrollBy(0, topBordersDiff);
+    console.log('Scrolled content node');
+    return;
+  }
+
+  if (isItemBottomBorderOutside) {
+    contentNode.scrollBy(0, bottomBordersDiff);
+    console.log('Scrolled content node');
+    return;
+  }
 }
 
 function pseudoFocusListItem(listItemId) {
@@ -290,6 +319,16 @@ function pseudoFocusListItem(listItemId) {
 function pseudoBlurListItems() {
   [...document.getElementsByClassName('list__item_focused')].forEach(i => i.classList.remove('list__item_focused'));
   console.log('Pseudo-focused items blurred');
+}
+
+function selectListItem(item) {
+  item.classList.add('list__item_selected');
+  console.log('Item selected');
+}
+
+function deselectListItems() {
+  [...document.getElementsByClassName('list__item_selected')].forEach(i => i.classList.remove('list__item_selected'));
+  console.log('Items deselected');
 }
 
 function resetContentState() {
