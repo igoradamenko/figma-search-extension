@@ -15,6 +15,8 @@ Supported browsers: Chrome, Firefox, and any Chromium-based browser (Edge, Opera
 [![Figma Search in Chrome Web Store](./add-to-chrome.svg)](https://chrome.google.com/webstore/detail/figma-search/lfofpannpmmeeicgiiacjghmcfgnebbi)
 [![Figma Search in Mozilla Add-ons](./add-to-firefox.svg)](https://addons.mozilla.org/en-US/firefox/addon/figma-search/)
 
+[![Demo Video on YouTube](./youtube-demo.png)](https://www.youtube.com/watch?v=lINTurBElgM)
+
 ## Contents
 
 - [Rationale](#rationale)

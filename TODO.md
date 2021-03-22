@@ -3,3 +3,7 @@
 - Add custom deep search preloading
 - Add section filter
 - Add Russian description
+- Check Firefox for Android support
+- Improve extension stores description
+- Improve Component variants?
+- Add FunBox logo
