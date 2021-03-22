@@ -4,15 +4,19 @@
   </head>
   <body class="root" id="root">
     <div class="search">
-      <input
-        class="input search__input"
-        id="input"
-        type="text"
-        placeholder="Search"
-        autofocus
-      >
+      <div class="search__control-group">
+        <input
+            class="input search__input"
+            id="input"
+            type="text"
+            placeholder="Search"
+            autofocus
+        >
 
-      <div class="search__select select">Everywhere</div>
+        <button class="search__deep-search-button" id="deep-search">Try Deep Search</button>
+      </div>
+
+      <div class="search__filter select">Everywhere</div>
     </div>
 
     <div class="content" id="content">
@@ -22,7 +26,6 @@
       ></div>
 
       <p class="content__empty-notice">Nothing found</p>
-      <button class="content__deep-search-button" id="deep-search">Try deep search</button>
     </div>
 
     <script src="popup.js"></script>

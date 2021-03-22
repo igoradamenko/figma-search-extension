@@ -359,11 +359,11 @@ function hideEmptyNotice() {
 }
 
 function showDeepSearchButton() {
-  contentNode.classList.add('content_deep-search-available');
+  deepSearchButtonNode.style.display = 'block';
 }
 
 function hideDeepSearchButton() {
-  contentNode.classList.remove('content_deep-search-available');
+  deepSearchButtonNode.style.display = 'none';
 }
 
 

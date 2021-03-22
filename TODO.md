@@ -1,7 +1,2 @@
-- Improve icon
-- Add separate icon for arrow?
-- Fix polygon icon and others
-- Optimize component & component set icons (duplicates)
 - `ё` → `е` replacement? Special symbols ignoring?
-- Auto deep search?
-- Does it work in version history mode?
+- Add inactive icon
