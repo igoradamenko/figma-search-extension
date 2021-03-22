@@ -157,7 +157,8 @@ function handleArrowUp() {
 
 function sendSearchRequest(searchString) {
   if (!searchString) {
-    showResult([]);
+    showResult(null);
+    updateCache({ searchResult: [] });
     resetContentState();
     return;
   }
@@ -175,6 +176,13 @@ function sendSearchRequest(searchString) {
 /* MARKUP */
 
 function showResult(data) {
+  if (data === null) {
+    resultsNode.innerHTML = '';
+    hideEmptyNotice();
+    hideLoader();
+    return;
+  }
+
   const contentMarkup = buildResultsMarkup(data.searchResult);
 
   if (data.notLoadedPagesNumber && !didDeepSearch) {
@@ -394,6 +402,9 @@ function loadCache(loadedCache) {
   cache = loadedCache;
 
   inputNode.value = cache.inputValue;
+
+  if (!cache.inputValue) return;
+
   inputNode.setSelectionRange(0, cache.inputValue.length);
 
   didDeepSearch = cache.didDeepSearch;
