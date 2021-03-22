@@ -154,8 +154,14 @@ button {
 
 .content__empty-notice {
   display: none;
-  margin: 0;
-  padding: 8px 16px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #A5A5B1;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
 }
 
 .content_empty:not(.content_loading) .content__empty-notice {
