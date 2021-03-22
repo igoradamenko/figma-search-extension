@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="none">
+  <path stroke="#18A0FB" stroke-width="18" d="M183 106c0 42.523-34.477 77-77 77s-77-34.477-77-77 34.477-77 77-77 77 34.477 77 77z" clip-rule="evenodd"/>
+  <path fill="#18A0FB" fill-rule="evenodd" d="M106 61.75l19.667 19.667L106 101.083 86.333 81.417 106 61.75zm19.667 68.833L106 110.917l-19.667 19.666L106 150.25l19.667-19.667zm-44.25-44.25L101.083 106l-19.666 19.667L61.75 106l19.667-19.667zm49.166 0L150.25 106l-19.667 19.667L110.917 106l19.666-19.667z" clip-rule="evenodd"/>
+  <path stroke="#18A0FB" stroke-width="18" d="M227.5 227.5l-67-67"/>
+</svg>

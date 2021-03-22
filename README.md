@@ -1,5 +1,11 @@
 # Figma Search Extension
 
+<img align="right"
+     alt="Project logo: magnifying glass with component icon inside"
+     src="icon.svg" 
+     width="128" 
+     height="128">
+
 Search though Figma objects even in “View only” mode.
 
 Supported browsers: Chrome, Firefox, and any Chromium-based browser (Edge, Opera, Yandex.Browser, etc).
