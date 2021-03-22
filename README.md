@@ -30,6 +30,7 @@ Supported browsers: Chrome, Firefox, and any Chromium-based browser (Edge, Opera
   - [Manual installation](#manual-installation)
     - [Chrome or other Chromium-based browser](#chrome-or-other-chromium-based-browser)
     - [Firefox](#firefox)
+- [Credits](#credits)
 
 ## Rationale
 
@@ -108,3 +109,9 @@ If you use Linux or have already installed one of those editions, then:
 3. Open `about:addons`, press on a settings icon and pick “Install Add-on From File...” from a dropdown menu.
 4. Select the downloaded ZIP extension (from 1st step).
 5. Approve an installation.
+
+## Credits
+
+Design by Ruslan Daltsaev.
+
+[![Sponsored by FunBox](https://funbox.ru/badges/sponsored_by_funbox_centered.svg)](https://funbox.ru)

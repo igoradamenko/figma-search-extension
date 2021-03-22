@@ -6,4 +6,3 @@
 - Check Firefox for Android support
 - Improve extension stores description
 - Improve Component variants?
-- Add FunBox logo
