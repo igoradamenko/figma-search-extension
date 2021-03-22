@@ -49,6 +49,7 @@ button {
 .root_loading::before {
   content: '';
   position: absolute;
+  z-index: 1;
   top: var(--search-height);
   left: 0;
   right: 0;
@@ -62,6 +63,7 @@ button {
   content: '';
   box-sizing: border-box;
   position: absolute;
+  z-index: 2;
   top: calc(50% + var(--search-height));
   left: 50%;
   width: var(--size);
