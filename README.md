@@ -6,9 +6,7 @@
      width="128"
      height="128">
 
-![Chrome Web Store](https://img.shields.io/chrome-web-store/v/lfofpannpmmeeicgiiacjghmcfgnebbi?label=Chrome%20Web%20Store)
-
-![Mozilla Add-on](https://img.shields.io/amo/v/figma-search?label=Mozilla%20Add-ons)
+![Chrome Web Store](https://img.shields.io/chrome-web-store/v/lfofpannpmmeeicgiiacjghmcfgnebbi?label=Chrome%20Web%20Store) ![Mozilla Add-on](https://img.shields.io/amo/v/figma-search?label=Mozilla%20Add-ons)
 
 Search though Figma objects even in “View only” mode.
 
@@ -40,7 +38,7 @@ So this plugin was built as a temporary solution, until the time when Figma deve
 
 ## Features
 
-There're some things you should probably know about this extension.
+There are some things you should probably know about this extension.
 
 ### Shortcut
 
@@ -58,7 +56,7 @@ Any key except `Arrow Down`, `Arrow Up` and `Enter`. Use these keys to faster go
 Sadly, but sometimes Figma does not load all pages in “View only” mode, which does not allow us to search through all the existed 
 objects. So if your file has a lot of pages, you have to load them all.
 
-To make it a bit easier the extension shows button “Try deep search” in such cases. Click on this button will load 
+To make it a bit easier the extension shows button “Try Deep Search” in such cases. Click on this button will load 
 all the pages for you and retry the current search request. 
 
 ## How to install
