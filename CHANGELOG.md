@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0 (22.03.2021)
+
+First release!
+
+Everything was redesigned. Nothing was removed. Groups were added to search results.
+
+Some small bugs was fixed, such as showing “Try Deep Search” or empty notice when nothing entered. 
+
+
 ## 0.7.0 (12.03.2021)
 
 Now previously selected item is selected again when popup is reopen.
