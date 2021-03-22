@@ -10,7 +10,7 @@ const iconFiles = fs.readdirSync(path.resolve(__dirname, '../icons'))
   }));
 
 const iconStyles = iconFiles.map(({ name, content }) => {
-  return `.list__item_type_${name}::before {
+  return `.${name}::before {
   background-image: url('data:image/svg+xml,${encodeURIComponent(content)}')
 }`;
 }).join('\n\n');
