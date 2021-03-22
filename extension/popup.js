@@ -179,6 +179,7 @@ function showResult(data) {
   if (data === null) {
     resultsNode.innerHTML = '';
     hideEmptyNotice();
+    hideDeepSearchButton();
     hideLoader();
     return;
   }
