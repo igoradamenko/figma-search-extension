@@ -2,3 +2,4 @@
 - Add inactive icon
 - Add custom deep search preloading
 - Add section filter
+- Add Russian description

@@ -2,13 +2,20 @@
 
 <img align="right"
      alt="Project logo: magnifying glass with component icon inside"
-     src="icon.svg" 
-     width="128" 
+     src="icon.svg"
+     width="128"
      height="128">
+
+![Chrome Web Store](https://img.shields.io/chrome-web-store/v/lfofpannpmmeeicgiiacjghmcfgnebbi?label=Chrome%20Web%20Store)
+
+![Mozilla Add-on](https://img.shields.io/amo/v/figma-search?label=Mozilla%20Add-ons)
 
 Search though Figma objects even in “View only” mode.
 
 Supported browsers: Chrome, Firefox, and any Chromium-based browser (Edge, Opera, Yandex.Browser, etc).
+
+[![Figma Search in Chrome Web Store](./add-to-chrome.svg)](https://chrome.google.com/webstore/detail/figma-search/lfofpannpmmeeicgiiacjghmcfgnebbi)
+[![Figma Search in Mozilla Add-ons](./add-to-firefox.svg)](https://addons.mozilla.org/en-US/firefox/addon/figma-search/)
 
 ## Contents
 
