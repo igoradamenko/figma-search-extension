@@ -1,5 +1,6 @@
 :root {
-  --search-height: 74px;
+  /*--search-height: 74px;*/
+  --search-height: 51px;
 }
 
 @font-face {
