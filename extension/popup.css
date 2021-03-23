@@ -43,6 +43,7 @@ button {
   color: #2D2D38;
 }
 
+/* show loading overlay on root to overlap the scrollbar */
 .root_loading {
   position: relative;
 }
@@ -56,25 +57,6 @@ button {
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, .9);
-}
-
-.root_loading::after {
-  --size: 34px;
-
-  content: '';
-  box-sizing: border-box;
-  position: absolute;
-  z-index: 3;
-  top: calc(50% + var(--search-height));
-  left: 50%;
-  width: var(--size);
-  height: var(--size);
-  margin-left: calc(-1 * var(--size) / 2);
-  margin-top: calc(-1 * var(--size) / 2 - var(--search-height) / 2);
-  border: 4px solid #18A0FB;
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  animation: results__loading .5s infinite linear;
 }
 
 .search {
@@ -144,16 +126,11 @@ button {
 
 .deep-searching {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background: rgba(255, 255, 255, .9);
-  z-index: 2;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
 }
 
 .deep-searching__headline {
@@ -173,7 +150,7 @@ button {
 
 @keyframes mining {
   0% {
-    transform: rotateZ(0);
+    transform: rotateZ(0deg);
   }
 
   70% {
@@ -215,12 +192,6 @@ button {
   max-height: calc(100% - var(--search-height));
 }
 
-@keyframes results__loading {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .content__empty-notice {
   display: none;
   position: absolute;
@@ -237,13 +208,41 @@ button {
   display: none;
 }
 
-/* TODO: there is no content_loading anymore */
-.content_empty:not(.content_loading) .content__empty-notice {
+.content__preloader {
+  --size: 34px;
+
+  display: none;
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  width: var(--size);
+  height: var(--size);
+  margin-left: calc(-1 * var(--size) / 2);
+  margin-top: calc(-1 * var(--size) / 2);
+  border: 4px solid #18A0FB;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: spinning .5s infinite linear;
+}
+
+@keyframes spinning {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.content_loading .content__preloader {
+  display: block;
+}
+
+.content_empty .content__empty-notice {
   display: block;
 }
 
 .content_deep-searching .content__deep-searching-notice {
-  display: flex;
+  display: block;
 }
 
 .results {

@@ -200,7 +200,6 @@ function showResult(data) {
     setTimeout(() => hideDeepSearchingNotice());
   }
 
-
   hideLoader();
 
   if (data === null) {
@@ -318,7 +317,7 @@ function focusListItem(listItemId) {
 
 const contentTop = contentNode.getBoundingClientRect().top;
 const contentHeight = contentNode.offsetHeight;
-const headlineHeight = 28; // TODO: calc?
+const headlineHeight = 28; // *shrug*
 
 function scrollToItem(item) {
   const itemBounds = item.getBoundingClientRect();
@@ -387,24 +386,30 @@ function resetContentState() {
 let loaderTimeout = null;
 function showLoader() {
   clearTimeout(loaderTimeout);
-  loaderTimeout = setTimeout(() => rootNode.classList.add('root_loading'), 50);
+  loaderTimeout = setTimeout(() => {
+    rootNode.classList.add('root_loading');
+    contentNode.classList.add('content_loading');
+  }, 50);
 }
 
 function hideLoader() {
   clearTimeout(loaderTimeout);
   rootNode.classList.remove('root_loading');
+  contentNode.classList.remove('content_loading');
 }
 
 function showDeepSearchingNotice() {
+  rootNode.classList.add('root_loading');
   contentNode.classList.add('content_deep-searching');
 }
 
 function hideDeepSearchingNotice() {
+  rootNode.classList.remove('root_loading');
   contentNode.classList.remove('content_deep-searching');
 }
 
 function isDeepSearchingNoticeShown() {
-  contentNode.classList.contains('content_deep-searching');
+  return contentNode.classList.contains('content_deep-searching');
 }
 
 function setDeepSearchProgress(fraction) {
