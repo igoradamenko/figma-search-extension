@@ -3,6 +3,7 @@ const inputNode = document.getElementById('input');
 const contentNode = document.getElementById('content');
 const resultsNode = document.getElementById('results');
 const deepSearchButtonNode = document.getElementById('deep-search');
+const deepSearchProgressNode = document.getElementById('deep-search-progress');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
@@ -40,10 +41,14 @@ function onMessageGet(message) {
       resetContentState();
       return;
 
+    case 'PAGES_LOADED':
+      updateDeepSearchLoadingState(message.data);
+      return;
+
     case 'DEEP_SEARCH_COMPLETED':
       didDeepSearch = true;
       updateCache({ didDeepSearch });
-      sendSearchRequest(inputNode.value);
+      sendSearchRequest(inputNode.value, { deepSearch: true });
       return;
 
     case 'CACHE_EXISTS':
@@ -72,8 +77,16 @@ function onContentScroll(e) {
 
 function onDeepSearchButtonClick(e) {
   console.log('Deep search button clicked');
+
+  inputNode.setAttribute('disabled', 'disabled');
+
+  hideEmptyNotice();
+  hideDeepSearchButton();
+
+  setDeepSearchProgress(0);
+  showDeepSearchingNotice();
+
   sendMessage({ type: 'DEEP_SEARCH_STARTED' });
-  showLoader();
 }
 
 function onRootKeyDown(e) {
@@ -155,7 +168,7 @@ function handleArrowUp() {
 
 /* SEARCH */
 
-function sendSearchRequest(searchString) {
+function sendSearchRequest(searchString, options = {}) {
   if (!searchString) {
     showResult(null);
     updateCache({ searchResult: [] });
@@ -168,7 +181,10 @@ function sendSearchRequest(searchString) {
     type: 'SEARCH_STARTED',
     data: { searchString },
   });
-  showLoader();
+
+  if (!options.deepSearch) {
+    showLoader();
+  }
 }
 
 
@@ -176,11 +192,21 @@ function sendSearchRequest(searchString) {
 /* MARKUP */
 
 function showResult(data) {
+  inputNode.removeAttribute('disabled');
+
+  if (isDeepSearchingNoticeShown) {
+    // fill up the progress and hide it
+    setDeepSearchProgress(1);
+    setTimeout(() => hideDeepSearchingNotice());
+  }
+
+
+  hideLoader();
+
   if (data === null) {
     resultsNode.innerHTML = '';
     hideEmptyNotice();
     hideDeepSearchButton();
-    hideLoader();
     return;
   }
 
@@ -195,7 +221,6 @@ function showResult(data) {
   if (!contentMarkup) {
     resultsNode.innerHTML = '';
     showEmptyNotice();
-    hideLoader();
     return;
   }
 
@@ -204,7 +229,6 @@ function showResult(data) {
   listItems = [...document.querySelectorAll('.list__item')];
 
   hideEmptyNotice();
-  hideLoader();
 }
 
 const groupsOrder = [
@@ -317,6 +341,18 @@ function scrollToItem(item) {
   }
 }
 
+function updateDeepSearchLoadingState({ total, loaded }) {
+  console.log('Deep search loading state are getting updated; total:', total, 'loaded:', loaded);
+
+  if (loaded > total) loaded = total;
+
+  // we add 1 fake page to reuse deep search progress when all the pages
+  // are loaded, but we're still waiting for search request
+  total += 1;
+
+  setDeepSearchProgress(loaded / total);
+}
+
 function pseudoFocusListItem(listItemId) {
   pseudoBlurListItems();
 
@@ -357,6 +393,23 @@ function showLoader() {
 function hideLoader() {
   clearTimeout(loaderTimeout);
   rootNode.classList.remove('root_loading');
+}
+
+function showDeepSearchingNotice() {
+  contentNode.classList.add('content_deep-searching');
+}
+
+function hideDeepSearchingNotice() {
+  contentNode.classList.remove('content_deep-searching');
+}
+
+function isDeepSearchingNoticeShown() {
+  contentNode.classList.contains('content_deep-searching');
+}
+
+function setDeepSearchProgress(fraction) {
+  deepSearchProgressNode.style.setProperty('--progress-fraction', fraction.toString());
+  console.log('Set deep search progress as', fraction);
 }
 
 function showEmptyNotice() {

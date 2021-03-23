@@ -76,9 +76,10 @@
     loadNextPage();
 
     function pageLoadHandler() {
-      // TODO: send process notifications?
       loadedPagesNumber += 1;
       log(loadedPagesNumber, 'pages loaded');
+
+      sendMessage({ type: 'PAGES_LOADED', data: { loaded:loadedPagesNumber , total: pagesToLoad.length } });
 
       if (loadedPagesNumber === pagesToLoad.length) {
         log('All pages loaded');

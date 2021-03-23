@@ -3,19 +3,27 @@
     <link rel="stylesheet" href="popup.css">
   </head>
   <body class="root" id="root">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+      <defs>
+        <symbol id="pickaxe">
+          <path d="M20 19l-9-9-1 1 9 9 1-1zM8 7c2.5-2.5 7-3 7-3v.5C10 7 7 10 4.5 15H4s.5-4.5 3-7c-.5-.5.5-1.5 1-1z"/>
+        </symbol>
+      </defs>
+    </svg>
+
     <div class="search">
       <div class="search__control-group">
         <input
-            class="input search__input"
-            id="input"
-            type="text"
-            placeholder="Search"
-            autofocus
+          class="input search__input"
+          id="input"
+          type="text"
+          placeholder="Search"
+          autofocus
         >
 
         <button class="search__deep-search-button" id="deep-search">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="search__deep-search-icon">
-            <path d="M20 19l-9-9-1 1 9 9 1-1zM8 7c2.5-2.5 7-3 7-3v.5C10 7 7 10 4.5 15H4s.5-4.5 3-7c-.5-.5.5-1.5 1-1z"/>
+            <use xlink:href="#pickaxe"/>
           </svg>
 
           Try Deep Search
@@ -32,6 +40,16 @@
       ></div>
 
       <p class="content__empty-notice">Nothing found</p>
+
+      <div class="content__deep-searching-notice deep-searching">
+        <div class="deep-searching__headline">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="deep-searching__icon">
+            <use xlink:href="#pickaxe"/>
+          </svg>Deep Search
+        </div>
+
+        <div class="deep-searching__progress" id="deep-search-progress"></div>
+      </div>
     </div>
 
     <script src="popup.js"></script>
