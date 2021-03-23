@@ -50,7 +50,7 @@ button {
 .root_loading::before {
   content: '';
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   top: var(--search-height);
   left: 0;
   right: 0;
@@ -64,7 +64,7 @@ button {
   content: '';
   box-sizing: border-box;
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   top: calc(50% + var(--search-height));
   left: 50%;
   width: var(--size);
@@ -177,12 +177,13 @@ button {
 }
 
 .list__headline {
+  position: sticky;
+  z-index: 1;
+  top: 0;
   padding: 8px 16px 8px;
   font-size: 10px;
   line-height: 12px;
   color: #A5A5B1;
-  position: sticky;
-  top: 0;
   background: #fff;
 }
 
@@ -193,6 +194,7 @@ button {
 }
 
 .list__item {
+  position: relative;
   display: block;
   width: 100%;
   padding: 8px 16px 8px 48px;
@@ -211,12 +213,11 @@ button {
 
 .list__item::before {
   content: '';
-  display: inline-block;
+  position: absolute;
+  top: 8px;
+  left: 16px;
   width: 24px;
   height: 24px;
-  margin-left: -32px;
-  margin-right: 8px;
-  vertical-align: -7px;
   background: transparent center no-repeat;
 }
 
