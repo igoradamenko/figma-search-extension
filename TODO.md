@@ -4,3 +4,5 @@
 - Improve extension stores description
 - Improve Component Variants?
 - Do not search inside Component Instances?
+- Option for default value for filters?
+- Improve too many selected items.

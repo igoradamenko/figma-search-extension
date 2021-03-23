@@ -16,6 +16,7 @@
         <input
           class="input search__input"
           id="input"
+          name="search"
           type="text"
           placeholder="Search"
           autofocus
@@ -30,7 +31,37 @@
         </button>
       </div>
 
-<!--      <div class="search__filter select">Everywhere</div>-->
+      <div class="search__filter select" id="select">
+        <button class="select__button" id="select-button">
+          <span class="select__button-text" id="select-button-text">Everywhere</span><!--
+     --><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" class="select__arrow">
+          <path fill="none" d="M1 3.5l3 3 3-3"/>
+        </svg>
+        </button>
+
+        <div class="select__body" id="select-body">
+          <div class="select__item">Everywhere</div>
+          <div class="select__separator"></div>
+          <div class="select__item">Page</div>
+          <div class="select__item">Frame</div>
+          <div class="select__item">Component</div>
+          <div class="select__item">Group</div>
+          <div class="select__item" data-group-toggle>Others...</div>
+          <div class="select__group">
+            <div class="select__item">Instance</div>
+            <div class="select__item">Slice</div>
+            <div class="select__item">Vector</div>
+            <div class="select__item">Ellipse</div>
+            <div class="select__item">Polygon</div>
+            <div class="select__item">Star</div>
+            <div class="select__item">Line</div>
+            <div class="select__item">Arrow</div>
+            <div class="select__item">Text</div>
+            <div class="select__item">Rectangle</div>
+            <div class="select__item">Boolean</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="content" id="content">
@@ -45,7 +76,8 @@
         <div class="deep-searching__headline">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="deep-searching__icon">
             <use xlink:href="#pickaxe"/>
-          </svg>Deep Search
+          </svg><!--
+       -->Deep Search
         </div>
 
         <div class="deep-searching__progress" id="deep-search-progress"></div>

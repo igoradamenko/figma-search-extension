@@ -4,12 +4,36 @@ const contentNode = document.getElementById('content');
 const resultsNode = document.getElementById('results');
 const deepSearchButtonNode = document.getElementById('deep-search');
 const deepSearchProgressNode = document.getElementById('deep-search-progress');
+const selectNode = document.getElementById('select');
+const selectButtonNode = document.getElementById('select-button');
+const selectButtonTextNode = document.getElementById('select-button-text');
+const selectBodyNode = document.getElementById('select-body');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
 let listItems = [];
+let selectedFilters = [];
 let selectedListItemIndex;
 let didDeepSearch = false;
+
+const groupsOrder = [
+  'Page',
+  'Frame',
+  'Component',
+  'Group',
+  'Instance',
+  'Slice',
+  'Vector',
+  'Ellipse',
+  'Polygon',
+  'Star',
+  'Line',
+  'Arrow',
+  'Text',
+  'Rectangle',
+  'Boolean',
+  'Other',
+];
 
 run();
 
@@ -19,7 +43,10 @@ function run() {
   deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
   resultsNode.addEventListener('click', onResultsClick);
+  selectButtonNode.addEventListener('click', onSelectButtonClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
+
+  setSelectItemClickHandler();
 
   sendMessage({ type: 'POPUP_OPEN' });
 }
@@ -79,6 +106,7 @@ function onDeepSearchButtonClick(e) {
   console.log('Deep search button clicked');
 
   inputNode.setAttribute('disabled', 'disabled');
+  selectButtonNode.setAttribute('disabled', 'disabled');
 
   hideEmptyNotice();
   hideDeepSearchButton();
@@ -92,7 +120,7 @@ function onDeepSearchButtonClick(e) {
 function onRootKeyDown(e) {
   console.log('Some key pressed');
 
-  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' || listItems.length === 0) {
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape' || listItems.length === 0) {
     console.log('Keypress left unhandled');
     pseudoBlurListItems();
     inputNode.focus();
@@ -118,6 +146,13 @@ function onRootKeyDown(e) {
       // do not scroll the scrolling area
       e.preventDefault();
       handleArrowUp();
+      return;
+
+    case 'Escape':
+      if (!isSelectBodyShown()) return;
+      e.preventDefault();
+      selectButtonNode.removeAttribute('disabled');
+      hideSelectBody();
       return;
   }
 }
@@ -147,6 +182,119 @@ function onResultsClick(e) {
       itemId: item.dataset.id,
     },
   });
+}
+
+function onSelectButtonClick(e) {
+  selectButtonNode.setAttribute('disabled', 'disabled');
+
+  showSelectBody();
+
+  setSelectOutsideClickHandler();
+
+  // stop to prevent handling by outside click handler
+  e.stopPropagation();
+
+  updateSelectItemsState();
+}
+
+function setSelectItemClickHandler() {
+  selectBodyNode.addEventListener('click', handler);
+
+  function handler(e) {
+    const item = e.target.closest('.select__item');
+
+    if (!item) return;
+
+    if ('groupToggle' in item.dataset) {
+      selectBodyNode.querySelector('.select__group').style.display = 'block';
+      item.remove();
+
+      // to prevent click outside the select body
+      e.stopPropagation();
+
+      return;
+    }
+
+    const filter = item.textContent.trim();
+
+    if (filter === 'Everywhere') {
+      selectedFilters = [];
+      updateSelectItemsState();
+      applySelectedFilters();
+      return;
+    }
+
+    if (selectedFilters.includes(filter)) {
+      selectedFilters = selectedFilters.filter(f => f !== filter);
+    } else {
+      selectedFilters = selectedFilters.concat(filter);
+    }
+
+    // last element of groupsOrder is Other which does not exist as filter
+    if (selectedFilters.length === groupsOrder.length - 1) {
+      selectedFilters = [];
+    }
+
+    updateSelectItemsState();
+    applySelectedFilters();
+  }
+}
+
+function updateSelectItemsState() {
+  const items = [...selectBodyNode.querySelectorAll('.select__item')];
+
+  items.forEach(x => x.classList.remove('select__item_selected'));
+
+  if (!selectedFilters.length) {
+    items[0].classList.add('select__item_selected');
+    return;
+  }
+
+  selectedFilters.forEach(filter => {
+    items.find(item => item.textContent.trim() === filter).classList.add('select__item_selected');
+  });
+}
+
+function applySelectedFilters() {
+  updateCache({ selectedFilters });
+
+  if (!selectedFilters.length) {
+    selectButtonTextNode.innerHTML = 'Everywhere';
+    return;
+  }
+
+  let filters = [...selectedFilters];
+
+  filters.sort((a, b) => groupsOrder.indexOf(a) - groupsOrder.indexOf(b));
+
+  // assume that 5 is the max number of filters we can show w/o problem
+  if (filters.length > 5) {
+    filters = filters.map(f => shortFilter(f));
+  }
+
+  selectButtonTextNode.innerHTML = filters.join(', ');
+
+  function shortFilter(filter) {
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+    const firstLetter = filter[0];
+
+    filter = [...filter].slice(1).filter(l => !vowels.includes(l.toLowerCase())).join('');
+
+    return firstLetter + filter[0];
+  }
+}
+
+function setSelectOutsideClickHandler() {
+  rootNode.addEventListener('click', handler);
+
+  function handler(e) {
+    if (e.target.closest('.select__body')) return;
+
+    selectButtonNode.removeAttribute('disabled');
+    hideSelectBody();
+
+    rootNode.removeEventListener('click', handler);
+  }
 }
 
 function handleArrowDown() {
@@ -193,6 +341,7 @@ function sendSearchRequest(searchString, options = {}) {
 
 function showResult(data) {
   inputNode.removeAttribute('disabled');
+  selectButtonNode.removeAttribute('disabled');
 
   if (isDeepSearchingNoticeShown) {
     // fill up the progress and hide it
@@ -229,25 +378,6 @@ function showResult(data) {
 
   hideEmptyNotice();
 }
-
-const groupsOrder = [
-  'Page',
-  'Frame',
-  'Component',
-  'Group',
-  'Instance',
-  'Slice',
-  'Vector',
-  'Ellipse',
-  'Polygon',
-  'Star',
-  'Line',
-  'Arrow',
-  'Text',
-  'Rectangle',
-  'Boolean',
-  'Other',
-];
 
 function buildResultsMarkup(items = []) {
   if (!items.length) return '';
@@ -433,6 +563,18 @@ function hideDeepSearchButton() {
   deepSearchButtonNode.style.display = 'none';
 }
 
+function showSelectBody() {
+  selectNode.classList.add('select_open');
+}
+
+function hideSelectBody() {
+  selectNode.classList.remove('select_open');
+}
+
+function isSelectBodyShown() {
+  return selectNode.classList.contains('select_open');
+}
+
 
 
 /* CACHE */
@@ -459,6 +601,11 @@ function loadCache(loadedCache) {
   if (!loadedCache) return;
 
   cache = loadedCache;
+
+  // TODO: versions before 1.1.0 may now have selectedFilters in a cache
+  //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
+  selectedFilters = cache.selectedFilters || [];
+  applySelectedFilters();
 
   inputNode.value = cache.inputValue;
 
