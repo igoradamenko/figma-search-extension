@@ -92,7 +92,7 @@ button {
   position: relative;
   flex-shrink: 0;
   display: none;
-  padding-left: 32px; /* input offset + icon size + icon offset */
+  padding-left: 36px; /* input offset + icon size + icon offset */
   font-size: 12px;
   line-height: 24px;
   color: #18A0FB;
@@ -103,7 +103,7 @@ button {
 .search__deep-search-button::before {
   content: '';
   position: absolute;
-  left: 4px; /* input offset */
+  left: 8px; /* input offset */
   width: 24px;
   height: 24px;
   background: transparent center no-repeat;
