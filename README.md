@@ -12,6 +12,8 @@ Search though Figma objects even in “View only” mode.
 
 Supported browsers: Chrome, Firefox, and any Chromium-based browser (Edge, Opera, Yandex.Browser, etc).
 
+[По-русски](./README.ru.md)
+
 [![Figma Search in Chrome Web Store](./add-to-chrome.svg)](https://chrome.google.com/webstore/detail/figma-search/lfofpannpmmeeicgiiacjghmcfgnebbi)
 [![Figma Search in Mozilla Add-ons](./add-to-firefox.svg)](https://addons.mozilla.org/en-US/firefox/addon/figma-search/)
 
@@ -51,7 +53,7 @@ It's possible to change this shortcut in your browser's settings.
 
 ### Keyboard navigation
 
-Any key that you press while extension's popup is open will be sent into its search field.
+Any key that you press while extension's popup is focused will be sent into its search field.
 Any key except `Arrow Down`, `Arrow Up` and `Enter`. Use these keys to faster go through search results.
 
 ### Deep search
