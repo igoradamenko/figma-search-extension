@@ -1,5 +1,4 @@
 - `ё` → `е` replacement? Special symbols ignoring?
-- Add inactive icon
 - Add custom deep search preloading
 - Add section filter
 - Add Russian description

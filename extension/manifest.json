@@ -12,6 +12,13 @@
     "default_popup": "popup.html",
     "default_icon": "icon.png"
   },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": [
+    "tabs"
+  ],
   "icons": {
     "256": "icon.png"
   },
