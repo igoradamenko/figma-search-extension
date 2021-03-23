@@ -275,6 +275,7 @@ button {
   position: relative;
   display: block;
   width: 100%;
+  min-height: 40px;
   padding: 8px 16px 8px 48px;
   text-align: left;
   font-size: 13px;

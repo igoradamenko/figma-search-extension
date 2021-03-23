@@ -1,6 +1,6 @@
 - `ё` → `е` replacement? Special symbols ignoring?
-- Add custom deep search preloading
 - Add section filter
 - Check Firefox for Android support
 - Improve extension stores description
-- Improve Component variants?
+- Improve Component Variants?
+- Do not search inside Component Instances?
