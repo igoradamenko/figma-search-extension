@@ -112,6 +112,6 @@ If you use Linux or have already installed one of those editions, then:
 
 ## Credits
 
-Design by Ruslan Daltsaev.
+Design by [Ruslan Daltsaev](https://dribbble.com/workmachine).
 
 [![Sponsored by FunBox](https://funbox.ru/badges/sponsored_by_funbox_centered.svg)](https://funbox.ru)
