@@ -1,49 +1,34 @@
 class Select {
-  constructor({ groupsOrder, onSelectUpdate }) {
+  constructor({ onUpdate }) {
     this.rootNode = $('#root');
     this.selectNode = $('#select');
-    this.selectButtonNode = $('#select-button');
-    this.selectButtonTextNode = $('#select-button-text');
-    this.selectBodyNode = $('#select-body');
+    this.buttonNode = $('#select-button');
+    this.buttonTextNode = $('#select-button-text');
+    this.bodyNode = $('#select-body');
 
-    this.groupsOrder = groupsOrder;
+    this.valuesOrder = $$('[data-item]', this.bodyNode).map(x => x.textContent.trim());
+    this.onUpdate = onUpdate;
 
-    this.state = {
-      filters: [],
-      onUpdateCallbacks: [onSelectUpdate],
-    }
+    this.selectedValues = [];
 
-    this.selectButtonNode.addEventListener('click', this.onSelectButtonClick.bind(this));
-    this.selectBodyNode.addEventListener('click', this.onBodyClick.bind(this));
+    this.buttonNode.addEventListener('click', this.onButtonClick.bind(this));
+    this.bodyNode.addEventListener('click', this.onBodyClick.bind(this));
   }
 
-  updateFilters(filters) {
-    this.state.filters = filters;
 
-    this.updateSelectItemsState();
-    this.updateSelectorButtonText();
+  /* EVENT HANDLERS */
 
-    this.state.onUpdateCallbacks.forEach(f => f(filters));
-  }
+  onButtonClick(e) {
+    this.Disable();
 
-  setFilters(filters) {
-    this.state.filters = filters;
+    this.Open();
 
-    this.updateSelectItemsState();
-    this.updateSelectorButtonText();
-  }
-
-  onSelectButtonClick(e) {
-    this.disableSelectButton();
-
-    this.showSelectBody();
-
-    this.setSelectOutsideClickHandler();
+    this.setOutsideClickHandler();
 
     // stop to prevent handling by outside click handler
     e.stopPropagation();
 
-    this.updateSelectItemsState();
+    this.updateItemsState();
   }
 
   onBodyClick(e) {
@@ -52,7 +37,7 @@ class Select {
     if (!item) return;
 
     if ('groupToggle' in item.dataset) {
-      $('.select__group', this.selectBodyNode).style.display = 'block';
+      $('.select__group', this.bodyNode).style.display = 'block';
       item.remove();
 
       // to prevent click outside the select body
@@ -61,49 +46,57 @@ class Select {
       return;
     }
 
-    const filter = item.textContent.trim();
-
-    if (filter === 'Everywhere') {
-      this.updateFilters([]);
+    if ('all' in item.dataset) {
+      this.updateSelectedValues([]);
       return;
     }
 
-    let newFilters = [...this.state.filters];
-    if (newFilters.includes(filter)) {
-      newFilters = newFilters.filter(f => f !== filter);
+    let newSelectedValues = [...this.selectedValues];
+    const itemValue = item.textContent.trim();
+
+    if (newSelectedValues.includes(itemValue)) {
+      newSelectedValues = newSelectedValues.filter(f => f !== itemValue);
     } else {
-      newFilters = newFilters.concat(filter);
+      newSelectedValues = newSelectedValues.concat(itemValue);
     }
 
-    // last element of groupsOrder is Other which does not exist as filter
-    if (newFilters.length === this.groupsOrder.length - 1) {
-      newFilters = [];
+    if (newSelectedValues.length === this.valuesOrder.length) {
+      newSelectedValues = [];
     }
 
-    this.updateFilters(newFilters);
+    this.updateSelectedValues(newSelectedValues);
   }
 
-  updateSelectItemsState() {
-    const items = $$('.select__item', this.selectBodyNode);
+  updateSelectedValues(newValues) {
+    this.selectedValues = newValues;
+
+    this.updateItemsState();
+    this.updateSelectorButtonText();
+
+    this.onUpdate(newValues);
+  }
+
+  updateItemsState() {
+    const items = $$('.select__item', this.bodyNode);
 
     items.forEach(x => x.classList.remove('select__item_selected'));
 
-    if (!this.state.filters.length) {
+    if (!this.selectedValues.length) {
       items[0].classList.add('select__item_selected');
       return;
     }
 
-    this.state.filters.forEach(filter => {
+    this.selectedValues.forEach(filter => {
       items.find(item => item.textContent.trim() === filter).classList.add('select__item_selected');
     });
   }
 
-  setSelectOutsideClickHandler() {
+  setOutsideClickHandler() {
     const handler = (e) => {
       if (e.target.closest('.select__body')) return;
 
-      this.enableSelectButton();
-      this.hideSelectBody();
+      this.Enable();
+      this.Close();
 
       this.rootNode.removeEventListener('click', handler);
     }
@@ -112,49 +105,58 @@ class Select {
   }
 
   updateSelectorButtonText() {
-    if (!this.state.filters.length) {
-      this.selectButtonTextNode.innerHTML = 'Everywhere';
+    if (!this.selectedValues.length) {
+      this.buttonTextNode.innerHTML = 'Everywhere';
       return;
     }
 
-    let filters = [...this.state.filters];
+    let selectedValues = [...this.selectedValues];
 
-    filters.sort((a, b) => groupsOrder.indexOf(a) - groupsOrder.indexOf(b));
+    selectedValues.sort((a, b) => this.valuesOrder.indexOf(a) - this.valuesOrder.indexOf(b));
 
     // assume that 5 is the max number of filters we can show w/o problem
-    if (filters.length > 5) {
-      filters = filters.map(f => this.shortFilter(f));
+    if (selectedValues.length > 5) {
+      selectedValues = selectedValues.map(v => this.shortValue(v));
     }
 
-    this.selectButtonTextNode.innerHTML = filters.join(', ');
+    this.buttonTextNode.innerHTML = selectedValues.join(', ');
   }
 
-  shortFilter(filter) {
+  shortValue(value) {
     const vowels = ['a', 'e', 'i', 'o', 'u'];
-    const firstLetter = filter[0];
+    const firstLetter = value[0];
 
-    filter = [...filter].slice(1).filter(l => !vowels.includes(l.toLowerCase())).join('');
+    value = [...value].slice(1).filter(l => !vowels.includes(l.toLowerCase())).join('');
 
-    return firstLetter + filter[0];
+    return firstLetter + value[0];
   }
 
-  showSelectBody() {
+
+  /* PUBLIC */
+  Open() {
     this.selectNode.classList.add('select_open');
   }
 
-  hideSelectBody() {
+  Close() {
     this.selectNode.classList.remove('select_open');
   }
 
-  isSelectBodyShown() {
+  IsOpen() {
     return this.selectNode.classList.contains('select_open');
   }
 
-  disableSelectButton() {
-    this.selectButtonNode.setAttribute('disabled', 'disabled');
+  Enable() {
+    this.buttonNode.removeAttribute('disabled');
   }
 
-  enableSelectButton() {
-    this.selectButtonNode.removeAttribute('disabled');
+  Disable() {
+    this.buttonNode.setAttribute('disabled', 'disabled');
+  }
+
+  SetFilters(filters) {
+    this.selectedValues = filters;
+
+    this.updateItemsState();
+    this.updateSelectorButtonText();
   }
 }

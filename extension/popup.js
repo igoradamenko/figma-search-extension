@@ -11,11 +11,6 @@ let listItems = [];
 let selectedFilters = [];
 let selectedListItemIndex;
 let didDeepSearch = false;
-let hideSelectBody = () => {};
-let isSelectBodyShown = () => {};
-let disableSelectButton = () => {};
-let enableSelectButton = () => {};
-let setFilters = () => {};
 
 let select;
 
@@ -48,12 +43,7 @@ function run() {
   resultsNode.addEventListener('click', onResultsClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
-  select = new Select({ groupsOrder, onSelectUpdate: applySelectedFilters });
-  hideSelectBody = select.hideSelectBody.bind(select);
-  isSelectBodyShown = select.isSelectBodyShown.bind(select);
-  disableSelectButton = select.disableSelectButton.bind(select);
-  enableSelectButton = select.enableSelectButton.bind(select);
-  setFilters = select.setFilters.bind(select);
+  select = new Select({ onUpdate: applySelectedFilters });
 
   sendMessage({ type: 'POPUP_OPEN' });
 }
@@ -113,7 +103,7 @@ function onDeepSearchButtonClick(e) {
   console.log('Deep search button clicked');
 
   inputNode.setAttribute('disabled', 'disabled');
-  disableSelectButton();
+  select.Disable();
 
   hideEmptyNotice();
   hideDeepSearchButton();
@@ -156,10 +146,10 @@ function onRootKeyDown(e) {
       return;
 
     case 'Escape':
-      if (!isSelectBodyShown()) return;
+      if (!select.IsOpen()) return;
       e.preventDefault();
-      enableSelectButton();
-      hideSelectBody();
+      select.Enable();
+      select.Close();
       return;
   }
 }
@@ -241,7 +231,7 @@ function applySelectedFilters(filters) {
 
 function showResult(data) {
   inputNode.removeAttribute('disabled');
-  enableSelectButton();
+  select.Enable();
 
   if (isDeepSearchingNoticeShown) {
     // fill up the progress and hide it
@@ -506,7 +496,7 @@ function loadCache(loadedCache) {
   // TODO: versions before 1.1.0 may now have selectedFilters in a cache
   //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
   selectedFilters = cache.selectedFilters || [];
-  setFilters(selectedFilters);
+  select.SetFilters(selectedFilters);
 
   inputNode.value = cache.inputValue;
 
