@@ -1,77 +1,58 @@
-(() => {
-  window.initSelect = initSelect;
+class Select {
+  constructor({ groupsOrder, onSelectUpdate }) {
+    this.rootNode = $('#root');
+    this.selectNode = $('#select');
+    this.selectButtonNode = $('#select-button');
+    this.selectButtonTextNode = $('#select-button-text');
+    this.selectBodyNode = $('#select-body');
 
-  const rootNode = $('#root');
-  const selectNode = $('#select');
-  const selectButtonNode = $('#select-button');
-  const selectButtonTextNode = $('#select-button-text');
-  const selectBodyNode = $('#select-body');
+    this.groupsOrder = groupsOrder;
 
-  const STATE = {
-    set filters(value) {
-      this._filters = value;
-
-      updateSelectItemsState();
-      updateSelectorButtonText();
-
-      this.onUpdateCallback(this._filters);
-    },
-
-    get filters() {
-      return this._filters || [];
-    },
-
-    set onUpdate(value) {
-      this.onUpdateCallback = value;
-    },
-
-    forceSetFilters(value) {
-      this._filters = value;
-
-      updateSelectItemsState();
-      updateSelectorButtonText();
+    this.state = {
+      filters: [],
+      onUpdateCallbacks: [onSelectUpdate],
     }
+
+    this.selectButtonNode.addEventListener('click', this.onSelectButtonClick.bind(this));
+    this.selectBodyNode.addEventListener('click', this.onBodyClick.bind(this));
   }
 
-  function initSelect(onSelectUpdate) {
-    selectButtonNode.addEventListener('click', onSelectButtonClick);
-    selectBodyNode.addEventListener('click', onBodyClick);
+  updateFilters(filters) {
+    this.state.filters = filters;
 
-    STATE.onUpdate = onSelectUpdate;
+    this.updateSelectItemsState();
+    this.updateSelectorButtonText();
 
-    return {
-      hideSelectBody,
-      isSelectBodyShown,
-      disableSelectButton,
-      enableSelectButton,
-      setFilters,
-    };
+    this.state.onUpdateCallbacks.forEach(f => f(filters));
   }
 
-  function setFilters(filters) {
-    STATE.forceSetFilters(filters);
+  setFilters(filters) {
+    this.state.filters = filters;
+
+    this.updateSelectItemsState();
+    this.updateSelectorButtonText();
   }
 
-  function onSelectButtonClick(e) {
-    disableSelectButton();
+  onSelectButtonClick(e) {
+    this.disableSelectButton();
 
-    showSelectBody();
+    this.showSelectBody();
 
-    setSelectOutsideClickHandler();
+    this.setSelectOutsideClickHandler();
 
     // stop to prevent handling by outside click handler
     e.stopPropagation();
 
-    updateSelectItemsState();
+    this.updateSelectItemsState();
   }
 
-  function onBodyClick(e) {
+  onBodyClick(e) {
     const item = e.target.closest('.select__item');
 
     if (!item) return;
 
     if ('groupToggle' in item.dataset) {
-      selectBodyNode.querySelector('.select__group').style.display = 'block';
+      $('.select__group', this.selectBodyNode).style.display = 'block';
       item.remove();
 
       // to prevent click outside the select body
@@ -83,94 +64,97 @@
     const filter = item.textContent.trim();
 
     if (filter === 'Everywhere') {
-      STATE.filters = [];
+      this.updateFilters([]);
       return;
     }
 
-    if (STATE.filters.includes(filter)) {
-      STATE.filters = STATE.filters.filter(f => f !== filter);
+    let newFilters = [...this.state.filters];
+    if (newFilters.includes(filter)) {
+      newFilters = newFilters.filter(f => f !== filter);
     } else {
-      STATE.filters = STATE.filters.concat(filter);
+      newFilters = newFilters.concat(filter);
     }
 
     // last element of groupsOrder is Other which does not exist as filter
-    if (STATE.filters.length === groupsOrder.length - 1) {
-      STATE.filters = [];
+    if (newFilters.length === this.groupsOrder.length - 1) {
+      newFilters = [];
     }
+
+    this.updateFilters(newFilters);
   }
 
-  function updateSelectItemsState() {
-    const items = $$('.select__item', selectBodyNode);
+  updateSelectItemsState() {
+    const items = $$('.select__item', this.selectBodyNode);
 
     items.forEach(x => x.classList.remove('select__item_selected'));
 
-    if (!STATE.filters.length) {
+    if (!this.state.filters.length) {
       items[0].classList.add('select__item_selected');
       return;
     }
 
-    STATE.filters.forEach(filter => {
+    this.state.filters.forEach(filter => {
       items.find(item => item.textContent.trim() === filter).classList.add('select__item_selected');
     });
   }
 
-  function setSelectOutsideClickHandler() {
-    rootNode.addEventListener('click', handler);
-
-    function handler(e) {
+  setSelectOutsideClickHandler() {
+    const handler = (e) => {
       if (e.target.closest('.select__body')) return;
 
-      enableSelectButton();
-      hideSelectBody();
+      this.enableSelectButton();
+      this.hideSelectBody();
 
-      rootNode.removeEventListener('click', handler);
+      this.rootNode.removeEventListener('click', handler);
     }
+
+    this.rootNode.addEventListener('click', handler);
   }
 
-  function updateSelectorButtonText() {
-    if (!STATE.filters.length) {
-      selectButtonTextNode.innerHTML = 'Everywhere';
+  updateSelectorButtonText() {
+    if (!this.state.filters.length) {
+      this.selectButtonTextNode.innerHTML = 'Everywhere';
       return;
     }
 
-    let filters = [...STATE.filters];
+    let filters = [...this.state.filters];
 
     filters.sort((a, b) => groupsOrder.indexOf(a) - groupsOrder.indexOf(b));
 
     // assume that 5 is the max number of filters we can show w/o problem
     if (filters.length > 5) {
-      filters = filters.map(f => shortFilter(f));
+      filters = filters.map(f => this.shortFilter(f));
     }
 
-    selectButtonTextNode.innerHTML = filters.join(', ');
-
-    function shortFilter(filter) {
-      const vowels = ['a', 'e', 'i', 'o', 'u'];
-      const firstLetter = filter[0];
-
-      filter = [...filter].slice(1).filter(l => !vowels.includes(l.toLowerCase())).join('');
-
-      return firstLetter + filter[0];
-    }
+    this.selectButtonTextNode.innerHTML = filters.join(', ');
   }
 
-  function showSelectBody() {
-    selectNode.classList.add('select_open');
+  shortFilter(filter) {
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+    const firstLetter = filter[0];
+
+    filter = [...filter].slice(1).filter(l => !vowels.includes(l.toLowerCase())).join('');
+
+    return firstLetter + filter[0];
   }
 
-  function hideSelectBody() {
-    selectNode.classList.remove('select_open');
+  showSelectBody() {
+    this.selectNode.classList.add('select_open');
   }
 
-  function isSelectBodyShown() {
-    return selectNode.classList.contains('select_open');
+  hideSelectBody() {
+    this.selectNode.classList.remove('select_open');
   }
 
-  function disableSelectButton() {
-    selectButtonNode.setAttribute('disabled', 'disabled');
+  isSelectBodyShown() {
+    return this.selectNode.classList.contains('select_open');
   }
 
-  function enableSelectButton() {
-    selectButtonNode.removeAttribute('disabled');
+  disableSelectButton() {
+    this.selectButtonNode.setAttribute('disabled', 'disabled');
   }
-})();
+
+  enableSelectButton() {
+    this.selectButtonNode.removeAttribute('disabled');
+  }
+}

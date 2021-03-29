@@ -17,6 +17,8 @@ let disableSelectButton = () => {};
 let enableSelectButton = () => {};
 let setFilters = () => {};
 
+let select;
+
 const groupsOrder = [
   'Page',
   'Frame',
@@ -46,12 +48,12 @@ function run() {
   resultsNode.addEventListener('click', onResultsClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
-  const select = initSelect(applySelectedFilters);
-  hideSelectBody = select.hideSelectBody;
-  isSelectBodyShown = select.isSelectBodyShown;
-  disableSelectButton = select.disableSelectButton;
-  enableSelectButton = select.enableSelectButton;
-  setFilters = select.setFilters;
+  select = new Select({ groupsOrder, onSelectUpdate: applySelectedFilters });
+  hideSelectBody = select.hideSelectBody.bind(select);
+  isSelectBodyShown = select.isSelectBodyShown.bind(select);
+  disableSelectButton = select.disableSelectButton.bind(select);
+  enableSelectButton = select.enableSelectButton.bind(select);
+  setFilters = select.setFilters.bind(select);
 
   sendMessage({ type: 'POPUP_OPEN' });
 }
