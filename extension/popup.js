@@ -27,7 +27,6 @@ function run() {
 
   select = new Select({
     node: $('#select'),
-    rootNode,
     onUpdate: applySelectedFilters,
   });
 
@@ -68,6 +67,7 @@ function onMessageGet(message) {
       return;
   }
 }
+
 
 
 /* DOM EVENTS HANDLERS */

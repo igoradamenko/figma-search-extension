@@ -1,6 +1,5 @@
 class Select {
-  constructor({ node, rootNode, onUpdate }) {
-    this.rootNode = rootNode;
+  constructor({ node, onUpdate }) {
     this.selectNode = node;
     this.buttonNode = $('.select__button', node);
     this.buttonTextNode = $('.select__button-text', node);
@@ -67,6 +66,9 @@ class Select {
     this.updateSelectedValues(newSelectedValues);
   }
 
+
+  /* PRIVATE */
+
   updateSelectedValues(newValues) {
     this.selectedValues = newValues;
 
@@ -98,10 +100,10 @@ class Select {
       this.Enable();
       this.Close();
 
-      this.rootNode.removeEventListener('click', handler);
+      document.body.removeEventListener('click', handler);
     }
 
-    this.rootNode.addEventListener('click', handler);
+    document.body.addEventListener('click', handler);
   }
 
   updateSelectorButtonText() {
