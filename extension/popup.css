@@ -274,6 +274,7 @@ button[disabled], input[disabled] {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  margin: 0;
   color: #A5A5B1;
   font-size: 13px;
   line-height: 18px;
@@ -323,6 +324,10 @@ button[disabled], input[disabled] {
 
 .results {
   padding: 0 0 6px;
+}
+
+.results:empty {
+  padding: 0;
 }
 
 .list {
