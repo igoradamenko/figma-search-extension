@@ -369,7 +369,6 @@ function showResult(data) {
     return;
   }
 
-  const contentMarkup = buildResultsMarkup(data.searchResult);
 
   if (data.notLoadedPagesNumber && !didDeepSearch) {
     showDeepSearchButton();
@@ -377,22 +376,20 @@ function showResult(data) {
     hideDeepSearchButton();
   }
 
-  if (!contentMarkup) {
+  if (!data.searchResult.length) {
     resultsNode.innerHTML = '';
     showEmptyNotice();
     return;
   }
 
-  resultsNode.innerHTML = contentMarkup;
+  resultsNode.innerHTML = buildResultsMarkup(data.searchResult);
 
   listItems = $$('.list__item');
 
   hideEmptyNotice();
 }
 
-function buildResultsMarkup(items = []) {
-  if (!items.length) return '';
-
+function buildResultsMarkup(items) {
   items.sort((a, b) => {
     const aGroup = typeToGroup(a.type);
     const bGroup = typeToGroup(b.type);
