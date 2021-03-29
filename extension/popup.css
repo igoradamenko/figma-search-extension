@@ -285,7 +285,15 @@ button[disabled], input[disabled] {
   display: none;
 }
 
-.content__preloader {
+.content_empty .content__empty-notice {
+  display: block;
+}
+
+.content_deep-searching .content__deep-searching-notice {
+  display: block;
+}
+
+.global-preloader {
   --size: 34px;
 
   display: none;
@@ -304,22 +312,14 @@ button[disabled], input[disabled] {
   animation: spinning .5s infinite linear;
 }
 
+.global-preloader_visible {
+  display: block;
+}
+
 @keyframes spinning {
   100% {
     transform: rotate(360deg);
   }
-}
-
-.content_loading .content__preloader {
-  display: block;
-}
-
-.content_empty .content__empty-notice {
-  display: block;
-}
-
-.content_deep-searching .content__deep-searching-notice {
-  display: block;
 }
 
 .empty-notice {

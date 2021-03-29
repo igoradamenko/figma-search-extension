@@ -16,6 +16,7 @@ let select;
 let input;
 let list;
 let emptyNotice;
+let globalPreloader;
 
 run();
 
@@ -23,6 +24,8 @@ function run() {
   deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
   chrome.runtime.onMessage.addListener(onMessageGet);
+
+  const overlayNode = $('#overlay');
 
   input = new Input({
     node: $('#input'),
@@ -43,8 +46,13 @@ function run() {
 
   emptyNotice = new EmptyNotice({
     node: $('#empty-notice'),
-    overlayNode: $('#overlay'),
+    overlayNode,
     // TODO: onSearchButtonClick
+  });
+
+  globalPreloader = new GlobalPreloader({
+    node: $('#global-preloader'),
+    overlayNode,
   });
 
   groupsOrder = [...select.GetValuesOrder(), 'Other'];
@@ -207,7 +215,7 @@ function sendSearchRequest(searchString, options = {}) {
   });
 
   if (!options.deepSearch) {
-    showLoader();
+    globalPreloader.Show();
   }
 }
 
@@ -225,7 +233,7 @@ function showResult(data) {
     setTimeout(() => hideDeepSearchingNotice());
   }
 
-  hideLoader();
+  globalPreloader.Hide();
 
   if (data === null) {
     // TODO: should we reset selectedListItem?
@@ -363,21 +371,6 @@ function resetContentState() {
   updateCache({ selectedListItemIndex, listScrollTop: 0 });
 
   console.log('Content state reset');
-}
-
-let loaderTimeout = null;
-function showLoader() {
-  clearTimeout(loaderTimeout);
-  loaderTimeout = setTimeout(() => {
-    rootNode.classList.add('root_loading');
-    contentNode.classList.add('content_loading');
-  }, 50);
-}
-
-function hideLoader() {
-  clearTimeout(loaderTimeout);
-  rootNode.classList.remove('root_loading');
-  contentNode.classList.remove('content_loading');
 }
 
 function showDeepSearchingNotice() {
