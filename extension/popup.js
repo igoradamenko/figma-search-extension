@@ -1,6 +1,5 @@
 const rootNode = $('#root');
 const contentNode = $('#content');
-const resultsNode = $('#results');
 const deepSearchButtonNode = $('#deep-search');
 const deepSearchProgressNode = $('#deep-search-progress');
 
@@ -13,15 +12,14 @@ let didDeepSearch = false;
 
 let select;
 let input;
+let list;
 let groupsOrder;
 
 run();
 
 function run() {
-  contentNode.addEventListener('scroll', onContentScroll);
   deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
-  resultsNode.addEventListener('click', onResultsClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
   input = new Input({
@@ -32,6 +30,13 @@ function run() {
   select = new Select({
     node: $('#select'),
     onUpdate: onSelectUpdate,
+  });
+
+  list = new List({
+    node: $('#results'),
+    scrolledContainerNode: contentNode,
+    onItemFocus: onListItemFocus,
+    onScroll: onContentScroll,
   });
 
   groupsOrder = [...select.GetValuesOrder(), 'Other'];
@@ -90,9 +95,9 @@ function onInputUpdate(value) {
   debouncedSendSearchRequest(value);
 }
 
-function onContentScroll(e) {
-  console.log('Content scrolled');
-  updateCache({ contentScrollTop: contentNode.scrollTop });
+// TODO: should be onListScroll
+function onContentScroll(contentScrollTop) {
+  updateCache({ contentScrollTop });
 }
 
 function onDeepSearchButtonClick(e) {
@@ -149,29 +154,14 @@ function onRootKeyDown(e) {
   }
 }
 
-function onResultsClick(e) {
-  console.log('Results clicked');
-
-  const item = e.target.closest('.list__item');
-  if (!item) {
-    console.log('Clicked item not found')
-    return;
-  }
-
-  console.log('Clicked item found');
-
-  pseudoBlurListItems();
-  deselectListItems();
-  scrollToItem(item);
-  selectListItem(item);
-
-  selectedListItemIndex = $$('.list__item').findIndex(i => i === item);
-  updateCache({ selectedListItemIndex });
+function onListItemFocus({ index, id }) {
+  selectedListItemIndex = index; // TODO: move to List?
+  updateCache({ selectedListItemIndex: index });
 
   sendMessage({
     type: 'ITEM_FOCUSED',
     data: {
-      itemId: item.dataset.id,
+      itemId: id,
     },
   });
 }
@@ -181,7 +171,7 @@ function handleArrowDown() {
   selectedListItemIndex = (selectedListItemIndex + 1) % listItems.length;
   updateCache({ selectedListItemIndex });
 
-  focusListItem(selectedListItemIndex);
+  list.FocusItemByIndex(selectedListItemIndex);
 }
 
 function handleArrowUp() {
@@ -189,7 +179,7 @@ function handleArrowUp() {
   selectedListItemIndex = (selectedListItemIndex - 1 + listItems.length) % listItems.length;
   updateCache({ selectedListItemIndex });
 
-  focusListItem(selectedListItemIndex);
+  list.FocusItemByIndex(selectedListItemIndex);
 }
 
 
@@ -231,7 +221,8 @@ function showResult(data) {
   hideLoader();
 
   if (data === null) {
-    resultsNode.innerHTML = '';
+    // TODO: should we reset selectedListItem?
+    list.Clear();
     hideEmptyNotice();
     hideDeepSearchButton();
     return;
@@ -244,13 +235,15 @@ function showResult(data) {
   }
 
   if (!data.searchResult.length) {
-    resultsNode.innerHTML = '';
+    // TODO: should we reset selectedListItem?
+    list.Clear();
     showEmptyNotice();
     return;
   }
 
-  resultsNode.innerHTML = buildResultsMarkup(data.searchResult);
+  list.SetMarkup(buildResultsMarkup(data.searchResult));
 
+  // TODO: does it work with items hiding?
   listItems = $$('.list__item');
 
   hideEmptyNotice();
@@ -329,39 +322,6 @@ function typeToGroup(type) {
 
 /* MARKUP STATES */
 
-function focusListItem(listItemId) {
-  const item = $$('.list__item')[listItemId];
-  scrollToItem(item);
-
-  item.focus();
-  console.log(`Item #${listItemId} focused`);
-}
-
-const contentTop = contentNode.getBoundingClientRect().top;
-const contentHeight = contentNode.offsetHeight;
-const headlineHeight = 28; // *shrug*
-
-function scrollToItem(item) {
-  const itemBounds = item.getBoundingClientRect();
-
-  const topBordersDiff = itemBounds.top - (contentTop + headlineHeight);
-  const bottomBordersDiff = (itemBounds.top + itemBounds.height) - (contentTop + contentHeight);
-  const isItemTopBorderOutside = topBordersDiff < 0;
-  const isItemBottomBorderOutside = bottomBordersDiff > 0;
-
-  if (isItemTopBorderOutside) {
-    contentNode.scrollBy(0, topBordersDiff);
-    console.log('Scrolled content node');
-    return;
-  }
-
-  if (isItemBottomBorderOutside) {
-    contentNode.scrollBy(0, bottomBordersDiff);
-    console.log('Scrolled content node');
-    return;
-  }
-}
-
 function updateDeepSearchLoadingState({ total, loaded }) {
   console.log('Deep search loading state are getting updated; total:', total, 'loaded:', loaded);
 
@@ -387,18 +347,9 @@ function pseudoBlurListItems() {
   console.log('Pseudo-focused items blurred');
 }
 
-function selectListItem(item) {
-  item.classList.add('list__item_selected');
-  console.log('Item selected');
-}
-
-function deselectListItems() {
-  $$('.list__item_selected').forEach(i => i.classList.remove('list__item_selected'));
-  console.log('Items deselected');
-}
-
 function resetContentState() {
-  contentNode.scrollTop = 0;
+  list.ResetState();
+
   selectedListItemIndex = undefined;
   updateCache({ selectedListItemIndex, contentScrollTop: 0 });
 
@@ -503,7 +454,7 @@ function loadCache(loadedCache) {
     pseudoFocusListItem(selectedListItemIndex);
   }
 
-  contentNode.scrollTop = cache.contentScrollTop;
+  list.SetScrollTop(cache.contentScrollTop);
 }
 
 

@@ -6,7 +6,7 @@ There are some new features:
 
 1. Extension icon is inactivated when the current page is not Figma.com.
 
-2. Deep Search now has progress bar.
+2. Deep Search now has a progress bar.
 
 3. Groups Filter has been added. It allows to filter results to show only selected groups.
 
