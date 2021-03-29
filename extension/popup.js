@@ -1,13 +1,13 @@
-const rootNode = document.getElementById('root');
-const inputNode = document.getElementById('input');
-const contentNode = document.getElementById('content');
-const resultsNode = document.getElementById('results');
-const deepSearchButtonNode = document.getElementById('deep-search');
-const deepSearchProgressNode = document.getElementById('deep-search-progress');
-const selectNode = document.getElementById('select');
-const selectButtonNode = document.getElementById('select-button');
-const selectButtonTextNode = document.getElementById('select-button-text');
-const selectBodyNode = document.getElementById('select-body');
+const rootNode = $('#root');
+const inputNode = $('#input');
+const contentNode = $('#content');
+const resultsNode = $('#results');
+const deepSearchButtonNode = $('#deep-search');
+const deepSearchProgressNode = $('#deep-search-progress');
+const selectNode = $('#select');
+const selectButtonNode = $('#select-button');
+const selectButtonTextNode = $('#select-button-text');
+const selectBodyNode = $('#select-body');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
@@ -173,7 +173,7 @@ function onResultsClick(e) {
   scrollToItem(item);
   selectListItem(item);
 
-  selectedListItemIndex = [...document.querySelectorAll('.list__item')].findIndex(i => i === item);
+  selectedListItemIndex = $$('.list__item').findIndex(i => i === item);
   updateCache({ selectedListItemIndex });
 
   sendMessage({
@@ -385,7 +385,7 @@ function showResult(data) {
 
   resultsNode.innerHTML = contentMarkup;
 
-  listItems = [...document.querySelectorAll('.list__item')];
+  listItems = $$('.list__item');
 
   hideEmptyNotice();
 }
@@ -466,7 +466,7 @@ function typeToGroup(type) {
 /* MARKUP STATES */
 
 function focusListItem(listItemId) {
-  const item = document.getElementsByClassName('list__item')[listItemId];
+  const item = $$('.list__item')[listItemId];
   scrollToItem(item);
 
   item.focus();
@@ -513,13 +513,13 @@ function updateDeepSearchLoadingState({ total, loaded }) {
 function pseudoFocusListItem(listItemId) {
   pseudoBlurListItems();
 
-  const item = document.getElementsByClassName('list__item')[listItemId];
+  const item = $$('.list__item')[listItemId];
   item.classList.add('list__item_focused');
   console.log(`Item #${listItemId} pseudo-focused`);
 }
 
 function pseudoBlurListItems() {
-  [...document.getElementsByClassName('list__item_focused')].forEach(i => i.classList.remove('list__item_focused'));
+  $$('.list__item_focused').forEach(i => i.classList.remove('list__item_focused'));
   console.log('Pseudo-focused items blurred');
 }
 
@@ -529,7 +529,7 @@ function selectListItem(item) {
 }
 
 function deselectListItems() {
-  [...document.getElementsByClassName('list__item_selected')].forEach(i => i.classList.remove('list__item_selected'));
+  $$('.list__item_selected').forEach(i => i.classList.remove('list__item_selected'));
   console.log('Items deselected');
 }
 
