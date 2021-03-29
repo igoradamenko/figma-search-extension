@@ -36,7 +36,7 @@ function run() {
     node: $('#results'),
     scrolledContainerNode: contentNode,
     onItemFocus: onListItemFocus,
-    onScroll: onContentScroll,
+    onScroll: onListScroll,
   });
 
   groupsOrder = [...select.GetValuesOrder(), 'Other'];
@@ -79,7 +79,7 @@ function onMessageGet(message) {
 
 
 
-/* DOM EVENTS HANDLERS */
+/* EVENT HANDLERS */
 
 function onSelectUpdate(filters) {
   selectedFilters = filters;
@@ -95,9 +95,8 @@ function onInputUpdate(value) {
   debouncedSendSearchRequest(value);
 }
 
-// TODO: should be onListScroll
-function onContentScroll(contentScrollTop) {
-  updateCache({ contentScrollTop });
+function onListScroll(listScrollTop) {
+  updateCache({ listScrollTop });
 }
 
 function onDeepSearchButtonClick(e) {
@@ -351,7 +350,7 @@ function resetContentState() {
   list.ResetState();
 
   selectedListItemIndex = undefined;
-  updateCache({ selectedListItemIndex, contentScrollTop: 0 });
+  updateCache({ selectedListItemIndex, listScrollTop: 0 });
 
   console.log('Content state reset');
 }
@@ -416,7 +415,7 @@ let cache = {
   notLoadedPagesNumber: 0,
   didDeepSearch: false,
   selectedListItemIndex: undefined,
-  contentScrollTop: 0,
+  listScrollTop: 0,
 };
 
 function updateCache(obj) {
@@ -454,7 +453,7 @@ function loadCache(loadedCache) {
     pseudoFocusListItem(selectedListItemIndex);
   }
 
-  list.SetScrollTop(cache.contentScrollTop);
+  list.SetScrollTop(cache.listScrollTop);
 }
 
 
