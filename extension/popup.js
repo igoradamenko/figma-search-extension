@@ -1,5 +1,4 @@
 const rootNode = $('#root');
-const inputNode = $('#input');
 const contentNode = $('#content');
 const resultsNode = $('#results');
 const deepSearchButtonNode = $('#deep-search');
@@ -13,21 +12,26 @@ let selectedListItemIndex;
 let didDeepSearch = false;
 
 let select;
+let input;
 let groupsOrder;
 
 run();
 
 function run() {
-  inputNode.addEventListener('input', onInputChange);
   contentNode.addEventListener('scroll', onContentScroll);
   deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
   resultsNode.addEventListener('click', onResultsClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
+  input = new Input({
+    node: $('#input'),
+    onUpdate: onInputUpdate,
+  })
+
   select = new Select({
     node: $('#select'),
-    onUpdate: applySelectedFilters,
+    onUpdate: onSelectUpdate,
   });
 
   groupsOrder = [...select.GetValuesOrder(), 'Other'];
@@ -59,7 +63,7 @@ function onMessageGet(message) {
     case 'DEEP_SEARCH_COMPLETED':
       didDeepSearch = true;
       updateCache({ didDeepSearch });
-      sendSearchRequest(inputNode.value, { deepSearch: true });
+      sendSearchRequest(input.GetValue(), { deepSearch: true });
       return;
 
     case 'CACHE_EXISTS':
@@ -72,9 +76,13 @@ function onMessageGet(message) {
 
 /* DOM EVENTS HANDLERS */
 
-function onInputChange(e) {
-  const value = e.target.value;
+function onSelectUpdate(filters) {
+  selectedFilters = filters;
+  updateCache({ selectedFilters });
+  showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
+}
 
+function onInputUpdate(value) {
   console.log('Input changed', value);
 
   updateCache({ inputValue: value });
@@ -90,7 +98,7 @@ function onContentScroll(e) {
 function onDeepSearchButtonClick(e) {
   console.log('Deep search button clicked');
 
-  inputNode.setAttribute('disabled', 'disabled');
+  input.Disable();
   select.Disable();
 
   hideEmptyNotice();
@@ -108,12 +116,12 @@ function onRootKeyDown(e) {
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape' || listItems.length === 0) {
     console.log('Keypress left unhandled');
     pseudoBlurListItems();
-    inputNode.focus();
+    input.Focus();
     return;
   }
 
   console.log(`It is ${e.key} key`);
-  inputNode.blur();
+  input.Blur();
 
   switch (e.key) {
     case 'Enter':
@@ -207,18 +215,12 @@ function sendSearchRequest(searchString, options = {}) {
   }
 }
 
-function applySelectedFilters(filters) {
-  selectedFilters = filters;
-  updateCache({ selectedFilters });
-  showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
-}
-
 
 
 /* MARKUP */
 
 function showResult(data) {
-  inputNode.removeAttribute('disabled');
+  input.Enable();
   select.Enable();
 
   if (isDeepSearchingNoticeShown) {
@@ -486,11 +488,11 @@ function loadCache(loadedCache) {
   selectedFilters = cache.selectedFilters || [];
   select.SetFilters(selectedFilters);
 
-  inputNode.value = cache.inputValue;
+  input.SetValue(cache.inputValue);
 
   if (!cache.inputValue) return;
 
-  inputNode.setSelectionRange(0, cache.inputValue.length);
+  input.SelectAll();
 
   didDeepSearch = cache.didDeepSearch;
 
