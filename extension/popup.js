@@ -486,7 +486,7 @@ function loadCache(loadedCache) {
   // TODO: versions before 1.1.0 may now have selectedFilters in a cache
   //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
   selectedFilters = cache.selectedFilters || [];
-  select.SetFilters(selectedFilters);
+  select.SetSelectedValues(selectedFilters);
 
   input.SetValue(cache.inputValue);
 

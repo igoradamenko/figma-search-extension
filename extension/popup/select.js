@@ -156,8 +156,8 @@ class Select {
     this.buttonNode.setAttribute('disabled', 'disabled');
   }
 
-  SetFilters(filters) {
-    this.selectedValues = filters;
+  SetSelectedValues(selectedValues) {
+    this.selectedValues = selectedValues;
 
     this.updateItemsState();
     this.updateSelectorButtonText();
