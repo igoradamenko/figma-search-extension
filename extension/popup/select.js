@@ -1,10 +1,10 @@
 class Select {
-  constructor({ onUpdate }) {
-    this.rootNode = $('#root');
-    this.selectNode = $('#select');
-    this.buttonNode = $('#select-button');
-    this.buttonTextNode = $('#select-button-text');
-    this.bodyNode = $('#select-body');
+  constructor({ node, rootNode, onUpdate }) {
+    this.rootNode = rootNode;
+    this.selectNode = node;
+    this.buttonNode = $('.select__button', node);
+    this.buttonTextNode = $('.select__button-text', node);
+    this.bodyNode = $('.select__body', node);
 
     this.valuesOrder = $$('[data-item]', this.bodyNode).map(x => x.textContent.trim());
     this.onUpdate = onUpdate;

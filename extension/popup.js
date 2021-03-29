@@ -25,7 +25,11 @@ function run() {
   resultsNode.addEventListener('click', onResultsClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
-  select = new Select({ onUpdate: applySelectedFilters });
+  select = new Select({
+    node: $('#select'),
+    rootNode,
+    onUpdate: applySelectedFilters,
+  });
 
   groupsOrder = [...select.GetValuesOrder(), 'Other'];
 
