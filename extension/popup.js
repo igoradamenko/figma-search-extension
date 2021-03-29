@@ -258,6 +258,16 @@ function updateSelectItemsState() {
 function applySelectedFilters() {
   updateCache({ selectedFilters });
 
+  updateSelectorButtonText();
+
+  filterResults();
+}
+
+function filterResults() {
+  showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
+}
+
+function updateSelectorButtonText() {
   if (!selectedFilters.length) {
     selectButtonTextNode.innerHTML = 'Everywhere';
     return;
@@ -283,6 +293,7 @@ function applySelectedFilters() {
     return firstLetter + filter[0];
   }
 }
+
 
 function setSelectOutsideClickHandler() {
   rootNode.addEventListener('click', handler);
@@ -412,17 +423,34 @@ function buildResultsMarkup(items = []) {
     groupToPut.items.push(item);
   });
 
+  if (!selectedFilters.length) {
+    return itemsByGroup
+      .filter(x => x.items.length)
+      .map(renderGroup)
+      .join('');
+  }
+
   return itemsByGroup
-    .filter(x => x.items.length)
-    .map(obj => {
-      const headline = `<div class="list__headline">${obj.group}</div>`;
+    .filter(x => selectedFilters.includes(x.group))
+    .map(renderGroup)
+    .join('');
+
+  function renderGroup(obj) {
+    const headline = `<div class="list__headline">${obj.group}</div>`;
+    let list;
+
+    if (obj.items.length) {
       const listItems = obj.items.map(i => {
         return `<li><button class="list__item list__item_type_${i.type}" type="button" data-id="${i.id}">${i.name}</button></li>`
       }).join('');
 
-      return `<div class="list">${headline}<ul class="list__items">${listItems}</ul></div>`;
-    })
-    .join('');
+      list = `<ul class="list__items">${listItems}</ul>`;
+    } else {
+      list = '<div class="list__empty-notice">Nothing found</div>';
+    }
+
+    return `<div class="list">${headline}${list}</div>`;
+  }
 }
 
 function typeToGroup(type) {

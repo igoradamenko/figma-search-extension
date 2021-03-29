@@ -357,6 +357,13 @@ button[disabled], input[disabled] {
   line-height: 16px;
 }
 
+.list__empty-notice {
+  padding: 12px 16px 16px;
+  font-size: 13px;
+  line-height: 16px;
+  color: #A5A5B1;
+}
+
 .list__item:hover, .list__item:focus, .list__item_focused {
   background: #F4F4F8;
 }
