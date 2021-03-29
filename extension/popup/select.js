@@ -18,8 +18,6 @@ class Select {
   /* EVENT HANDLERS */
 
   onButtonClick(e) {
-    this.Disable();
-
     this.Open();
 
     this.setOutsideClickHandler();
@@ -137,11 +135,13 @@ class Select {
   /* PUBLIC */
 
   Open() {
+    this.Disable();
     this.selectNode.classList.add('select_open');
   }
 
   Close() {
     this.selectNode.classList.remove('select_open');
+    this.Enable();
   }
 
   IsOpen() {

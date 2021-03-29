@@ -144,7 +144,6 @@ function onRootKeyDown(e) {
     case 'Escape':
       if (!select.IsOpen()) return;
       e.preventDefault();
-      select.Enable();
       select.Close();
       return;
   }
