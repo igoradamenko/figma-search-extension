@@ -6,10 +6,10 @@ function debounce(fn, ms) {
   };
 }
 
-function $(selector) {
-  return document.querySelector(selector);
+function $(selector, node = document) {
+  return node.querySelector(selector);
 }
 
-function $$(selector) {
-  return [...document.querySelectorAll(selector)];
+function $$(selector, node = document) {
+  return [...node.querySelectorAll(selector)];
 }

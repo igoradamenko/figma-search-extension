@@ -4,10 +4,6 @@ const contentNode = $('#content');
 const resultsNode = $('#results');
 const deepSearchButtonNode = $('#deep-search');
 const deepSearchProgressNode = $('#deep-search-progress');
-const selectNode = $('#select');
-const selectButtonNode = $('#select-button');
-const selectButtonTextNode = $('#select-button-text');
-const selectBodyNode = $('#select-body');
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
@@ -15,6 +11,11 @@ let listItems = [];
 let selectedFilters = [];
 let selectedListItemIndex;
 let didDeepSearch = false;
+let hideSelectBody = () => {};
+let isSelectBodyShown = () => {};
+let disableSelectButton = () => {};
+let enableSelectButton = () => {};
+let setFilters = () => {};
 
 const groupsOrder = [
   'Page',
@@ -43,10 +44,14 @@ function run() {
   deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
   rootNode.addEventListener('keydown', onRootKeyDown);
   resultsNode.addEventListener('click', onResultsClick);
-  selectButtonNode.addEventListener('click', onSelectButtonClick);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
-  setSelectItemClickHandler();
+  const select = initSelect(applySelectedFilters);
+  hideSelectBody = select.hideSelectBody;
+  isSelectBodyShown = select.isSelectBodyShown;
+  disableSelectButton = select.disableSelectButton;
+  enableSelectButton = select.enableSelectButton;
+  setFilters = select.setFilters;
 
   sendMessage({ type: 'POPUP_OPEN' });
 }
@@ -106,7 +111,7 @@ function onDeepSearchButtonClick(e) {
   console.log('Deep search button clicked');
 
   inputNode.setAttribute('disabled', 'disabled');
-  selectButtonNode.setAttribute('disabled', 'disabled');
+  disableSelectButton();
 
   hideEmptyNotice();
   hideDeepSearchButton();
@@ -151,7 +156,7 @@ function onRootKeyDown(e) {
     case 'Escape':
       if (!isSelectBodyShown()) return;
       e.preventDefault();
-      selectButtonNode.removeAttribute('disabled');
+      enableSelectButton();
       hideSelectBody();
       return;
   }
@@ -182,130 +187,6 @@ function onResultsClick(e) {
       itemId: item.dataset.id,
     },
   });
-}
-
-function onSelectButtonClick(e) {
-  selectButtonNode.setAttribute('disabled', 'disabled');
-
-  showSelectBody();
-
-  setSelectOutsideClickHandler();
-
-  // stop to prevent handling by outside click handler
-  e.stopPropagation();
-
-  updateSelectItemsState();
-}
-
-function setSelectItemClickHandler() {
-  selectBodyNode.addEventListener('click', handler);
-
-  function handler(e) {
-    const item = e.target.closest('.select__item');
-
-    if (!item) return;
-
-    if ('groupToggle' in item.dataset) {
-      selectBodyNode.querySelector('.select__group').style.display = 'block';
-      item.remove();
-
-      // to prevent click outside the select body
-      e.stopPropagation();
-
-      return;
-    }
-
-    const filter = item.textContent.trim();
-
-    if (filter === 'Everywhere') {
-      selectedFilters = [];
-      updateSelectItemsState();
-      applySelectedFilters();
-      return;
-    }
-
-    if (selectedFilters.includes(filter)) {
-      selectedFilters = selectedFilters.filter(f => f !== filter);
-    } else {
-      selectedFilters = selectedFilters.concat(filter);
-    }
-
-    // last element of groupsOrder is Other which does not exist as filter
-    if (selectedFilters.length === groupsOrder.length - 1) {
-      selectedFilters = [];
-    }
-
-    updateSelectItemsState();
-    applySelectedFilters();
-  }
-}
-
-function updateSelectItemsState() {
-  const items = [...selectBodyNode.querySelectorAll('.select__item')];
-
-  items.forEach(x => x.classList.remove('select__item_selected'));
-
-  if (!selectedFilters.length) {
-    items[0].classList.add('select__item_selected');
-    return;
-  }
-
-  selectedFilters.forEach(filter => {
-    items.find(item => item.textContent.trim() === filter).classList.add('select__item_selected');
-  });
-}
-
-function applySelectedFilters() {
-  updateCache({ selectedFilters });
-
-  updateSelectorButtonText();
-
-  filterResults();
-}
-
-function filterResults() {
-  showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
-}
-
-function updateSelectorButtonText() {
-  if (!selectedFilters.length) {
-    selectButtonTextNode.innerHTML = 'Everywhere';
-    return;
-  }
-
-  let filters = [...selectedFilters];
-
-  filters.sort((a, b) => groupsOrder.indexOf(a) - groupsOrder.indexOf(b));
-
-  // assume that 5 is the max number of filters we can show w/o problem
-  if (filters.length > 5) {
-    filters = filters.map(f => shortFilter(f));
-  }
-
-  selectButtonTextNode.innerHTML = filters.join(', ');
-
-  function shortFilter(filter) {
-    const vowels = ['a', 'e', 'i', 'o', 'u'];
-    const firstLetter = filter[0];
-
-    filter = [...filter].slice(1).filter(l => !vowels.includes(l.toLowerCase())).join('');
-
-    return firstLetter + filter[0];
-  }
-}
-
-
-function setSelectOutsideClickHandler() {
-  rootNode.addEventListener('click', handler);
-
-  function handler(e) {
-    if (e.target.closest('.select__body')) return;
-
-    selectButtonNode.removeAttribute('disabled');
-    hideSelectBody();
-
-    rootNode.removeEventListener('click', handler);
-  }
 }
 
 function handleArrowDown() {
@@ -346,13 +227,19 @@ function sendSearchRequest(searchString, options = {}) {
   }
 }
 
+function applySelectedFilters(filters) {
+  selectedFilters = filters;
+  updateCache({ selectedFilters });
+  showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
+}
+
 
 
 /* MARKUP */
 
 function showResult(data) {
   inputNode.removeAttribute('disabled');
-  selectButtonNode.removeAttribute('disabled');
+  enableSelectButton();
 
   if (isDeepSearchingNoticeShown) {
     // fill up the progress and hide it
@@ -368,7 +255,6 @@ function showResult(data) {
     hideDeepSearchButton();
     return;
   }
-
 
   if (data.notLoadedPagesNumber && !didDeepSearch) {
     showDeepSearchButton();
@@ -588,18 +474,6 @@ function hideDeepSearchButton() {
   deepSearchButtonNode.style.display = 'none';
 }
 
-function showSelectBody() {
-  selectNode.classList.add('select_open');
-}
-
-function hideSelectBody() {
-  selectNode.classList.remove('select_open');
-}
-
-function isSelectBodyShown() {
-  return selectNode.classList.contains('select_open');
-}
-
 
 
 /* CACHE */
@@ -630,7 +504,7 @@ function loadCache(loadedCache) {
   // TODO: versions before 1.1.0 may now have selectedFilters in a cache
   //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
   selectedFilters = cache.selectedFilters || [];
-  applySelectedFilters();
+  setFilters(selectedFilters);
 
   inputNode.value = cache.inputValue;
 
