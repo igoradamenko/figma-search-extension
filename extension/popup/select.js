@@ -133,6 +133,7 @@ class Select {
 
 
   /* PUBLIC */
+
   Open() {
     this.selectNode.classList.add('select_open');
   }
@@ -158,5 +159,9 @@ class Select {
 
     this.updateItemsState();
     this.updateSelectorButtonText();
+  }
+
+  GetValuesOrder() {
+    return this.valuesOrder;
   }
 }

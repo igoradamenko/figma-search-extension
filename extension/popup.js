@@ -13,25 +13,7 @@ let selectedListItemIndex;
 let didDeepSearch = false;
 
 let select;
-
-const groupsOrder = [
-  'Page',
-  'Frame',
-  'Component',
-  'Group',
-  'Instance',
-  'Slice',
-  'Vector',
-  'Ellipse',
-  'Polygon',
-  'Star',
-  'Line',
-  'Arrow',
-  'Text',
-  'Rectangle',
-  'Boolean',
-  'Other',
-];
+let groupsOrder;
 
 run();
 
@@ -44,6 +26,8 @@ function run() {
   chrome.runtime.onMessage.addListener(onMessageGet);
 
   select = new Select({ onUpdate: applySelectedFilters });
+
+  groupsOrder = [...select.GetValuesOrder(), 'Other'];
 
   sendMessage({ type: 'POPUP_OPEN' });
 }
