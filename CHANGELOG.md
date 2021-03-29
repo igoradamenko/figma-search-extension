@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.1.0 (29.03.2021)
+
+There are some new features:
+
+1. Extension icon is inactivated when the current page is not Figma.com.
+
+2. Deep Search now has progress bar.
+
+3. Groups Filter has been added. It allows to filter results to show only selected groups.
+
+
+And also some fixes:
+
+1. Multiline item text & icon rendering has been fixed. Now they does not look “shifted”.
+
+2. The gap between input and Deep Search button has been increased to prevent collapsing.
+
+3. Fixed some styles (e.g. Deep Search button hover color, etc).
+
+
 ## 1.0.0 (22.03.2021)
 
 First release!
