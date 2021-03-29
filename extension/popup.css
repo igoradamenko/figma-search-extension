@@ -36,6 +36,7 @@ button[disabled], input[disabled] {
 }
 
 .root {
+  position: relative;
   width: 340px;
   height: 536px;
   overflow: hidden;
@@ -47,10 +48,7 @@ button[disabled], input[disabled] {
 }
 
 /* show loading overlay on root to overlap the scrollbar */
-.root_loading {
-  position: relative;
-}
-
+/* TODO: probably won't be necessary after overlay refactoring */
 .root_loading::before {
   content: '';
   position: absolute;
@@ -60,6 +58,21 @@ button[disabled], input[disabled] {
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, .9);
+}
+
+.overlay {
+  display: none;
+  position: absolute;
+  z-index: 2;
+  top: var(--search-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, .9);
+}
+
+.overlay_visible {
+  display: block;
 }
 
 .search {
@@ -268,19 +281,6 @@ button[disabled], input[disabled] {
   max-height: calc(100% - var(--search-height));
 }
 
-.content__empty-notice {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  margin: 0;
-  color: #A5A5B1;
-  font-size: 13px;
-  line-height: 18px;
-  text-align: center;
-}
-
 .content__deep-searching-notice {
   display: none;
 }
@@ -319,6 +319,34 @@ button[disabled], input[disabled] {
 }
 
 .content_deep-searching .content__deep-searching-notice {
+  display: block;
+}
+
+.empty-notice {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #A5A5B1;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.empty-notice__text {
+  display: none;
+  margin: 0;
+}
+
+.empty-notice_visible {
+  display: block;
+}
+
+.empty-notice_type_global.empty-notice_visible .empty-notice__text_type_global,
+.empty-notice_type_category.empty-notice_visible .empty-notice__text_type_category,
+.empty-notice_type_categories.empty-notice_visible .empty-notice__text_type_categories {
   display: block;
 }
 

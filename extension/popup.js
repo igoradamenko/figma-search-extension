@@ -10,10 +10,12 @@ let selectedFilters = [];
 let selectedListItemIndex;
 let didDeepSearch = false;
 
+let groupsOrder;
+
 let select;
 let input;
 let list;
-let groupsOrder;
+let emptyNotice;
 
 run();
 
@@ -37,6 +39,12 @@ function run() {
     scrolledContainerNode: contentNode,
     onItemFocus: onListItemFocus,
     onScroll: onListScroll,
+  });
+
+  emptyNotice = new EmptyNotice({
+    node: $('#empty-notice'),
+    overlayNode: $('#overlay'),
+    // TODO: onSearchButtonClick
   });
 
   groupsOrder = [...select.GetValuesOrder(), 'Other'];
@@ -105,7 +113,7 @@ function onDeepSearchButtonClick(e) {
   input.Disable();
   select.Disable();
 
-  hideEmptyNotice();
+  emptyNotice.Hide();
   hideDeepSearchButton();
 
   setDeepSearchProgress(0);
@@ -222,7 +230,7 @@ function showResult(data) {
   if (data === null) {
     // TODO: should we reset selectedListItem?
     list.Clear();
-    hideEmptyNotice();
+    emptyNotice.Hide();
     hideDeepSearchButton();
     return;
   }
@@ -236,7 +244,9 @@ function showResult(data) {
   if (!data.searchResult.length) {
     // TODO: should we reset selectedListItem?
     list.Clear();
-    showEmptyNotice();
+
+    // TODO: sure about global here?
+    emptyNotice.Show(EmptyNotice.TYPE.GLOBAL);
     return;
   }
 
@@ -245,7 +255,7 @@ function showResult(data) {
   // TODO: does it work with items hiding?
   listItems = $$('.list__item');
 
-  hideEmptyNotice();
+  emptyNotice.Hide();
 }
 
 function buildResultsMarkup(items) {
@@ -387,14 +397,6 @@ function isDeepSearchingNoticeShown() {
 function setDeepSearchProgress(fraction) {
   deepSearchProgressNode.style.setProperty('--progress-fraction', fraction.toString());
   console.log('Set deep search progress as', fraction);
-}
-
-function showEmptyNotice() {
-  contentNode.classList.add('content_empty');
-}
-
-function hideEmptyNotice() {
-  contentNode.classList.remove('content_empty');
 }
 
 function showDeepSearchButton() {

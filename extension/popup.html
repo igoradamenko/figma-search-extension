@@ -71,8 +71,6 @@
         id="results"
       ></div>
 
-      <p class="content__empty-notice">Nothing found</p>
-
       <div class="content__deep-searching-notice deep-searching">
         <div class="deep-searching__headline">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="deep-searching__icon">
@@ -87,10 +85,31 @@
       <div class="content__preloader"></div>
     </div>
 
+    <div class="overlay" id="overlay"></div>
+
+    <div class="empty-notice" id="empty-notice">
+      <p class="empty-notice__text empty-notice__text_type_global">
+        Nothing found
+      </p>
+
+      <p class="empty-notice__text empty-notice__text_type_category">
+        Nothing was found<br>
+        in this category.<br>
+        Search <button class="empty-notice__search-button">Everywhere</button>
+      </p>
+
+      <p class="empty-notice__text empty-notice__text_type_categories">
+        Nothing was found<br>
+        in these categories.<br>
+        Search <button class="empty-notice__search-button">Everywhere</button>
+      </p>
+    </div>
+
     <script src="popup/common.js"></script>
     <script src="popup/select.js"></script>
     <script src="popup/input.js"></script>
     <script src="popup/list.js"></script>
+    <script src="popup/empty-notice.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>
