@@ -436,7 +436,7 @@ function buildResultsMarkup(items = []) {
     .join('');
 
   function renderGroup(obj) {
-    const headline = `<div class="list__headline">${obj.group}</div>`;
+    const headline = selectedFilters.length === 1 ? '' : `<div class="list__headline">${obj.group}</div>`;
     let list;
 
     if (obj.items.length) {
