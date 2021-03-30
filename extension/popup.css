@@ -101,6 +101,11 @@ button[disabled], input[disabled] {
   color: #0A86D9;
 }
 
+.deep-search-button:hover .deep-search-button__icon {
+  animation: mining .3s 2;
+  transform-origin: 70% 70%;
+}
+
 .deep-search-button__icon {
   position: absolute;
   top: -1px;
