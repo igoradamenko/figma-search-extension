@@ -2,7 +2,6 @@ const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
 let listItems = [];
 let selectedFilters = [];
-let selectedListItemIndex;
 let didDeepSearch = false;
 
 let groupsOrder;
@@ -176,7 +175,6 @@ function onRootKeyDown(e) {
 }
 
 function onListItemFocus({ index, id }) {
-  selectedListItemIndex = index; // TODO: move to List?
   updateCache({ selectedListItemIndex: index });
 
   sendMessage({
@@ -329,9 +327,7 @@ function updateDeepSearchLoadingState({ total, loaded }) {
 
 function resetContentState() {
   list.ResetState();
-
-  selectedListItemIndex = undefined;
-  updateCache({ selectedListItemIndex, listScrollTop: 0 });
+  updateCache({ selectedListItemIndex: undefined, listScrollTop: 0 });
 
   console.log('Content state reset');
 }
@@ -378,10 +374,8 @@ function loadCache(loadedCache) {
 
   showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
 
-  selectedListItemIndex = cache.selectedListItemIndex;
-
-  if (typeof selectedListItemIndex !== 'undefined') {
-    list.PseudoFocusItemByIndex(selectedListItemIndex);
+  if (typeof cache.selectedListItemIndex !== 'undefined') {
+    list.PseudoFocusItemByIndex(cache.selectedListItemIndex);
   }
 
   list.SetScrollTop(cache.listScrollTop);
