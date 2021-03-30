@@ -5,7 +5,7 @@ class EmptyNotice {
 
     this.onSearchButtonClick = onSearchButtonClick;
 
-    $$('.empty-notice__button', this.noticeNode).forEach(button => {
+    $$('.empty-notice__search-button', this.noticeNode).forEach(button => {
       button.addEventListener('click', this.onSearchButtonClick.bind(this));
     });
   }
@@ -20,8 +20,7 @@ class EmptyNotice {
 
   Show(type) {
     this.overlayNode.classList.add('overlay_visible');
-    this.noticeNode.classList.add(`empty-notice_type_${type}`);
-    this.noticeNode.classList.add(`empty-notice_visible`);
+    this.noticeNode.className = `empty-notice empty-notice_visible empty-notice_type_${type}`;
   }
 }
 

@@ -37,7 +37,7 @@ function run() {
   emptyNotice = new EmptyNotice({
     node: $('#empty-notice'),
     overlayNode,
-    // TODO: onSearchButtonClick
+    onSearchButtonClick: onEmptyNoticeSearchButtonClick,
   });
 
   globalPreloader = new GlobalPreloader({
@@ -188,6 +188,15 @@ function handleArrowUp() {
   updateCache({ selectedListItemIndex });
 }
 
+function onEmptyNoticeSearchButtonClick() {
+  updateCache({ selectedFilters: [] });
+  select.SetSelectedValues([]);
+  showResult({
+    searchResult: cache.searchResult,
+    notLoadedPagesNumber: cache.notLoadedPagesNumber,
+  });
+}
+
 
 /* SEARCH */
 
@@ -243,15 +252,25 @@ function showResult(data) {
 
   if (!data.searchResult.length) {
     list.Clear();
-
-    // TODO: sure about global here?
     emptyNotice.Show(EmptyNotice.TYPE.GLOBAL);
     return;
   }
 
   const itemsByGroups = buildResultItems(data.searchResult);
-  list.RenderItems(itemsByGroups);
 
+  if (itemsByGroups.every(x => x.items.length === 0)) {
+    list.Clear();
+
+    if (itemsByGroups.length === 1) {
+      emptyNotice.Show(EmptyNotice.TYPE.CATEGORY);
+    } else {
+      emptyNotice.Show(EmptyNotice.TYPE.CATEGORIES);
+    }
+
+    return;
+  }
+
+  list.RenderItems(itemsByGroups);
   emptyNotice.Hide();
 }
 

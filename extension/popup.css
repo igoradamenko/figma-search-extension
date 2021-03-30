@@ -338,6 +338,17 @@ button[disabled], input[disabled] {
   display: block;
 }
 
+.empty-notice__search-button {
+  all: inherit;
+  display: inline;
+  color: #000;
+  cursor: pointer;
+}
+
+.empty-notice__search-button:hover {
+  color: #0A86D9;
+}
+
 .results {
   padding: 0 0 6px;
 }
