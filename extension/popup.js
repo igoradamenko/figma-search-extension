@@ -229,7 +229,6 @@ function showResult(data) {
   globalPreloader.Hide();
 
   if (data === null) {
-    // TODO: should we reset selectedListItem?
     list.Clear();
     emptyNotice.Hide();
     deepSearchButton.Hide();
@@ -243,7 +242,6 @@ function showResult(data) {
   }
 
   if (!data.searchResult.length) {
-    // TODO: should we reset selectedListItem?
     list.Clear();
 
     // TODO: sure about global here?
