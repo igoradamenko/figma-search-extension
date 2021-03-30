@@ -7,3 +7,4 @@
 - Improve too many selected items.
 - Update demo video.
 - Improve Not Found notice.
+- Save selected filters across Figma pages?

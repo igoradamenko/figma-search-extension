@@ -6,6 +6,9 @@ class List {
     this.selectedItemIndex = undefined;
     this.itemsNodes = [];
 
+    this.pseudoFocusedItem = null;
+    this.selectedItem = null;
+
     this.measurements = {
       containerTopOffset: this.containerNode.getBoundingClientRect().top,
       containerHeight: this.containerNode.offsetHeight,
@@ -39,9 +42,9 @@ class List {
 
     console.log('Clicked item found');
 
-    this.pseudoBlurListItems();
+    this.PseudoBlurItems();
     this.scrollToItem(item);
-    this.selectListItem(item);
+    this.selectItem(item);
 
     this.selectedItemIndex = this.itemsNodes.findIndex(i => i === item);
 
@@ -54,23 +57,16 @@ class List {
 
   /* PRIVATE */
 
-  pseudoBlurListItems() {
-    // TODO: we have to store focused/selected items instead of searching
-    this.itemsNodes
-      .filter(x => x.classList.contains('list__item_focused'))
-      .forEach(x => x.classList.remove('list__item_focused'));
-
-    console.log('Pseudo-focused items blurred');
-  }
-
-  selectListItem(item) {
-    this.itemsNodes
-      .filter(x => x.classList.contains('list__item_selected'))
-      .forEach(x => x.classList.remove('list__item_selected'));
-
-    console.log('Items deselected');
+  selectItem(item) {
+    if (!this.selectedItem) {
+      console.log('There is no previously selected item to deselect');
+    } else {
+      this.selectedItem.classList.remove('list__item_selected');
+      console.log('Deselected previously selected item');
+    }
 
     item.classList.add('list__item_selected');
+    this.selectedItem = item;
 
     console.log('Item selected');
   }
@@ -142,6 +138,9 @@ class List {
   Clear() {
     this.itemsNodes = [];
     this.listNode.innerHTML = '';
+
+    this.pseudoFocusedItem = null;
+    this.selectedItem = null;
   }
 
   IsEmpty() {
@@ -152,6 +151,9 @@ class List {
   RenderItems(itemsByGroup, selectedGroups) {
     this.listNode.innerHTML = this.buildListMarkup(itemsByGroup, selectedGroups);
     this.itemsNodes = $$('.list__item', this.listNode);
+
+    this.pseudoFocusedItem = null;
+    this.selectedItem = null;
   }
 
   FocusNextItem() {
@@ -173,11 +175,13 @@ class List {
   }
 
   PseudoBlurItems() {
-    this.itemsNodes
-      .filter(x => x.classList.contains('list__item_focused'))
-      .forEach(x => x.classList.remove('list__item_focused'));
+    if (!this.pseudoFocusedItem) {
+      console.log('There is no pseudo-focused item to blur');
+      return;
+    }
 
-    console.log('Pseudo-focused items blurred');
+    this.pseudoFocusedItem.classList.remove('list__item_focused');
+    this.pseudoFocusedItem = null;
   }
 
   PseudoFocusItemByIndex(index) {
@@ -186,11 +190,14 @@ class List {
     const item = this.itemsNodes[index];
     item.classList.add('list__item_focused');
 
+    this.pseudoFocusedItem = item;
+
     this.selectedItemIndex = index;
 
     console.log(`Item #${index} pseudo-focused`);
   }
 
+  // TODO: do we really need it?
   ResetState() {
     this.containerNode.scrollTop = 0;
     this.selectedItemIndex = undefined;
