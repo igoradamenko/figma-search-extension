@@ -70,19 +70,6 @@
         class="results"
         id="results"
       ></div>
-
-      <div class="content__deep-searching-notice deep-searching">
-        <div class="deep-searching__headline">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="deep-searching__icon">
-            <use xlink:href="#pickaxe"/>
-          </svg><!--
-       -->Deep Search
-        </div>
-
-        <div class="deep-searching__progress" id="deep-search-progress"></div>
-      </div>
-
-      <div class="content__preloader"></div>
     </div>
 
     <div class="overlay" id="overlay"></div>
@@ -107,12 +94,24 @@
 
     <div class="global-preloader" id="global-preloader"></div>
 
+    <div class="deep-search-preloader" id="deep-search-preloader">
+      <div class="deep-search-preloader__headline">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="deep-search-preloader__icon">
+          <use xlink:href="#pickaxe"/>
+        </svg><!--
+       -->Deep Search
+      </div>
+
+      <div class="deep-search-preloader__progress"></div>
+    </div>
+
     <script src="popup/common.js"></script>
     <script src="popup/select.js"></script>
     <script src="popup/input.js"></script>
     <script src="popup/list.js"></script>
     <script src="popup/empty-notice.js"></script>
     <script src="popup/global-preloader.js"></script>
+    <script src="popup/deep-search-preloader.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

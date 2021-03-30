@@ -17,6 +17,7 @@ let input;
 let list;
 let emptyNotice;
 let globalPreloader;
+let deepSearchPreloader;
 
 run();
 
@@ -52,6 +53,11 @@ function run() {
 
   globalPreloader = new GlobalPreloader({
     node: $('#global-preloader'),
+    overlayNode,
+  });
+
+  deepSearchPreloader = new DeepSearchPreloader({
+    node: $('#deep-search-preloader'),
     overlayNode,
   });
 
@@ -124,8 +130,7 @@ function onDeepSearchButtonClick(e) {
   emptyNotice.Hide();
   hideDeepSearchButton();
 
-  setDeepSearchProgress(0);
-  showDeepSearchingNotice();
+  deepSearchPreloader.Show();
 
   sendMessage({ type: 'DEEP_SEARCH_STARTED' });
 }
@@ -227,10 +232,10 @@ function showResult(data) {
   input.Enable();
   select.Enable();
 
-  if (isDeepSearchingNoticeShown) {
+  if (deepSearchPreloader.IsShown()) {
     // fill up the progress and hide it
-    setDeepSearchProgress(1);
-    setTimeout(() => hideDeepSearchingNotice());
+    deepSearchPreloader.SetProgress(1);
+    setTimeout(() => deepSearchPreloader.Hide());
   }
 
   globalPreloader.Hide();
@@ -348,7 +353,7 @@ function updateDeepSearchLoadingState({ total, loaded }) {
   // are loaded, but we're still waiting for search request
   total += 1;
 
-  setDeepSearchProgress(loaded / total);
+  deepSearchPreloader.SetProgress(loaded / total);
 }
 
 function pseudoFocusListItem(listItemId) {
@@ -371,25 +376,6 @@ function resetContentState() {
   updateCache({ selectedListItemIndex, listScrollTop: 0 });
 
   console.log('Content state reset');
-}
-
-function showDeepSearchingNotice() {
-  rootNode.classList.add('root_loading');
-  contentNode.classList.add('content_deep-searching');
-}
-
-function hideDeepSearchingNotice() {
-  rootNode.classList.remove('root_loading');
-  contentNode.classList.remove('content_deep-searching');
-}
-
-function isDeepSearchingNoticeShown() {
-  return contentNode.classList.contains('content_deep-searching');
-}
-
-function setDeepSearchProgress(fraction) {
-  deepSearchProgressNode.style.setProperty('--progress-fraction', fraction.toString());
-  console.log('Set deep search progress as', fraction);
 }
 
 function showDeepSearchButton() {

@@ -213,7 +213,8 @@ button[disabled], input[disabled] {
   display: block;
 }
 
-.deep-searching {
+.deep-search-preloader {
+  display: none;
   position: absolute;
   z-index: 3;
   top: 50%;
@@ -222,13 +223,17 @@ button[disabled], input[disabled] {
   text-align: center;
 }
 
-.deep-searching__headline {
+.deep-search-preloader_visible {
+  display: block;
+}
+
+.deep-search-preloader__headline {
   font-size: 12px;
   line-height: 15px;
   color: #18A0FB;
 }
 
-.deep-searching__icon {
+.deep-search-preloader__icon {
   margin-right: 4px;
   margin-bottom: -7px;
   fill: currentColor;
@@ -251,7 +256,7 @@ button[disabled], input[disabled] {
   }
 }
 
-.deep-searching__progress {
+.deep-search-preloader__progress {
   position: relative;
   width: 240px;
   height: 4px;
@@ -261,7 +266,7 @@ button[disabled], input[disabled] {
   background: #DAEBF7;
 }
 
-.deep-searching__progress::after {
+.deep-search-preloader__progress::after {
   content: '';
   position: absolute;
   left: 0;
@@ -279,18 +284,6 @@ button[disabled], input[disabled] {
   overflow: auto;
   height: calc(100% - var(--search-height));
   max-height: calc(100% - var(--search-height));
-}
-
-.content__deep-searching-notice {
-  display: none;
-}
-
-.content_empty .content__empty-notice {
-  display: block;
-}
-
-.content_deep-searching .content__deep-searching-notice {
-  display: block;
 }
 
 .global-preloader {
