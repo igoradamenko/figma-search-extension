@@ -220,6 +220,7 @@ function sendSearchRequest(searchString, options = {}) {
   });
 
   if (!options.deepSearch) {
+    emptyNotice.Hide();
     globalPreloader.Show();
   }
 }
