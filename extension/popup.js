@@ -1,7 +1,5 @@
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let didDeepSearch = false;
-
 let groupsOrder;
 
 let select;
@@ -86,8 +84,7 @@ function onMessageGet(message) {
       return;
 
     case 'DEEP_SEARCH_COMPLETED':
-      didDeepSearch = true;
-      updateCache({ didDeepSearch });
+      updateCache({ didDeepSearch: true });
       sendSearchRequest(input.GetValue(), { deepSearch: true });
       return;
 
@@ -239,7 +236,7 @@ function showResult(data) {
     return;
   }
 
-  if (data.notLoadedPagesNumber && !didDeepSearch) {
+  if (data.notLoadedPagesNumber && !cache.didDeepSearch) {
     deepSearchButton.Show();
   } else {
     deepSearchButton.Hide();
@@ -364,9 +361,10 @@ function loadCache(loadedCache) {
 
   input.SelectAll();
 
-  didDeepSearch = cache.didDeepSearch;
-
-  showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
+  showResult({
+    searchResult: cache.searchResult,
+    notLoadedPagesNumber: cache.notLoadedPagesNumber,
+  });
 
   if (typeof cache.selectedListItemIndex !== 'undefined') {
     list.PseudoFocusItemByIndex(cache.selectedListItemIndex);
