@@ -146,6 +146,11 @@ class List {
     this.listNode.innerHTML = '';
   }
 
+  IsEmpty() {
+    // TODO: does it work this items hiding?
+    return this.itemsNodes.length === 0;
+  }
+
   RenderItems(itemsByGroup, selectedGroups) {
     this.listNode.innerHTML = this.buildListMarkup(itemsByGroup, selectedGroups);
     this.itemsNodes = $$('.list__item', this.listNode);

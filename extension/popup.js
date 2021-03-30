@@ -1,6 +1,5 @@
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let listItems = [];
 let selectedFilters = [];
 let didDeepSearch = false;
 
@@ -138,7 +137,7 @@ function onDeepSearchButtonClick() {
 function onRootKeyDown(e) {
   console.log('Some key pressed');
 
-  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape' || listItems.length === 0) {
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape' || list.IsEmpty()) {
     console.log('Keypress left unhandled');
     list.PseudoBlurItems();
     input.Focus();
@@ -259,9 +258,6 @@ function showResult(data) {
 
   const itemsByGroups = buildResultItems(data.searchResult);
   list.RenderItems(itemsByGroups, selectedFilters);
-
-  // TODO: does it work with items hiding?
-  listItems = $$('.list__item');
 
   emptyNotice.Hide();
 }
