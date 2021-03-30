@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 (30.03.2021)
+
+If you picked categories w/o items but there are ones with them, you will see a friendly notice that will
+suggest you to search everywhere.
+
+“Others...” group in Categories Filter is open by default if there is selected item inside it.
+
+“Not found” message and loader indicator do not overlap each other anymore.
+
+
 ## 1.1.0 (29.03.2021)
 
 There are some new features:
@@ -8,7 +18,7 @@ There are some new features:
 
 2. Deep Search now has a progress bar.
 
-3. Groups Filter has been added. It allows to filter results to show only selected groups.
+3. Categories Filter has been added. It allows to filter results to show only selected groups.
 
 
 And also some fixes:

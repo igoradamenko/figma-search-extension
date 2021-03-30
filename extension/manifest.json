@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Figma Search",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Search through Figma objects even in “View only” mode",
   "browser_specific_settings": {
     "gecko": {
