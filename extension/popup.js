@@ -127,7 +127,7 @@ function onDeepSearchButtonClick() {
 }
 
 function onRootKeyDown(e) {
-  console.log('Some key pressed');
+  console.log(e.key, 'key pressed');
 
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape' || list.IsEmpty()) {
     console.log('Keypress left unhandled');
@@ -136,7 +136,6 @@ function onRootKeyDown(e) {
     return;
   }
 
-  console.log(`It is ${e.key} key`);
   input.Blur();
 
   switch (e.key) {

@@ -150,7 +150,8 @@ class List {
   }
 
   IsEmpty() {
-    // TODO: does it work this items hiding?
+    // it works even with items hiding, because we don't actually “hide” them
+    // we rebuild the list w/o them; so there are no nodes for hidden items in DOM
     return this.itemsNodes.length === 0;
   }
 
