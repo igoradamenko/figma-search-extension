@@ -1,6 +1,5 @@
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let selectedFilters = [];
 let didDeepSearch = false;
 
 let groupsOrder;
@@ -103,8 +102,7 @@ function onMessageGet(message) {
 /* EVENT HANDLERS */
 
 function onSelectUpdate(filters) {
-  selectedFilters = filters;
-  updateCache({ selectedFilters });
+  updateCache({ selectedFilters: filters });
   showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
 }
 
@@ -257,7 +255,7 @@ function showResult(data) {
   }
 
   const itemsByGroups = buildResultItems(data.searchResult);
-  list.RenderItems(itemsByGroups, selectedFilters);
+  list.RenderItems(itemsByGroups, cache.selectedFilters);
 
   emptyNotice.Hide();
 }
@@ -355,9 +353,9 @@ function loadCache(loadedCache) {
 
   cache = loadedCache;
 
-  // TODO: versions before 1.1.0 may now have selectedFilters in a cache
+  // TODO: versions before 1.1.0 may not have selectedFilters in cache
   //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
-  selectedFilters = cache.selectedFilters || [];
+  const selectedFilters = cache.selectedFilters || [];
   select.SetSelectedValues(selectedFilters);
 
   input.SetValue(cache.inputValue);
