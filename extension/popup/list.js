@@ -117,17 +117,9 @@ class List {
     return `<div class="list">${headline}${list}</div>`;
   }
 
-  buildListMarkup(itemsByGroup, selectedGroups) {
-    if (!selectedGroups.length) {
-      return itemsByGroup
-        .filter(x => x.items.length)
-        .map(x => this.buildGroupMarkup(x.group, x.items))
-        .join('');
-    }
-
+  buildListMarkup(itemsByGroup) {
     return itemsByGroup
-      .filter(x => selectedGroups.includes(x.group))
-      .map(x => this.buildGroupMarkup(x.group, x.items, { hideHeadline: selectedGroups.length === 1 }))
+      .map(x => this.buildGroupMarkup(x.group, x.items, { hideHeadline: itemsByGroup.length === 1 }))
       .join('');
   }
 
@@ -155,8 +147,8 @@ class List {
     return this.itemsNodes.length === 0;
   }
 
-  RenderItems(itemsByGroup, selectedGroups) {
-    this.listNode.innerHTML = this.buildListMarkup(itemsByGroup, selectedGroups);
+  RenderItems(itemsByGroup) {
+    this.listNode.innerHTML = this.buildListMarkup(itemsByGroup);
     this.itemsNodes = $$('.list__item', this.listNode);
 
     this.resetState();

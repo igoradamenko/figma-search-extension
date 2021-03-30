@@ -250,7 +250,7 @@ function showResult(data) {
   }
 
   const itemsByGroups = buildResultItems(data.searchResult);
-  list.RenderItems(itemsByGroups, cache.selectedFilters);
+  list.RenderItems(itemsByGroups);
 
   emptyNotice.Hide();
 }
@@ -287,7 +287,11 @@ function buildResultItems(items) {
     groupToPut.items.push(item);
   });
 
-  return itemsByGroup;
+  if (!cache.selectedFilters.length) {
+    return itemsByGroup.filter(x => x.items.length)
+  }
+
+  return itemsByGroup.filter(x => cache.selectedFilters.includes(x.group))
 }
 
 function typeToGroup(type) {
@@ -325,6 +329,7 @@ let cache = {
   didDeepSearch: false,
   selectedListItemIndex: undefined,
   listScrollTop: 0,
+  selectedFilters: [],
 };
 
 function updateCache(obj) {
@@ -343,8 +348,8 @@ function loadCache(loadedCache) {
 
   // TODO: versions before 1.1.0 may not have selectedFilters in cache
   //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
-  const selectedFilters = cache.selectedFilters || [];
-  select.SetSelectedValues(selectedFilters);
+  cache.selectedFilters = cache.selectedFilters || [];
+  select.SetSelectedValues(cache.selectedFilters);
 
   input.SetValue(cache.inputValue);
 
