@@ -115,6 +115,20 @@ class List {
     console.log(`Item #${index} focused`);
   }
 
+  PseudoBlurItems() {
+    $$('.list__item_focused', this.listNode).forEach(i => i.classList.remove('list__item_focused'));
+    console.log('Pseudo-focused items blurred');
+  }
+
+  PseudoFocusItemByIndex(index) {
+    list.PseudoBlurItems();
+
+    const item = $$('.list__item', this.listNode)[index];
+    item.classList.add('list__item_focused');
+
+    console.log(`Item #${index} pseudo-focused`);
+  }
+
   ResetState() {
     this.containerNode.scrollTop = 0;
     this.selectedListItemIndex = undefined;

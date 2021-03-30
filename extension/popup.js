@@ -140,7 +140,7 @@ function onRootKeyDown(e) {
 
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape' || listItems.length === 0) {
     console.log('Keypress left unhandled');
-    pseudoBlurListItems();
+    list.PseudoBlurItems();
     input.Focus();
     return;
   }
@@ -357,19 +357,6 @@ function updateDeepSearchLoadingState({ total, loaded }) {
   deepSearchPreloader.SetProgress(loaded / total);
 }
 
-function pseudoFocusListItem(listItemId) {
-  pseudoBlurListItems();
-
-  const item = $$('.list__item')[listItemId];
-  item.classList.add('list__item_focused');
-  console.log(`Item #${listItemId} pseudo-focused`);
-}
-
-function pseudoBlurListItems() {
-  $$('.list__item_focused').forEach(i => i.classList.remove('list__item_focused'));
-  console.log('Pseudo-focused items blurred');
-}
-
 function resetContentState() {
   list.ResetState();
 
@@ -424,7 +411,7 @@ function loadCache(loadedCache) {
   selectedListItemIndex = cache.selectedListItemIndex;
 
   if (typeof selectedListItemIndex !== 'undefined') {
-    pseudoFocusListItem(selectedListItemIndex);
+    list.PseudoFocusItemByIndex(selectedListItemIndex);
   }
 
   list.SetScrollTop(cache.listScrollTop);
