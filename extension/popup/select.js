@@ -5,7 +5,9 @@ class Select {
     this.buttonTextNode = $('.select__button-text', node);
     this.bodyNode = $('.select__body', node);
 
-    this.valuesOrder = $$('[data-item]', this.bodyNode).map(x => x.textContent.trim());
+    this.itemsNodes = $$('[data-item]', this.bodyNode);
+
+    this.valuesOrder = this.itemsNodes.map(x => x.textContent.trim());
     this.onUpdate = onUpdate;
 
     this.selectedValues = [];
@@ -34,8 +36,7 @@ class Select {
     if (!item) return;
 
     if ('groupToggle' in item.dataset) {
-      $('.select__group', this.bodyNode).style.display = 'block';
-      item.remove();
+      this.showHiddenGroup();
 
       // to prevent click outside the select body
       e.stopPropagation();
@@ -66,6 +67,11 @@ class Select {
 
 
   /* PRIVATE */
+
+  showHiddenGroup() {
+    $('.select__group', this.bodyNode).style.display = 'block';
+    $('[data-group-toggle]', this.bodyNode).remove();
+  }
 
   updateSelectedValues(newValues) {
     this.selectedValues = newValues;
@@ -131,6 +137,12 @@ class Select {
     return firstLetter + value[0];
   }
 
+  isValueHidden(value) {
+    const item = this.itemsNodes.find(x => x.textContent.trim() === value);
+
+    return !!item && item.parentElement.classList.contains('select__group');
+  }
+
 
   /* PUBLIC */
 
@@ -158,6 +170,10 @@ class Select {
 
   SetSelectedValues(selectedValues) {
     this.selectedValues = selectedValues;
+
+    if (this.selectedValues.some(v => this.isValueHidden(v))) {
+      this.showHiddenGroup();
+    }
 
     this.updateItemsState();
     this.updateSelectorButtonText();
