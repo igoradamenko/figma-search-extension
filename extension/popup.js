@@ -256,7 +256,7 @@ function showResult(data) {
 }
 
 function buildResultItems(items) {
-  // TODO: mutation?
+  // mutation here, but we don't want to copy the huge array to prevent perf drop
   items.sort((a, b) => {
     const aGroup = typeToGroup(a.type);
     const bGroup = typeToGroup(b.type);
