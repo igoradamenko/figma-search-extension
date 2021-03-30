@@ -1,19 +1,14 @@
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let groupsOrder;
+let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton;
 
-let select;
-let input;
-let list;
-let emptyNotice;
-let globalPreloader;
-let deepSearchPreloader;
-let deepSearchButton;
+let groupsOrder;
 
 run();
 
 function run() {
   $('#root').addEventListener('keydown', onRootKeyDown);
+
   chrome.runtime.onMessage.addListener(onMessageGet);
 
   const overlayNode = $('#overlay');
@@ -100,7 +95,10 @@ function onMessageGet(message) {
 
 function onSelectUpdate(filters) {
   updateCache({ selectedFilters: filters });
-  showResult({ searchResult: cache.searchResult, notLoadedPagesNumber: cache.notLoadedPagesNumber });
+  showResult({
+    searchResult: cache.searchResult,
+    notLoadedPagesNumber: cache.notLoadedPagesNumber,
+  });
 }
 
 function onInputUpdate(value) {
@@ -192,7 +190,7 @@ function handleArrowUp() {
 
 /* SEARCH */
 
-function sendSearchRequest(searchString, options = {}) {
+function sendSearchRequest(searchString, { deepSearch = false }  = {}) {
   if (!searchString) {
     showResult(null);
     updateCache({ searchResult: [] });
@@ -206,7 +204,7 @@ function sendSearchRequest(searchString, options = {}) {
     data: { searchString },
   });
 
-  if (!options.deepSearch) {
+  if (!deepSearch) {
     emptyNotice.Hide();
     globalPreloader.Show();
   }

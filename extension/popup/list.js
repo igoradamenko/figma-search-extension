@@ -40,12 +40,10 @@ class List {
     console.log('Clicked item found');
 
     this.pseudoBlurListItems();
-    this.deselectListItems();
     this.scrollToItem(item);
     this.selectListItem(item);
 
-    // TODO: rewrite using this.itemsNodes; everywhere
-    this.selectedItemIndex = $$('.list__item', this.listNode).findIndex(i => i === item);
+    this.selectedItemIndex = this.itemsNodes.findIndex(i => i === item);
 
     this.onItemFocus({
       index: this.selectedItemIndex,
@@ -57,24 +55,24 @@ class List {
   /* PRIVATE */
 
   pseudoBlurListItems() {
-    $$('.list__item_focused', this.listNode).forEach(i => [
-      i.classList.remove('list__item_focused')
-    ]);
+    // TODO: we have to store focused/selected items instead of searching
+    this.itemsNodes
+      .filter(x => x.classList.contains('list__item_focused'))
+      .forEach(x => x.classList.remove('list__item_focused'));
 
     console.log('Pseudo-focused items blurred');
   }
 
   selectListItem(item) {
-    item.classList.add('list__item_selected');
-    console.log('Item selected');
-  }
-
-  deselectListItems() {
-    $$('.list__item_selected', this.listNode).forEach(i => {
-      i.classList.remove('list__item_selected')
-    });
+    this.itemsNodes
+      .filter(x => x.classList.contains('list__item_selected'))
+      .forEach(x => x.classList.remove('list__item_selected'));
 
     console.log('Items deselected');
+
+    item.classList.add('list__item_selected');
+
+    console.log('Item selected');
   }
 
   focusItemByIndex(index) {
@@ -167,7 +165,7 @@ class List {
 
   FocusPreviousItem() {
     this.selectedItemIndex ??= 0;
-    this.selectedItemIndex = (this.selectedItemIndex - 1 + this.itemsNodes.length) % listItems.length;
+    this.selectedItemIndex = (this.selectedItemIndex - 1 + this.itemsNodes.length) % this.itemsNodes.length;
 
     this.focusItemByIndex(this.selectedItemIndex);
 
@@ -175,7 +173,10 @@ class List {
   }
 
   PseudoBlurItems() {
-    $$('.list__item_focused', this.listNode).forEach(i => i.classList.remove('list__item_focused'));
+    this.itemsNodes
+      .filter(x => x.classList.contains('list__item_focused'))
+      .forEach(x => x.classList.remove('list__item_focused'));
+
     console.log('Pseudo-focused items blurred');
   }
 
