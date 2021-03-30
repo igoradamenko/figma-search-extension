@@ -47,19 +47,6 @@ button[disabled], input[disabled] {
   color: #2D2D38;
 }
 
-/* show loading overlay on root to overlap the scrollbar */
-/* TODO: probably won't be necessary after overlay refactoring */
-.root_loading::before {
-  content: '';
-  position: absolute;
-  z-index: 2;
-  top: var(--search-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, .9);
-}
-
 .overlay {
   display: none;
   position: absolute;
