@@ -61,6 +61,7 @@ function run() {
     onClick: onDeepSearchButtonClick,
   });
 
+  // TODO: Other?
   groupsOrder = [...select.GetValuesOrder(), 'Other'];
 
   sendMessage({ type: 'POPUP_OPEN' });
@@ -264,7 +265,8 @@ function showResult(data) {
     return;
   }
 
-  list.SetMarkup(buildResultsMarkup(data.searchResult));
+  const itemsByGroups = buildResultItems(data.searchResult);
+  list.RenderItems(itemsByGroups, selectedFilters);
 
   // TODO: does it work with items hiding?
   listItems = $$('.list__item');
@@ -272,7 +274,8 @@ function showResult(data) {
   emptyNotice.Hide();
 }
 
-function buildResultsMarkup(items) {
+function buildResultItems(items) {
+  // TODO: mutation?
   items.sort((a, b) => {
     const aGroup = typeToGroup(a.type);
     const bGroup = typeToGroup(b.type);
@@ -303,34 +306,7 @@ function buildResultsMarkup(items) {
     groupToPut.items.push(item);
   });
 
-  if (!selectedFilters.length) {
-    return itemsByGroup
-      .filter(x => x.items.length)
-      .map(renderGroup)
-      .join('');
-  }
-
-  return itemsByGroup
-    .filter(x => selectedFilters.includes(x.group))
-    .map(renderGroup)
-    .join('');
-
-  function renderGroup(obj) {
-    const headline = selectedFilters.length === 1 ? '' : `<div class="list__headline">${obj.group}</div>`;
-    let list;
-
-    if (obj.items.length) {
-      const listItems = obj.items.map(i => {
-        return `<li><button class="list__item list__item_type_${i.type}" type="button" data-id="${i.id}">${i.name}</button></li>`
-      }).join('');
-
-      list = `<ul class="list__items">${listItems}</ul>`;
-    } else {
-      list = '<div class="list__empty-notice">Nothing found</div>';
-    }
-
-    return `<div class="list">${headline}${list}</div>`;
-  }
+  return itemsByGroup;
 }
 
 function typeToGroup(type) {

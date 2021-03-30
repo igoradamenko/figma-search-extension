@@ -96,6 +96,38 @@ class List {
     }
   }
 
+  buildGroupMarkup(name, items, { hideHeadline = false } = {}) {
+    const headline = hideHeadline ? '' : `<div class="list__headline">${name}</div>`;
+    let list;
+
+    if (items.length) {
+      const listItems = items.map(i => {
+        return `<li><button class="list__item list__item_type_${i.type}" type="button" data-id="${i.id}">${i.name}</button></li>`
+      }).join('');
+
+      list = `<ul class="list__items">${listItems}</ul>`;
+    } else {
+      list = '<div class="list__empty-notice">Nothing found</div>';
+    }
+
+    return `<div class="list">${headline}${list}</div>`;
+  }
+
+  buildListMarkup(itemsByGroup, selectedGroups) {
+    if (!selectedGroups.length) {
+      return itemsByGroup
+        .filter(x => x.items.length)
+        .map(x => this.buildGroupMarkup(x.group, x.items))
+        .join('');
+    }
+
+    return itemsByGroup
+      .filter(x => selectedGroups.includes(x.group))
+      .map(x => this.buildGroupMarkup(x.group, x.items, { hideHeadline: selectedGroups.length === 1 }))
+      .join('');
+  }
+
+
 
   /* PUBLIC */
 
@@ -103,8 +135,8 @@ class List {
     this.listNode.innerHTML = '';
   }
 
-  SetMarkup(markup) {
-    this.listNode.innerHTML = markup;
+  RenderItems(itemsByGroup, selectedGroups) {
+    this.listNode.innerHTML = this.buildListMarkup(itemsByGroup, selectedGroups);
   }
 
   FocusItemByIndex(index) {
