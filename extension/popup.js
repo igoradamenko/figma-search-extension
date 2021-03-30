@@ -188,19 +188,13 @@ function onListItemFocus({ index, id }) {
 }
 
 function handleArrowDown() {
-  selectedListItemIndex ??= -1;
-  selectedListItemIndex = (selectedListItemIndex + 1) % listItems.length;
+  const selectedListItemIndex = list.FocusNextItem();
   updateCache({ selectedListItemIndex });
-
-  list.FocusItemByIndex(selectedListItemIndex);
 }
 
 function handleArrowUp() {
-  selectedListItemIndex ??= 0;
-  selectedListItemIndex = (selectedListItemIndex - 1 + listItems.length) % listItems.length;
+  const selectedListItemIndex = list.FocusPreviousItem();
   updateCache({ selectedListItemIndex });
-
-  list.FocusItemByIndex(selectedListItemIndex);
 }
 
 

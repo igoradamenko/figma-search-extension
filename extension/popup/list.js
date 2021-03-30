@@ -3,7 +3,8 @@ class List {
     this.listNode = node;
     this.containerNode = scrolledContainerNode;
 
-    this.selectedListItemIndex = undefined;
+    this.selectedItemIndex = undefined;
+    this.itemsNodes = [];
 
     this.measurements = {
       containerTopOffset: this.containerNode.getBoundingClientRect().top,
@@ -43,10 +44,11 @@ class List {
     this.scrollToItem(item);
     this.selectListItem(item);
 
-    this.selectedListItemIndex = $$('.list__item', this.listNode).findIndex(i => i === item);
+    // TODO: rewrite using this.itemsNodes; everywhere
+    this.selectedItemIndex = $$('.list__item', this.listNode).findIndex(i => i === item);
 
     this.onItemFocus({
-      index: this.selectedListItemIndex,
+      index: this.selectedItemIndex,
       id: item.dataset.id,
     });
   }
@@ -73,6 +75,14 @@ class List {
     });
 
     console.log('Items deselected');
+  }
+
+  focusItemByIndex(index) {
+    const item = this.itemsNodes[index];
+    this.scrollToItem(item);
+
+    item.focus();
+    console.log(`Item #${index} focused`);
   }
 
   scrollToItem(item) {
@@ -132,19 +142,31 @@ class List {
   /* PUBLIC */
 
   Clear() {
+    this.itemsNodes = [];
     this.listNode.innerHTML = '';
   }
 
   RenderItems(itemsByGroup, selectedGroups) {
     this.listNode.innerHTML = this.buildListMarkup(itemsByGroup, selectedGroups);
+    this.itemsNodes = $$('.list__item', this.listNode);
   }
 
-  FocusItemByIndex(index) {
-    const item = $$('.list__item', this.listNode)[index];
-    this.scrollToItem(item);
+  FocusNextItem() {
+    this.selectedItemIndex ??= -1;
+    this.selectedItemIndex = (this.selectedItemIndex + 1) % this.itemsNodes.length;
 
-    item.focus();
-    console.log(`Item #${index} focused`);
+    this.focusItemByIndex(this.selectedItemIndex);
+
+    return this.selectedItemIndex;
+  }
+
+  FocusPreviousItem() {
+    this.selectedItemIndex ??= 0;
+    this.selectedItemIndex = (this.selectedItemIndex - 1 + this.itemsNodes.length) % listItems.length;
+
+    this.focusItemByIndex(this.selectedItemIndex);
+
+    return this.selectedItemIndex;
   }
 
   PseudoBlurItems() {
@@ -155,15 +177,17 @@ class List {
   PseudoFocusItemByIndex(index) {
     list.PseudoBlurItems();
 
-    const item = $$('.list__item', this.listNode)[index];
+    const item = this.itemsNodes[index];
     item.classList.add('list__item_focused');
+
+    this.selectedItemIndex = index;
 
     console.log(`Item #${index} pseudo-focused`);
   }
 
   ResetState() {
     this.containerNode.scrollTop = 0;
-    this.selectedListItemIndex = undefined;
+    this.selectedItemIndex = undefined;
   }
 
   SetScrollTop(position) {
