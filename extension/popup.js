@@ -71,7 +71,6 @@ function onMessageGet(message) {
         notLoadedPagesNumber: message.data.notLoadedPagesNumber,
       });
       showResult(message.data);
-      resetContentState();
       return;
 
     case 'PAGES_LOADED':
@@ -194,7 +193,6 @@ function sendSearchRequest(searchString, { deepSearch = false }  = {}) {
   if (!searchString) {
     showResult(null);
     updateCache({ searchResult: [] });
-    resetContentState();
     return;
   }
 
@@ -215,6 +213,8 @@ function sendSearchRequest(searchString, { deepSearch = false }  = {}) {
 /* MARKUP */
 
 function showResult(data) {
+  updateCache({ selectedListItemIndex: undefined, listScrollTop: 0 });
+
   input.Enable();
   select.Enable();
 
@@ -312,13 +312,6 @@ function updateDeepSearchLoadingState({ total, loaded }) {
   total += 1;
 
   deepSearchPreloader.SetProgress(loaded / total);
-}
-
-function resetContentState() {
-  list.ResetState();
-  updateCache({ selectedListItemIndex: undefined, listScrollTop: 0 });
-
-  console.log('Content state reset');
 }
 
 

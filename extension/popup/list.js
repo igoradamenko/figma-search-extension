@@ -131,6 +131,13 @@ class List {
       .join('');
   }
 
+  resetState() {
+    this.containerNode.scrollTop = 0;
+    this.selectedItemIndex = undefined;
+    this.pseudoFocusedItem = null;
+    this.selectedItem = null;
+  }
+
 
 
   /* PUBLIC */
@@ -139,8 +146,7 @@ class List {
     this.itemsNodes = [];
     this.listNode.innerHTML = '';
 
-    this.pseudoFocusedItem = null;
-    this.selectedItem = null;
+    this.resetState();
   }
 
   IsEmpty() {
@@ -152,8 +158,7 @@ class List {
     this.listNode.innerHTML = this.buildListMarkup(itemsByGroup, selectedGroups);
     this.itemsNodes = $$('.list__item', this.listNode);
 
-    this.pseudoFocusedItem = null;
-    this.selectedItem = null;
+    this.resetState();
   }
 
   FocusNextItem() {
@@ -195,12 +200,6 @@ class List {
     this.selectedItemIndex = index;
 
     console.log(`Item #${index} pseudo-focused`);
-  }
-
-  // TODO: do we really need it?
-  ResetState() {
-    this.containerNode.scrollTop = 0;
-    this.selectedItemIndex = undefined;
   }
 
   SetScrollTop(position) {
