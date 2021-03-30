@@ -4,6 +4,10 @@ let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deep
 
 let groupsOrder;
 
+// special group in case of adding new types of items by Figma
+// which won't be handled by the extension
+const UNKNOWN_GROUP = 'Unknown';
+
 run();
 
 function run() {
@@ -51,8 +55,7 @@ function run() {
     onClick: onDeepSearchButtonClick,
   });
 
-  // TODO: Other?
-  groupsOrder = [...select.GetValuesOrder(), 'Other'];
+  groupsOrder = [...select.GetValuesOrder(), UNKNOWN_GROUP];
 
   sendMessage({ type: 'POPUP_OPEN' });
 }
@@ -293,7 +296,7 @@ function typeToGroup(type) {
   type = type.split('-')[0];
   const group = type[0].toUpperCase() + type.substr(1);
 
-  if (!groupsOrder.includes(group)) return 'Unknown';
+  if (!groupsOrder.includes(group)) return UNKNOWN_GROUP;
   return group;
 }
 
