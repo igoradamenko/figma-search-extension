@@ -51,6 +51,9 @@ If you press `Alt` + `Shift` + `F`, it will open the extension.
 
 It's possible to change this shortcut in your browser's settings.
 
+**Sometimes shortcut does not work right after installation** and you have to reassign it manually in your browser's 
+settings.
+
 ### Keyboard navigation
 
 Any key that you press while extension's popup is focused will be sent into its search field.
