@@ -87,6 +87,14 @@ button[disabled], input[disabled] {
 }
 
 .search__deep-search-button {
+  flex-shrink: 0;
+}
+
+.search__control-group {
+  display: flex;
+}
+
+.deep-search-button {
   position: relative;
   flex-shrink: 0;
   display: none;
@@ -98,20 +106,20 @@ button[disabled], input[disabled] {
   overflow: visible;
 }
 
-.search__deep-search-button:hover {
+.deep-search-button_visible {
+  display: block;
+}
+
+.deep-search-button:hover {
   color: #0A86D9;
 }
 
-.search__deep-search-icon {
+.deep-search-button__icon {
   position: absolute;
   top: -1px;
   left: 8px; /* input offset */
   fill: currentColor;
   stroke: currentColor;
-}
-
-.search__control-group {
-  display: flex;
 }
 
 .input {

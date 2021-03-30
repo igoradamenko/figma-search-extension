@@ -1,8 +1,3 @@
-const rootNode = $('#root');
-const contentNode = $('#content');
-const deepSearchButtonNode = $('#deep-search');
-const deepSearchProgressNode = $('#deep-search-progress');
-
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
 let listItems = [];
@@ -18,12 +13,12 @@ let list;
 let emptyNotice;
 let globalPreloader;
 let deepSearchPreloader;
+let deepSearchButton;
 
 run();
 
 function run() {
-  deepSearchButtonNode.addEventListener('click', onDeepSearchButtonClick);
-  rootNode.addEventListener('keydown', onRootKeyDown);
+  $('#root').addEventListener('keydown', onRootKeyDown);
   chrome.runtime.onMessage.addListener(onMessageGet);
 
   const overlayNode = $('#overlay');
@@ -40,7 +35,7 @@ function run() {
 
   list = new List({
     node: $('#results'),
-    scrolledContainerNode: contentNode,
+    scrolledContainerNode: $('#content'),
     onItemFocus: onListItemFocus,
     onScroll: onListScroll,
   });
@@ -59,6 +54,11 @@ function run() {
   deepSearchPreloader = new DeepSearchPreloader({
     node: $('#deep-search-preloader'),
     overlayNode,
+  });
+
+  deepSearchButton = new DeepSearchButton({
+    node: $('#deep-search-button'),
+    onClick: onDeepSearchButtonClick,
   });
 
   groupsOrder = [...select.GetValuesOrder(), 'Other'];
@@ -121,14 +121,14 @@ function onListScroll(listScrollTop) {
   updateCache({ listScrollTop });
 }
 
-function onDeepSearchButtonClick(e) {
-  console.log('Deep search button clicked');
+function onDeepSearchButtonClick() {
+  console.log('Deep Search Button clicked');
 
   input.Disable();
   select.Disable();
 
   emptyNotice.Hide();
-  hideDeepSearchButton();
+  deepSearchButton.Hide();
 
   deepSearchPreloader.Show();
 
@@ -244,14 +244,14 @@ function showResult(data) {
     // TODO: should we reset selectedListItem?
     list.Clear();
     emptyNotice.Hide();
-    hideDeepSearchButton();
+    deepSearchButton.Hide();
     return;
   }
 
   if (data.notLoadedPagesNumber && !didDeepSearch) {
-    showDeepSearchButton();
+    deepSearchButton.Show();
   } else {
-    hideDeepSearchButton();
+    deepSearchButton.Hide();
   }
 
   if (!data.searchResult.length) {
@@ -376,14 +376,6 @@ function resetContentState() {
   updateCache({ selectedListItemIndex, listScrollTop: 0 });
 
   console.log('Content state reset');
-}
-
-function showDeepSearchButton() {
-  deepSearchButtonNode.style.display = 'block';
-}
-
-function hideDeepSearchButton() {
-  deepSearchButtonNode.style.display = 'none';
 }
 
 
