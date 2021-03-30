@@ -17,7 +17,7 @@
 [![Figma Search в Chrome Web Store](./add-to-chrome.svg)](https://chrome.google.com/webstore/detail/figma-search/lfofpannpmmeeicgiiacjghmcfgnebbi)
 [![Figma Search в Mozilla Add-ons](./add-to-firefox.svg)](https://addons.mozilla.org/en-US/firefox/addon/figma-search/)
 
-[![Демо видео на Ютубе](./youtube-demo.png)](https://www.youtube.com/watch?v=lINTurBElgM)
+[![Демо видео на Ютубе](./youtube-demo.png)](https://youtu.be/F4wWJUe3JxQ)
 
 ## Contents
 
@@ -51,6 +51,9 @@
 Если нажать `Alt` + `Shift` + `F`, расширение активируется.
 
 Сочетание клавиш можно изменить в настройках браузера.
+
+**Иногда после установки расширения сочетание клавиш не работает.** В таком случае нужно переназначить его в настройках
+браузера.
 
 ### Навигация с клавиатуры
 
