@@ -1,4 +1,6 @@
 (() => {
+  const MAX_PAGE_LOAD_WAITING_MS = 2000;
+
   const scriptNode = document.getElementById('figma-search-extension-request');
 
   const type = scriptNode.dataset.type;
@@ -103,9 +105,8 @@
       figma.currentPage = pagesToLoad[loadedPagesNumber];
     }
 
-    const MAX_WAITING_MS = 2000;
     function waitAndLoadNextPage(alreadyWaitedMS = 0) {
-      if (alreadyWaitedMS === MAX_WAITING_MS) {
+      if (alreadyWaitedMS === MAX_PAGE_LOAD_WAITING_MS) {
         log('Waited for max allowed time, loading next page');
         loadNextPage();
         return;
