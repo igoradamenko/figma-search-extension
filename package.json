@@ -5,10 +5,14 @@
   "private": true,
   "scripts": {
     "build": "tasks/build.sh",
-    "generate-icon-styles": "tasks/generate-icon-styles.js"
+    "generate-icon-styles": "tasks/generate-icon-styles.js",
+    "test": "mocha test/test.js"
   },
   "devDependencies": {
     "@types/chrome": "0.0.133",
-    "@types/figma": "1.0.3"
+    "@types/figma": "1.0.3",
+    "chai": "4.3.4",
+    "mocha": "8.3.2",
+    "puppeteer": "8.0.0"
   }
 }

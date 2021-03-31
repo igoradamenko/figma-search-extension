@@ -7,20 +7,25 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Tests</title>
 
+  <script src="./figma-generated-stubs.js"></script>
+  <script src="./figma-stub.js"></script>
+
   <style>
-    iframe {
+    #popup {
       width: 340px;
       height: 536px;
       border: 1px solid #000;
     }
-  </style>
 
-  <script src="./figma-generated-stubs.js"></script>
-  <script src="./figma-stub.js"></script>
+    .popup-actions {
+      margin-bottom: 16px;
+    }
+  </style>
 </head>
 <body>
   <script>
-    const CHROME_MESSAGE_LISTENERS = [];
+    let CHROME_MESSAGE_LISTENERS = [];
+    let POPUP_MESSAGE_LISTENERS = [];
   </script>
 
   <script>
@@ -126,24 +131,54 @@
 
   <script src="../extension/figma-bg.js"></script>
 
-  <iframe src="../extension/popup.html"></iframe>
+  <div class="popup-actions">
+    <button id="open-popup-button">Open Popup</button>
+    <button id="close-popup-button">Close Popup</button>
+  </div>
+
+  <iframe id="popup"></iframe>
 
   <script>
     // chrome api mocks for popup
-    window.frames[0].chrome = {
-      runtime: {
-        onMessage: {
-          addListener: listener => CHROME_MESSAGE_LISTENERS.push(listener),
-        }
-      },
-      tabs: {
-        query: (_, callback) => callback([{id: 0}]),
-        sendMessage: (_, message) => {
-          // emulate message passing timeout
-          setTimeout(() => CHROME_MESSAGE_LISTENERS.forEach(f => f(message, {})), 100);
-        }
-      },
-    };
+    window.__PATCH_WINDOW_FOR_TESTS__ = (window) => {
+      window.chrome = {
+        runtime: {
+          onMessage: {
+            addListener: listener => {
+              CHROME_MESSAGE_LISTENERS.push(listener);
+              POPUP_MESSAGE_LISTENERS.push(listener);
+            },
+          }
+        },
+        tabs: {
+          query: (_, callback) => callback([{id: 0}]),
+          sendMessage: (_, message) => {
+            // emulate message passing timeout
+            setTimeout(() => CHROME_MESSAGE_LISTENERS.forEach(f => f(message, {})), 100);
+          }
+        },
+      };
+    }
+  </script>
+
+  <script>
+    const popupNode = document.getElementById('popup');
+
+    window.openPopup = () => popupNode.src = '../extension/popup.html';
+    window.closePopup = () => popupNode.removeAttribute('src');
+
+    document.getElementById('open-popup-button').addEventListener('click', () => {
+      window.openPopup();
+      window.popup = popupNode.contentWindow;
+    });
+
+    document.getElementById('close-popup-button').addEventListener('click', () => {
+      window.closePopup();
+
+      // prevent leaks
+      CHROME_MESSAGE_LISTENERS = CHROME_MESSAGE_LISTENERS.filter(l => !POPUP_MESSAGE_LISTENERS.includes(l));
+      POPUP_MESSAGE_LISTENERS = [];
+    });
   </script>
 </body>
 </html>

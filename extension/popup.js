@@ -1,3 +1,9 @@
+// we need it for tests
+// but it's safe for users because window.parent in extension is its window itself
+if (window.parent.__PATCH_WINDOW_FOR_TESTS__) {
+  window.parent.__PATCH_WINDOW_FOR_TESTS__(window);
+}
+
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
 let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton;
