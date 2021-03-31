@@ -80,6 +80,7 @@ function onMessageGet(message) {
         notLoadedPagesNumber: message.data.notLoadedPagesNumber,
       });
       showResult(message.data);
+      resetContentState();
       return;
 
     case 'PAGES_LOADED':
@@ -107,6 +108,7 @@ function onSelectUpdate(filters) {
     searchResult: cache.searchResult,
     notLoadedPagesNumber: cache.notLoadedPagesNumber,
   });
+  resetContentState();
 }
 
 function onInputUpdate(value) {
@@ -201,6 +203,7 @@ function onEmptyNoticeSearchButtonClick() {
     searchResult: cache.searchResult,
     notLoadedPagesNumber: cache.notLoadedPagesNumber,
   });
+  resetContentState();
 }
 
 
@@ -209,6 +212,7 @@ function onEmptyNoticeSearchButtonClick() {
 function sendSearchRequest(searchString, { deepSearch = false }  = {}) {
   if (!searchString) {
     showResult(null);
+    resetContentState();
     updateCache({ searchResult: [] });
     return;
   }
@@ -230,8 +234,6 @@ function sendSearchRequest(searchString, { deepSearch = false }  = {}) {
 /* MARKUP */
 
 function showResult(data) {
-  updateCache({ selectedListItemIndex: undefined, listScrollTop: 0 });
-
   input.Enable();
   select.Enable();
 
@@ -341,6 +343,10 @@ function updateDeepSearchLoadingState({ total, loaded }) {
   total += 1;
 
   deepSearchPreloader.SetProgress(loaded / total);
+}
+
+function resetContentState() {
+  updateCache({ selectedListItemIndex: undefined, listScrollTop: 0 });
 }
 
 
