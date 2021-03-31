@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tests</title>
+
+  <style>
+    iframe {
+      width: 340px;
+      height: 536px;
+      border: 1px solid #000;
+    }
+  </style>
+
+  <script src="./figma-generated-stubs.js"></script>
+  <script src="./figma-stub.js"></script>
+</head>
+<body>
+  <script>
+    const CHROME_MESSAGE_LISTENERS = [];
+  </script>
+
+  <script>
+    // chrome api mocks for content scripts
+    window.chrome = {
+      runtime: {
+        onMessage: {
+          addListener: listener => CHROME_MESSAGE_LISTENERS.push(listener),
+        },
+        sendMessage: message => {
+          // emulate message passing timeout
+          setTimeout(() => CHROME_MESSAGE_LISTENERS.forEach(f => f(message, { tab: 0 })), 100);
+        },
+        getURL: uri => `../extension/${uri}`,
+      },
+    }
+
+    // figma api mocks for content scripts
+    window.figma = {
+      __listeners: {},
+      __currentPage: window.figmaRootStubs.children[0],
+      root: window.figmaRootStubs,
+      set currentPage(value) {
+        value.children = window.figmaFullyLoadedRootStubs.children.find(x => x.id === value.id).children;
+
+        if (this.__listeners['currentpagechange']) {
+          this.__listeners['currentpagechange'].forEach(f => f());
+        }
+      },
+      get currentPage() {
+        return this.__currentPage;
+      },
+      viewport: {
+        scrollAndZoomIntoView: () => {},
+      },
+      on(event, fn) {
+        if (!this.__listeners[event]) {
+          this.__listeners[event] = [];
+        }
+
+        this.__listeners[event].push(fn);
+      },
+      off(event, fn) {
+        if (!this.__listeners[event]) return;
+
+        this.__listeners[event] = this.__listeners[event].filter(l => l !== fn);
+      },
+    }
+
+    // we dont need to add methods to every node as Figma does, because we use only root and pages' find*s
+    addFindMethods(window.figma.root);
+    window.figma.root.children.forEach(page => addFindMethods(page));
+
+    function addFindMethods(node) {
+      node.findAll = getFindAll(node);
+      node.findOne = getFindOne(node);
+    }
+
+    function getFindAll(node) {
+      return fn => figmaFindAllRecursive(fn, node);
+    }
+
+    function getFindOne(node) {
+      return fn => figmaFindOneRecursive(fn, node);
+    }
+
+    function figmaFindAllRecursive(fn = () => true, node) {
+      const result = [];
+
+      if (fn(node)) {
+        result.push(node);
+      }
+
+      if (!node.children) return result;
+
+      node.children.forEach(child => {
+        result.push(...figmaFindAllRecursive(fn, child));
+      });
+
+      return result;
+    }
+
+    function figmaFindOneRecursive(fn = () => true, node) {
+      if (fn(node)) {
+        return node;
+      }
+
+      if (!node.children) {
+        return null;
+      }
+
+      for (let i = 0; i < node.children.length; i++) {
+        const result = figmaFindOneRecursive(fn, node.children[i]);
+
+        if (result) {
+          return result;
+        }
+      }
+
+      return null;
+    }
+  </script>
+
+  <script src="../extension/figma-bg.js"></script>
+
+  <iframe src="../extension/popup.html"></iframe>
+
+  <script>
+    // chrome api mocks for popup
+    window.frames[0].chrome = {
+      runtime: {
+        onMessage: {
+          addListener: listener => CHROME_MESSAGE_LISTENERS.push(listener),
+        }
+      },
+      tabs: {
+        query: (_, callback) => callback([{id: 0}]),
+        sendMessage: (_, message) => {
+          // emulate message passing timeout
+          setTimeout(() => CHROME_MESSAGE_LISTENERS.forEach(f => f(message, {})), 100);
+        }
+      },
+    };
+  </script>
+</body>
+</html>

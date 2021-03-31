@@ -2,9 +2,10 @@
 - Improve Component Variants?
 - Do not search inside Component Instances?
 - Improve too many selected items.
-- Update demo video.
 - Save selected filters across Figma pages?
 - Make it easier to close select by clicking outside the element? Maybe add underlay?
 - Do not show “Nothing found” on empty list when select updated
 - Last selected element and scroll position are not saved anymore?
 - Do not hide group names when Everywhere is selected
+- Add badge with Chrome Web Store rating.
+- Implement fuzzy search? https://fusejs.io/
