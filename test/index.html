@@ -37,7 +37,7 @@
         },
         sendMessage: message => {
           // emulate message passing timeout
-          setTimeout(() => CHROME_MESSAGE_LISTENERS.forEach(f => f(message, { tab: 0 })), 100);
+          setTimeout(() => CHROME_MESSAGE_LISTENERS.forEach(f => f(message, { tab: 1 })), 100);
         },
         getURL: uri => `../extension/${uri}`,
       },
