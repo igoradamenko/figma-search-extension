@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.2.1 (01.04.2021)
+
+A bunch of bugfixes!
+
+1. If you are the fastest cowboy of the Wild West, you may encounter an error of non working Deep Search right after Figma page load. 
+   Now it fixed.
+   
+2. Fixed saving focused items on popup reopen. 
+
+3. Fixed Group Filter Escape press handling. Now it closes as it have to.
+
+4. Fixed input field keypress handling when Group Filter is open. Now the input is disabled when Group Filter is open.
+
+5. Fixed the error when picking groups in Group Filter with an empty input field showed “Nothing found” error.
+
+
 ## 1.2.0 (30.03.2021)
 
 If you picked categories w/o items but there are ones with them, you will see a friendly notice that will
