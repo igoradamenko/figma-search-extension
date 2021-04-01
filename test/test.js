@@ -43,7 +43,9 @@ afterEach(async () => {
   await page.close();
 });
 
-describe('Popup', () => {
+describe('Popup', function() {
+  this.timeout(10000);
+
   it('should open and close popup', async () => {
     const popup = await openPopup();
 
@@ -67,7 +69,9 @@ describe('Popup', () => {
   });
 });
 
-describe('Preloader', () => {
+describe('Preloader', function() {
+  this.timeout(10000);
+
   it('should show & hide preloader on search', async () => {
     const popup = await openPopup();
 
@@ -79,7 +83,9 @@ describe('Preloader', () => {
   });
 });
 
-describe('Filter', () => {
+describe('Filter', function() {
+  this.timeout(10000);
+
   it('should show groups filter', async () => {
     const popup = await openPopup();
 
@@ -257,7 +263,9 @@ describe('Filter', () => {
   });
 });
 
-describe('List', () => {
+describe('List', function() {
+  this.timeout(10000);
+
   it('should select items on click', async () => {
     const popup = await openPopup();
 
@@ -325,7 +333,9 @@ describe('List', () => {
   });
 });
 
-describe('Empty Notices', () => {
+describe('Empty Notices', function() {
+  this.timeout(10000);
+
   it('should show not found when nothing found', async () => {
     const popup = await openPopup();
 
@@ -452,7 +462,9 @@ describe('Empty Notices', () => {
   });
 });
 
-describe('Cache', () => {
+describe('Cache', function() {
+  this.timeout(10000);
+
   it('should restore previous search results', async () => {
     let popup = await openPopup();
 
@@ -469,8 +481,6 @@ describe('Cache', () => {
   });
 
   it('should restore scroll on previous search results', async function() {
-    this.timeout(10000);
-
     let popup = await openPopup();
 
     await popup.focus('#input');
@@ -572,7 +582,9 @@ describe('Cache', () => {
   });
 });
 
-describe('Deep Search', () => {
+describe('Deep Search', function() {
+  this.timeout(10000);
+
   it('should show deep search button', async () => {
     const popup = await openPopup();
 
