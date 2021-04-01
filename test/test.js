@@ -7,48 +7,49 @@ const { expect } = require('chai');
 
 let browser, page, server;
 
-describe('UI', () => {
-  before(async () => {
-    browser = await puppeteer.launch();
+before(async () => {
+  browser = await puppeteer.launch();
 
-    server = http.createServer((req, res) => {
-      fs.readFile(path.resolve(__dirname, '..', `./${req.url}`), (err, data) => {
-        if (err) {
-          res.writeHead(404);
-          res.end(JSON.stringify(err));
-          return;
-        }
-        res.writeHead(200);
-        res.end(data);
-      });
-    }).listen(8080);
-  });
-
-  after(async () => {
-    await browser.close();
-    await new Promise(resolve => server.close(resolve));
-  });
-
-  beforeEach(async () => {
-    page = await browser.newPage();
-
-    page.on('error', handleFatalError);
-    page.on('pageerror', handleFatalError);
-
-    // page.on('console', msg => console.log(msg.text()));
-
-    await page.setViewport({
-      width: 800,
-      height: 800,
+  // TODO: move to separated script to make it possible to run it as a task
+  server = http.createServer((req, res) => {
+    fs.readFile(path.resolve(__dirname, '..', `./${req.url}`), (err, data) => {
+      if (err) {
+        res.writeHead(404);
+        res.end(JSON.stringify(err));
+        return;
+      }
+      res.writeHead(200);
+      res.end(data);
     });
+  }).listen(8080);
+});
 
-    await page.goto('http://localhost:8080/test/index.html');
+after(async () => {
+  await browser.close();
+  await new Promise(resolve => server.close(resolve));
+});
+
+beforeEach(async () => {
+  page = await browser.newPage();
+
+  page.on('error', handleFatalError);
+  page.on('pageerror', handleFatalError);
+
+  // page.on('console', msg => console.log(msg.text()));
+
+  await page.setViewport({
+    width: 800,
+    height: 800,
   });
 
-  afterEach(async () => {
-    await page.close();
-  });
+  await page.goto('http://localhost:8080/test/index.html');
+});
 
+afterEach(async () => {
+  await page.close();
+});
+
+describe('Popup', () => {
   it('should open and close popup', async () => {
     const popup = await openPopup();
 
@@ -59,6 +60,10 @@ describe('UI', () => {
     await closePopup();
   });
 
+  // TODO: keys handling: letters go to input even w/o focus
+});
+
+describe('Preloader', () => {
   it('should show & hide preloader on search', async () => {
     const popup = await openPopup();
 
@@ -68,16 +73,89 @@ describe('UI', () => {
     await popup.waitForSelector('.global-preloader_visible', { visible: true });
     await popup.waitForSelector('.global-preloader_visible', { hidden: true });
   });
+});
 
-  it('should show not found when nothing found', async () => {
+describe('Filter', () => {
+  it('should show groups filter', async () => {
+    const popup = await openPopup();
+
+    await popup.waitForSelector('#select', { visible: true });
+  });
+
+  it('should open groups filter', async () => {
+    const popup = await openPopup();
+
+    await popup.waitForSelector('#select button', { visible: true });
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+  });
+
+  it('should open ”others...” group in groups filter', async () => {
+    const popup = await openPopup();
+
+    await popup.waitForSelector('#select button', { visible: true });
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+    await popup.waitForSelector('.select__group', { hidden: true });
+
+    await popup.click('.select__item[data-group-toggle]');
+    await popup.waitForSelector('.select__item[data-group-toggle]', { hidden: true });
+
+    await popup.waitForSelector('.select__group', { visible: true });
+  });
+
+  it('should select item in groups filter', async () => {
+    const popup = await openPopup();
+
+    await popup.waitForSelector('#select button', { visible: true });
+
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Everywhere"]', { visible: true });
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+    await popup.waitForSelector('.select__item_selected[data-all]', { visible: true });
+
+    await popup.click('.select__item[data-item]');
+    await popup.waitForSelector('.select__item_selected[data-item]', { visible: true });
+    await popup.waitForSelector('.select__item_selected[data-all]', { hidden: true });
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page"]', { visible: true });
+  });
+
+  it('should filter results using groups filter', async () => {
     const popup = await openPopup();
 
     await popup.focus('#input');
-    await page.keyboard.type('фшгравфлоывр');
+    await page.keyboard.type('widget');
 
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemsCountPrev = await popup.evaluate(() => {
+      return document.querySelectorAll('.list__item').length;
+    });
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item[data-item]:nth-child(4)');
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Frame"]', { visible: true });
+
+    const itemsCountNext = await popup.evaluate(() => {
+      return document.querySelectorAll('.list__item').length;
+    });
+
+    expect(itemsCountPrev > itemsCountNext).eql(true);
+    expect(itemsCountNext).eql(1);
   });
 
+  // TODO: select all select items → everywhere selected
+  // TODO: select closing?
+});
+
+describe('List', () => {
   it('should select items on click', async () => {
     const popup = await openPopup();
 
@@ -90,6 +168,121 @@ describe('UI', () => {
     await popup.waitForSelector('.list__item_selected', { visible: true });
   });
 
+  it('should not show group headlines when only one group is selected', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item[data-item]:nth-child(4)');
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Frame"]', { visible: true });
+
+    await popup.waitForSelector('.list__headline', { hidden: true });
+  });
+
+  it('should show group headlines when only two groups are selected', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item[data-item]:nth-child(4)');
+    await popup.click('.select__item[data-item]:nth-child(5)');
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Frame, Component"]', { visible: true });
+
+    await popup.waitForSelector('.list__headline', { visible: true });
+  });
+
+  // TODO: keyboard navigation
+});
+
+describe('Empty Notices', () => {
+  it('should show not found when nothing found', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('фшгравфлоывр');
+
+    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+  });
+
+  it('should show global empty notice when one empty group is selected', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item[data-item]:nth-child(3)');
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page"]', { visible: true });
+
+    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+  });
+
+  it('should show global empty notice when two empty groups are selected', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item[data-item]:nth-child(3)');
+
+    await popup.click('.select__item[data-group-toggle]');
+    await popup.waitForSelector('.select__item[data-group-toggle]', { hidden: true });
+
+    await popup.click('.select__item[data-item]:nth-child(8)');
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page, Arrow"]', { visible: true });
+
+
+    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+  });
+
+  it('should show empty group notice when two groups are selected and one of them is empty', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item[data-item]:nth-child(3)');
+    await popup.click('.select__item[data-item]:nth-child(4)');
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page, Frame"]', { visible: true });
+
+    await popup.waitForSelector('.list__empty-notice', { visible: true });
+  });
+
+  // TODO: try search everywhere button
+});
+
+describe('Cache', () => {
   it('should restore previous search results', async () => {
     let popup = await openPopup();
 
@@ -169,6 +362,10 @@ describe('UI', () => {
     await popup.waitForSelector('.list__item_focused', { visible: true });
   });
 
+  // TODO: keyboard navigation saving position?
+});
+
+describe('Deep Search', () => {
   it('should show deep search button', async () => {
     const popup = await openPopup();
 
@@ -220,186 +417,6 @@ describe('UI', () => {
 
     expect(itemsCountNext > itemsCountPrev).eql(true);
   });
-
-  it('should show groups filter', async () => {
-    const popup = await openPopup();
-
-    await popup.waitForSelector('#select', { visible: true });
-  });
-
-  it('should open groups filter', async () => {
-    const popup = await openPopup();
-
-    await popup.waitForSelector('#select button', { visible: true });
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-  });
-
-  it('should open ”others...” group in groups filter', async () => {
-    const popup = await openPopup();
-
-    await popup.waitForSelector('#select button', { visible: true });
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-    await popup.waitForSelector('.select__group', { hidden: true });
-
-    await popup.click('.select__item[data-group-toggle]');
-    await popup.waitForSelector('.select__item[data-group-toggle]', { hidden: true });
-
-    await popup.waitForSelector('.select__group', { visible: true });
-  });
-
-  it('should select item in groups filter', async () => {
-    const popup = await openPopup();
-
-    await popup.waitForSelector('#select button', { visible: true });
-
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Everywhere"]', { visible: true });
-
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-    await popup.waitForSelector('.select__item_selected[data-all]', { visible: true });
-
-    await popup.click('.select__item[data-item]');
-    await popup.waitForSelector('.select__item_selected[data-item]', { visible: true });
-    await popup.waitForSelector('.select__item_selected[data-all]', { hidden: true });
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page"]', { visible: true });
-  });
-
-  it('should filter results using groups filter', async () => {
-    const popup = await openPopup();
-
-    await popup.focus('#input');
-    await page.keyboard.type('widget');
-
-    await popup.waitForSelector('.list', { visible: true });
-
-    const itemsCountPrev = await popup.evaluate(() => {
-      return document.querySelectorAll('.list__item').length;
-    });
-
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-
-    await popup.click('.select__item[data-item]:nth-child(4)');
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Frame"]', { visible: true });
-
-    const itemsCountNext = await popup.evaluate(() => {
-      return document.querySelectorAll('.list__item').length;
-    });
-
-    expect(itemsCountPrev > itemsCountNext).eql(true);
-    expect(itemsCountNext).eql(1);
-  });
-
-  it('should not show group headlines when only one group is selected', async () => {
-    const popup = await openPopup();
-
-    await popup.focus('#input');
-    await page.keyboard.type('widget');
-
-    await popup.waitForSelector('.list', { visible: true });
-
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-
-    await popup.click('.select__item[data-item]:nth-child(4)');
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Frame"]', { visible: true });
-
-    await popup.waitForSelector('.list__headline', { hidden: true });
-  });
-
-  it('should show group headlines when only two groups are selected', async () => {
-    const popup = await openPopup();
-
-    await popup.focus('#input');
-    await page.keyboard.type('widget');
-
-    await popup.waitForSelector('.list', { visible: true });
-
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-
-    await popup.click('.select__item[data-item]:nth-child(4)');
-    await popup.click('.select__item[data-item]:nth-child(5)');
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Frame, Component"]', { visible: true });
-
-    await popup.waitForSelector('.list__headline', { visible: true });
-  });
-
-  it('should show global empty notice when one empty group is selected', async () => {
-    const popup = await openPopup();
-
-    await popup.focus('#input');
-    await page.keyboard.type('widget');
-
-    await popup.waitForSelector('.list', { visible: true });
-
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-
-    await popup.click('.select__item[data-item]:nth-child(3)');
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page"]', { visible: true });
-
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
-  });
-
-  it('should show global empty notice when two empty groups are selected', async () => {
-    const popup = await openPopup();
-
-    await popup.focus('#input');
-    await page.keyboard.type('widget');
-
-    await popup.waitForSelector('.list', { visible: true });
-
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-
-    await popup.click('.select__item[data-item]:nth-child(3)');
-
-    await popup.click('.select__item[data-group-toggle]');
-    await popup.waitForSelector('.select__item[data-group-toggle]', { hidden: true });
-
-    await popup.click('.select__item[data-item]:nth-child(8)');
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page, Arrow"]', { visible: true });
-
-
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
-  });
-
-  it('should show empty group notice when two groups are selected and one of them is empty', async () => {
-    const popup = await openPopup();
-
-    await popup.focus('#input');
-    await page.keyboard.type('widget');
-
-    await popup.waitForSelector('.list', { visible: true });
-
-    await popup.click('#select button');
-
-    await popup.waitForSelector('.select_open', { visible: true });
-
-    await popup.click('.select__item[data-item]:nth-child(3)');
-    await popup.click('.select__item[data-item]:nth-child(4)');
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page, Frame"]', { visible: true });
-
-    await popup.waitForSelector('.list__empty-notice', { visible: true });
-  });
-
-  // TODO:
-  //  try search everywhere button
-  //  select all select items → everywhere selected
-  //  select closing?
-  //  keyboard navigation
-  //  keys handling: letters to to input even w/o focus
 });
 
 async function openPopup() {
