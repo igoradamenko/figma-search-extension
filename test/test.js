@@ -54,7 +54,17 @@ describe('Popup', () => {
     await closePopup();
   });
 
-  // TODO: keys handling: letters go to input even w/o focus
+  it('should handle letters keys even w/o focusing on input', async () => {
+    const popup = await openPopup();
+
+    // for some reason .focus does not work here
+    // probably due to “unfocusability” of the non-input block
+    await popup.click('#content');
+
+    await page.keyboard.type('asd');
+
+    await popup.waitForFunction('document.getElementById("input").value === "asd"');
+  });
 });
 
 describe('Preloader', () => {
@@ -145,8 +155,106 @@ describe('Filter', () => {
     expect(itemsCountNext).eql(1);
   });
 
-  // TODO: select all select items → everywhere selected
-  // TODO: select closing?
+  it('should select “everywhere“ when all the items are selected', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item[data-group-toggle]');
+    await popup.waitForSelector('.select__item[data-group-toggle]', { hidden: true });
+
+    const notSelectedItemsSelector = '.select__separator ~ .select__item:not(.select__item_selected),.select__separator ~ .select__group .select__item:not(.select__item_selected)';
+
+    const itemsCount = await popup.evaluate(`document.querySelectorAll("${notSelectedItemsSelector}").length`);
+
+    for (let i = 0; i < itemsCount - 1; i++) {
+      await popup.click(notSelectedItemsSelector);
+      await popup.waitForFunction(`document.querySelectorAll("${notSelectedItemsSelector}").length === ${itemsCount - i - 1}`);
+    }
+
+    await popup.click(notSelectedItemsSelector);
+    await popup.waitForFunction(`document.querySelectorAll("${notSelectedItemsSelector}").length === ${itemsCount}`);
+    await popup.waitForFunction(`document.querySelector(".select__item_selected").textContent === "Everywhere"`);
+  });
+
+  it('should close when Esc pressed', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await page.keyboard.press('Escape');
+
+    await popup.waitForSelector('.select_open', { hidden: true });
+  });
+
+  it('should short filter titles when 5+ selected', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item[data-group-toggle]');
+    await popup.waitForSelector('.select__item[data-group-toggle]', { hidden: true });
+
+    const notSelectedItemsSelector = '.select__separator ~ .select__item:not(.select__item_selected),.select__separator ~ .select__group .select__item:not(.select__item_selected)';
+
+    const itemsCount = await popup.evaluate(`document.querySelectorAll("${notSelectedItemsSelector}").length`);
+
+    for (let i = 0; i < 6; i++) {
+      await popup.click(notSelectedItemsSelector);
+      await popup.waitForFunction(`document.querySelectorAll("${notSelectedItemsSelector}").length === ${itemsCount - i - 1}`);
+    }
+
+    await popup.waitForFunction(`document.querySelector(".select__button-text").textContent === "Pg, Fr, Cm, Gr, In, Sl"`);
+  });
+
+  it('should not move focus on input when open', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.waitForFunction(`document.getElementById('input').value === ''`);
+  });
+
+  it('should not filter when current selected values are not changed', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#select button');
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item_selected');
+
+    await page.keyboard.press('Escape');
+    await popup.waitForSelector('.select_open', { hidden: true });
+
+    await popup.waitForSelector('.empty-notice_visible', { hidden: true });
+  });
+
+  it('should not filter when input field is empty', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#select button');
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item:not(.select__item_selected)');
+    await popup.waitForSelector('.select__separator + .select__item_selected', { visible: true });
+
+    await page.keyboard.press('Escape');
+    await popup.waitForSelector('.select_open', { hidden: true });
+
+    await popup.waitForSelector('.empty-notice_visible', { hidden: true });
+  });
 });
 
 describe('List', () => {
@@ -199,7 +307,22 @@ describe('List', () => {
     await popup.waitForSelector('.list__headline', { visible: true });
   });
 
-  // TODO: keyboard navigation
+  it('should navigate through list using keyboard', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    // three times just for sure, nothing special here
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+
+    await popup.waitForSelector('.list__item_selected', { visible: true });
+  });
 });
 
 describe('Empty Notices', () => {
@@ -273,7 +396,60 @@ describe('Empty Notices', () => {
     await popup.waitForSelector('.list__empty-notice', { visible: true });
   });
 
-  // TODO: try search everywhere button
+  it('should change filter to Everywhere when “Try Search Everywhere” pressed (one group)', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#select button');
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item:not(.select__item_selected)');
+    await popup.waitForSelector('.select__separator + .select__item_selected', { visible: true });
+    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Page"');
+
+    await page.keyboard.press('Escape');
+    await popup.waitForSelector('.select_open', { hidden: true });
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.click('.empty-notice__text_type_category .empty-notice__search-button');
+
+
+    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everywhere"');
+    await popup.waitForSelector('.empty-notice_visible', { hidden: true });
+    await popup.waitForSelector('.list', { visible: true });
+  });
+
+  it('should change filter to Everywhere when “Try Search Everywhere” pressed (many groups)', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#select button');
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item:not(.select__item_selected)');
+    await popup.waitForSelector('.select__separator + .select__item_selected', { visible: true });
+
+    await popup.click('.select__item[data-group-toggle]');
+    await popup.waitForSelector('.select__group', { visible: true });
+
+    await popup.click('.select__group .select__item:nth-child(2)');
+    await popup.waitForSelector('.select__group .select__item.select__item_selected:nth-child(2)', { visible: true });
+    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Page, Slice"');
+
+    await page.keyboard.press('Escape');
+    await popup.waitForSelector('.select_open', { hidden: true });
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.click('.empty-notice__text_type_categories .empty-notice__search-button');
+
+    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everywhere"');
+    await popup.waitForSelector('.empty-notice_visible', { hidden: true });
+    await popup.waitForSelector('.list', { visible: true });
+  });
 });
 
 describe('Cache', () => {
@@ -293,7 +469,7 @@ describe('Cache', () => {
   });
 
   it('should restore scroll on previous search results', async function() {
-    this.timeout(5000);
+    this.timeout(10000);
 
     let popup = await openPopup();
 
@@ -353,7 +529,47 @@ describe('Cache', () => {
     await popup.waitForSelector('.list__item_focused', { visible: true });
   });
 
-  // TODO: keyboard navigation saving position?
+  it('should restore previously keyboard-selected item', async () => {
+    let popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    // three times just for sure, nothing special here
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowDown');
+
+    await closePopup();
+
+    popup = await openPopup();
+
+    await popup.waitForSelector('.list__item_focused', { visible: true });
+  });
+
+  it('should restore filter state', async () => {
+    let popup = await openPopup();
+
+    await popup.click('#select button');
+
+    await popup.waitForSelector('.select_open', { visible: true });
+
+    await popup.click('.select__item:not(.select__item_selected)');
+    await popup.waitForSelector('.select__separator + .select__item_selected');
+
+    await page.keyboard.press('Escape');
+    await popup.waitForSelector('.select_open', { hidden: true });
+
+    await popup.waitForFunction(`document.querySelector('.select__button-text').textContent === 'Page'`);
+
+    await closePopup();
+
+    popup = await openPopup();
+
+    await popup.waitForFunction(`document.querySelector('.select__button-text').textContent === 'Page'`);
+  });
 });
 
 describe('Deep Search', () => {
@@ -444,5 +660,9 @@ async function takeScreenshot() {
     if (err.code !== 'EEXIST') throw err;
   }
 
-  await page.screenshot({ path: path.resolve(__dirname, 'screenshots', `${new Date().toJSON().replace(/:/g, '-')}.png`) });
+  const filename = `${new Date().toJSON().replace(/:/g, '-')}.png`;
+
+  await page.screenshot({ path: path.resolve(__dirname, 'screenshots', filename) });
+
+  console.log('Took screenshot:', filename);
 }
