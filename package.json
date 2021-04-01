@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tasks/build.sh",
     "generate-icon-styles": "tasks/generate-icon-styles.js",
+    "serv": "node test/server.js",
     "start": "nodemon --exec 'npm run test' -w test/",
     "test": "mocha test/test.js"
   },

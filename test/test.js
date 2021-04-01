@@ -1,27 +1,16 @@
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
 
 const puppeteer = require('puppeteer');
 const { expect } = require('chai');
 
+const startServer = require('./server');
+
 let browser, page, server;
 
 before(async () => {
+  server = await startServer();
   browser = await puppeteer.launch();
-
-  // TODO: move to separated script to make it possible to run it as a task
-  server = http.createServer((req, res) => {
-    fs.readFile(path.resolve(__dirname, '..', `./${req.url}`), (err, data) => {
-      if (err) {
-        res.writeHead(404);
-        res.end(JSON.stringify(err));
-        return;
-      }
-      res.writeHead(200);
-      res.end(data);
-    });
-  }).listen(8080);
 });
 
 after(async () => {
@@ -322,8 +311,6 @@ describe('Cache', () => {
     // it takes some time to scroll the view
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    await makeScreenshot();
-
     const scrollTopPrev = await popup.evaluate(() => {
       return document.getElementById('content').scrollTop;
     });
@@ -335,7 +322,6 @@ describe('Cache', () => {
     popup = await openPopup();
 
     await popup.waitForSelector('.list', { visible: true });
-    await makeScreenshot();
 
     const scrollTopNext = await popup.evaluate(() => {
       return document.getElementById('content').scrollTop;
@@ -439,13 +425,13 @@ async function closePopup() {
 }
 
 async function handleFatalError(err) {
-  await makeScreenshot();
+  await takeScreenshot();
 
   console.error(err);
   process.exit(1);
 }
 
-async function makeScreenshot() {
+async function takeScreenshot() {
   const screenshotsDir = path.resolve(__dirname, 'screenshots');
 
   try {
