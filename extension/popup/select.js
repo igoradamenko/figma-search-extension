@@ -45,7 +45,10 @@ class Select {
     }
 
     if ('all' in item.dataset) {
-      this.updateSelectedValues([]);
+      if (this.selectedValues.length !== 0) {
+        this.updateSelectedValues([]);
+      }
+
       return;
     }
 
