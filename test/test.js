@@ -13,18 +13,22 @@ process.on('exit', () => {
   server.close();
 });
 
-before(async () => {
+before(async function() {
   server = await startServer();
   browser = await puppeteer.launch();
 });
 
-after(async () => {
+after(async function() {
   await browser.close();
   await new Promise(resolve => server.close(resolve));
 });
 
-beforeEach(async () => {
+beforeEach(async function() {
   page = await browser.newPage();
+
+  // set timeout to force tests to fail before mocha timeout
+  // makes it easier to figure out an error
+  page.setDefaultTimeout(3000);
 
   page.on('error', handleFatalError);
   page.on('pageerror', handleFatalError);
@@ -39,13 +43,11 @@ beforeEach(async () => {
   await page.goto('http://localhost:8080/test/index.html');
 });
 
-afterEach(async () => {
+afterEach(async function() {
   await page.close();
 });
 
 describe('Popup', function() {
-  this.timeout(10000);
-
   it('should open and close popup', async () => {
     const popup = await openPopup();
 
@@ -70,8 +72,6 @@ describe('Popup', function() {
 });
 
 describe('Preloader', function() {
-  this.timeout(10000);
-
   it('should show & hide preloader on search', async () => {
     const popup = await openPopup();
 
@@ -84,8 +84,6 @@ describe('Preloader', function() {
 });
 
 describe('Filter', function() {
-  this.timeout(10000);
-
   it('should show groups filter', async () => {
     const popup = await openPopup();
 
@@ -264,8 +262,6 @@ describe('Filter', function() {
 });
 
 describe('List', function() {
-  this.timeout(10000);
-
   it('should select items on click', async () => {
     const popup = await openPopup();
 
@@ -334,8 +330,6 @@ describe('List', function() {
 });
 
 describe('Empty Notices', function() {
-  this.timeout(10000);
-
   it('should show not found when nothing found', async () => {
     const popup = await openPopup();
 
@@ -463,8 +457,6 @@ describe('Empty Notices', function() {
 });
 
 describe('Cache', function() {
-  this.timeout(10000);
-
   it('should restore previous search results', async () => {
     let popup = await openPopup();
 
@@ -583,8 +575,6 @@ describe('Cache', function() {
 });
 
 describe('Deep Search', function() {
-  this.timeout(10000);
-
   it('should show deep search button', async () => {
     const popup = await openPopup();
 

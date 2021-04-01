@@ -9,7 +9,7 @@
     "generate-icon-styles": "tasks/generate-icon-styles.js",
     "serv": "node test/server.js",
     "start": "nodemon --signal SIGUSR1 --exec 'npm run test' -w test/",
-    "test": "mocha test/test.js"
+    "test": "mocha --timeout 10000 --retries 3 test/test.js"
   },
   "devDependencies": {
     "@types/chrome": "0.0.133",
