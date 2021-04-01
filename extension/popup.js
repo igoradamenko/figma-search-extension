@@ -141,6 +141,9 @@ function onRootKeyDown(e) {
   console.log(e.key, 'key pressed');
 
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape') {
+    // do not move focus on input if select is open
+    if (select.IsOpen()) return;
+
     console.log('Keypress left unhandled');
     list.PseudoBlurItems();
     input.Focus();
