@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tasks/build.sh",
     "generate-icon-styles": "tasks/generate-icon-styles.js",
+    "start": "nodemon --exec 'npm run test' -w test/",
     "test": "mocha test/test.js"
   },
   "devDependencies": {
@@ -13,6 +14,7 @@
     "@types/figma": "1.0.3",
     "chai": "4.3.4",
     "mocha": "8.3.2",
+    "nodemon": "2.0.7",
     "puppeteer": "8.0.0"
   }
 }
