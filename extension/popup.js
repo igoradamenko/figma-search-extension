@@ -104,6 +104,9 @@ function onMessageGet(message) {
 
 function onSelectUpdate(filters) {
   updateCache({ selectedFilters: filters });
+
+  if (cache.inputValue.length === 0) return;
+
   showResult({
     searchResult: cache.searchResult,
     notLoadedPagesNumber: cache.notLoadedPagesNumber,
