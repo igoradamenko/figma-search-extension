@@ -3,11 +3,12 @@
   "version": "1.2.0",
   "description": "Search through Figma objects even in “View only” mode",
   "private": true,
+  "//": "such a weird nodemon configuration due to https://youtrack.jetbrains.com/issue/WEB-36644#focus=Comments-27-3252515.0-0",
   "scripts": {
     "build": "tasks/build.sh",
     "generate-icon-styles": "tasks/generate-icon-styles.js",
     "serv": "node test/server.js",
-    "start": "nodemon --exec 'npm run test' -w test/",
+    "start": "nodemon --signal SIGUSR1 --exec 'npm run test' -w test/",
     "test": "mocha test/test.js"
   },
   "devDependencies": {

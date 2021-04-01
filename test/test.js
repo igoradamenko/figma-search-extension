@@ -8,6 +8,11 @@ const startServer = require('./server');
 
 let browser, page, server;
 
+process.on('exit', () => {
+  browser.close();
+  server.close();
+});
+
 before(async () => {
   server = await startServer();
   browser = await puppeteer.launch();
@@ -427,8 +432,7 @@ async function closePopup() {
 async function handleFatalError(err) {
   await takeScreenshot();
 
-  console.error(err);
-  process.exit(1);
+  throw err;
 }
 
 async function takeScreenshot() {
