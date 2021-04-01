@@ -155,6 +155,8 @@ class List {
   }
 
   FocusNextItem() {
+    if (this.IsEmpty()) return;
+
     this.selectedItemIndex ??= -1;
     this.selectedItemIndex = (this.selectedItemIndex + 1) % this.itemsNodes.length;
 
@@ -164,6 +166,8 @@ class List {
   }
 
   FocusPreviousItem() {
+    if (this.IsEmpty()) return;
+
     this.selectedItemIndex ??= 0;
     this.selectedItemIndex = (this.selectedItemIndex - 1 + this.itemsNodes.length) % this.itemsNodes.length;
 

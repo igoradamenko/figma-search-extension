@@ -140,7 +140,7 @@ function onDeepSearchButtonClick() {
 function onRootKeyDown(e) {
   console.log(e.key, 'key pressed');
 
-  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape' || list.IsEmpty()) {
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape') {
     console.log('Keypress left unhandled');
     list.PseudoBlurItems();
     input.Focus();
@@ -151,7 +151,7 @@ function onRootKeyDown(e) {
 
   switch (e.key) {
     case 'Enter':
-      // handled by this fn just to prevent handling on input
+      // handled by this fn just to prevent handling on input (we blurred it)
       // we don't need to preventDefault, so just return
       return;
 
