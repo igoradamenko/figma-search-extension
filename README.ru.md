@@ -32,6 +32,7 @@
   - [Ручная установка](#ручная-установка)
     - [Chrome и иные браузеры на основе Chromium](#chrome-и-иные-браузеры-на-основе-chromium)
     - [Firefox](#firefox)
+- [Ещё](#ещё)
 - [Благодарности](#благодарности)
 
 ## Мотивация
@@ -117,7 +118,11 @@
 4. Выбрать скаченный ZIP-файл с расширением (из п. 1).
 5. Одобрить установку.
 
-## Credits
+## Ещё
+
+- **[Figma Mixed Styles Extension](https://github.com/igoradamenko/figma-mixed-styles-extension)**
+
+## Благодарности
 
 Задизайнил [Руслан Дальцаев](https://dribbble.com/workmachine).
 

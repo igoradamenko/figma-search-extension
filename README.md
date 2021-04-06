@@ -32,6 +32,7 @@ Supported browsers: Chrome, Firefox, and any Chromium-based browser (Edge, Opera
   - [Manual installation](#manual-installation)
     - [Chrome or other Chromium-based browser](#chrome-or-other-chromium-based-browser)
     - [Firefox](#firefox)
+- [More](#more)
 - [Credits](#credits)
 
 ## Rationale
@@ -114,6 +115,10 @@ If you use Linux or have already installed one of those editions, then:
 3. Open `about:addons`, press on a settings icon and pick “Install Add-on From File...” from a dropdown menu.
 4. Select the downloaded ZIP extension (from 1st step).
 5. Approve an installation.
+
+## More
+
+- **[Figma Mixed Styles Extension](https://github.com/igoradamenko/figma-mixed-styles-extension)**
 
 ## Credits
 

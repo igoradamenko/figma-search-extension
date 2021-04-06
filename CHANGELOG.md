@@ -4,8 +4,8 @@
 
 A bunch of bugfixes!
 
-1. If you are the fastest cowboy of the Wild West, you may encounter an error of non working Deep Search right after Figma page load. 
-   Now it fixed.
+1. If you are the fastest cowboy of the Wild West, you might have encountered an error of non working Deep Search right 
+   after Figma page load. Now it fixed.
    
 2. Fixed saving focused items on popup reopen. 
 
