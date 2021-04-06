@@ -77,7 +77,7 @@
 Пользователям Chrome или иного браузера на основе Chromium (Edge, Opera, Yandex.Browser, пр.) стоит устанавливать 
 расширение из официального магазина Chrome:
 
-**[Figma Search](https://chrome.google.com/webstore/detail/figma-search/lfofpannpmmeeicgiiacjghmcfgnebbi) в Crome Web Store**
+**[Figma Search](https://chrome.google.com/webstore/detail/figma-search/lfofpannpmmeeicgiiacjghmcfgnebbi) в Chrome Web Store**
 
 Нажмите на ссылку выше, и на открывшейся странице нажмите на «Add to Chrome».
 

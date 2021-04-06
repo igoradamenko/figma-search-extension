@@ -75,7 +75,7 @@ all the pages for you and retry the current search request.
 If you use Chrome or any Chromium-based browser (Edge, Opera, Yandex.Browser, etc) it's easy to install 
 the extension from the official store:
 
-**[Figma Search](https://chrome.google.com/webstore/detail/figma-search/lfofpannpmmeeicgiiacjghmcfgnebbi) in Crome Web Store**
+**[Figma Search](https://chrome.google.com/webstore/detail/figma-search/lfofpannpmmeeicgiiacjghmcfgnebbi) in Chrome Web Store**
 
 Just click on the link above and press “Add to Chrome”.
 
