@@ -18,6 +18,7 @@ const startServer = () => new Promise(resolve => {
   process.on('exit', () => server.close());
 
   server.listen(8080, () => resolve(server));
+  console.log('http://localhost:8080');
 })
 
 if (module === require.main) {
