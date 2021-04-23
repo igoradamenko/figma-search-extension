@@ -20,7 +20,7 @@
 
   function processSearch({ searchString }) {
     const searchResult = figma.root
-      .findAll(item => item.name.toLocaleLowerCase().includes(searchString))
+      .findAll(item => item.name.toLocaleLowerCase().includes(searchString) && item.type !== 'DOCUMENT')
       .map(({ id, name, type }) => {
         return {
           id,
