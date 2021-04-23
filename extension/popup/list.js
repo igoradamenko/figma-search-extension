@@ -106,7 +106,25 @@ class List {
 
     if (items.length) {
       const listItems = items.map(i => {
-        return `<li><button class="list__item list__item_type_${i.type}" type="button" data-id="${i.id}">${i.name}</button></li>`
+        let subtitle = '';
+
+        if (i.pageTitle) {
+          subtitle += i.pageTitle;
+        }
+
+        if (i.frameTitle) {
+          subtitle += `&nbsp;→ ${i.frameTitle}`;
+        }
+
+        return `
+          <li>
+            <button class="list__item list__item_type_${i.type}" type="button" data-id="${i.id}">
+              <span class="list__item-title">${i.name}</span>
+              ${subtitle ? '<br/>' : ''}
+              ${subtitle ? `<span class="list__item-subtitle">${subtitle}</span>` : ''}
+            </button>
+          </li>
+        `;
       }).join('');
 
       list = `<ul class="list__items">${listItems}</ul>`;

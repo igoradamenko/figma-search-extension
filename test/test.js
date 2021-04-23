@@ -5,6 +5,7 @@ const puppeteer = require('puppeteer');
 const { expect } = require('chai');
 
 const startServer = require('./server');
+const SERVER_PORT = 8081;
 
 let browser, page, server;
 
@@ -14,7 +15,7 @@ process.on('exit', () => {
 });
 
 before(async function() {
-  server = await startServer();
+  server = await startServer(SERVER_PORT);
   browser = await puppeteer.launch();
 });
 
@@ -40,7 +41,7 @@ beforeEach(async function() {
     height: 800,
   });
 
-  await page.goto('http://localhost:8080/test/index.html');
+  await page.goto(`http://localhost:${SERVER_PORT}/test/index.html`);
 });
 
 afterEach(async function() {
@@ -84,6 +85,21 @@ describe('Preloader', function() {
 });
 
 describe('Filter', function() {
+  it('should not show DOCUMENT node in results', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('ios');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const documentNodesCount = await popup.evaluate(() => {
+      return [...document.querySelectorAll('.list__item-title')].filter(x => x.textContent === '(Variants) iOS & iPadOS 14 UI Kit for Figma (Community)').length;
+    });
+
+    expect(documentNodesCount).eql(0);
+  });
+
   it('should show groups filter', async () => {
     const popup = await openPopup();
 
@@ -326,6 +342,51 @@ describe('List', function() {
     await page.keyboard.press('Enter');
 
     await popup.waitForSelector('.list__item_selected', { visible: true });
+  });
+
+  it('should show root page & root frame name as subtitle when they exist', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemTitle = (await popup.evaluate(`document.querySelector('.list:nth-child(2) .list__item-title').textContent`)).trim();
+    const itemSubtitle = (await popup.evaluate(`document.querySelector('.list:nth-child(2) .list__item-subtitle').textContent`)).trim();
+
+    expect(itemTitle).eql('Widgets');
+    expect(itemSubtitle).eql('iOS\xa0→ Widgets');
+  });
+
+  it('should show only root page name as subtitle when root frame does not exist', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemTitle = (await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-title').textContent`)).trim();
+    const itemSubtitle = (await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-subtitle').textContent`)).trim();
+
+    expect(itemTitle).eql('Widgets');
+    expect(itemSubtitle).eql('iOS');
+  });
+
+  it('should not show root page names for pages', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('ios');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemTitle = (await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-title').textContent`)).trim();
+    const itemSubtitle = await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-subtitle')`);
+
+    expect(itemTitle).eql('iOS');
+    expect(itemSubtitle).eql(null);
   });
 });
 

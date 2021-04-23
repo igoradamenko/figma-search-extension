@@ -8,7 +8,7 @@
     "build": "tasks/build.sh",
     "generate-icon-styles": "tasks/generate-icon-styles.js",
     "serv": "node test/server.js",
-    "start": "nodemon --signal SIGUSR1 --exec 'npm run test' -w test/",
+    "start": "nodemon --signal SIGUSR1 --exec 'npm run test' -w test/ -w extension/",
     "test": "mocha --timeout 10000 --retries 3 test/test.js"
   },
   "devDependencies": {
