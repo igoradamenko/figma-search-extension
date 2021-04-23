@@ -21,12 +21,17 @@
   function processSearch({ searchString }) {
     const searchResult = figma.root
       .findAll(item => item.name.toLocaleLowerCase().includes(searchString) && item.type !== 'DOCUMENT')
-      .map(({ id, name, type }) => {
+      .map(item => {
+        const { id, name, type } = item;
+        const { pageTitle, frameTitle } = findRootParentTitles(item);
+
         return {
           id,
           name,
           loweredName: name.toLocaleLowerCase(),
           type: type.toLocaleLowerCase().replace(/_/g, '-'),
+          pageTitle,
+          frameTitle,
         }
       });
 
@@ -121,6 +126,28 @@
 
       setTimeout(waitAndLoadNextPage.bind(null, alreadyWaitedMS + 100), 100);
     }
+  }
+
+  function findRootParentTitles(node) {
+    let pageNode = node;
+    let frameNode = node;
+
+    while (pageNode.type !== 'PAGE') {
+      frameNode = pageNode;
+      pageNode = pageNode.parent;
+    }
+
+    const result = {};
+
+    if (pageNode === node) return result;
+
+    result.pageTitle = pageNode.name;
+
+    if (frameNode.type === 'FRAME' && frameNode !== node) {
+      result.frameTitle = frameNode.name;
+    }
+
+    return result;
   }
 
   function sendMessage(message) {

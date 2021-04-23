@@ -343,6 +343,51 @@ describe('List', function() {
 
     await popup.waitForSelector('.list__item_selected', { visible: true });
   });
+
+  it('should show root page & root frame name as subtitle when they exist', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemTitle = (await popup.evaluate(`document.querySelector('.list:nth-child(2) .list__item-title').textContent`)).trim();
+    const itemSubtitle = (await popup.evaluate(`document.querySelector('.list:nth-child(2) .list__item-subtitle').textContent`)).trim();
+
+    expect(itemTitle).eql('Widgets');
+    expect(itemSubtitle).eql('iOS\xa0→ Widgets');
+  });
+
+  it('should show only root page name as subtitle when root frame does not exist', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemTitle = (await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-title').textContent`)).trim();
+    const itemSubtitle = (await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-subtitle').textContent`)).trim();
+
+    expect(itemTitle).eql('Widgets');
+    expect(itemSubtitle).eql('iOS');
+  });
+
+  it('should not show root page names for pages', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('ios');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemTitle = (await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-title').textContent`)).trim();
+    const itemSubtitle = await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-subtitle')`);
+
+    expect(itemTitle).eql('iOS');
+    expect(itemSubtitle).eql(null);
+  });
 });
 
 describe('Empty Notices', function() {

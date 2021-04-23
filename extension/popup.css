@@ -390,8 +390,17 @@ button[disabled], input[disabled] {
   min-height: 40px;
   padding: 8px 16px 8px 48px;
   text-align: left;
+}
+
+.list__item-title {
   font-size: 13px;
   line-height: 16px;
+}
+
+.list__item-subtitle {
+  font-size: 10px;
+  line-height: 12px;
+  color: #737388;
 }
 
 .list__empty-notice {
