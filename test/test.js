@@ -5,6 +5,7 @@ const puppeteer = require('puppeteer');
 const { expect } = require('chai');
 
 const startServer = require('./server');
+const SERVER_PORT = 8081;
 
 let browser, page, server;
 
@@ -14,7 +15,7 @@ process.on('exit', () => {
 });
 
 before(async function() {
-  server = await startServer();
+  server = await startServer(SERVER_PORT);
   browser = await puppeteer.launch();
 });
 
@@ -40,7 +41,7 @@ beforeEach(async function() {
     height: 800,
   });
 
-  await page.goto('http://localhost:8080/test/index.html');
+  await page.goto(`http://localhost:${SERVER_PORT}/test/index.html`);
 });
 
 afterEach(async function() {

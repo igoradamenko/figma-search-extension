@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
-const startServer = () => new Promise(resolve => {
+const startServer = (port = 8080) => new Promise(resolve => {
   let server = http.createServer((req, res) => {
     fs.readFile(path.resolve(__dirname, '..', `./${req.url}`), (err, data) => {
       if (err) {
@@ -17,8 +17,8 @@ const startServer = () => new Promise(resolve => {
 
   process.on('exit', () => server.close());
 
-  server.listen(8080, () => resolve(server));
-  console.log('http://localhost:8080');
+  server.listen(port, () => resolve(server));
+  console.log(`Starting server on http://localhost:${port}\n`);
 })
 
 if (module === require.main) {
