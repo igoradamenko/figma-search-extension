@@ -84,6 +84,21 @@ describe('Preloader', function() {
 });
 
 describe('Filter', function() {
+  it('should not show DOCUMENT node in results', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('ios');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const documentNodesCount = await popup.evaluate(() => {
+      return [...document.querySelectorAll('.list__item-title')].filter(x => x.textContent === '(Variants) iOS & iPadOS 14 UI Kit for Figma (Community)').length;
+    });
+
+    expect(documentNodesCount).eql(0);
+  });
+
   it('should show groups filter', async () => {
     const popup = await openPopup();
 
