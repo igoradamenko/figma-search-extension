@@ -218,6 +218,8 @@ function onEmptyNoticeSearchButtonClick() {
 }
 
 function onPagesFilterUpdate(selectedFilter) {
+  updateCache({ selectedPagesFilter: selectedFilter });
+
   switch (selectedFilter) {
     case Tabs.TAB.ALL_PAGES:
       console.log('all pages selected');
@@ -384,6 +386,7 @@ let cache = {
   selectedListItemIndex: undefined,
   listScrollTop: 0,
   selectedFilters: [],
+  selectedPagesFilter: Tabs.TAB.ALL_PAGES,
 };
 
 function updateCache(obj) {
@@ -396,7 +399,10 @@ function updateCache(obj) {
 }
 
 function loadCache(loadedCache) {
-  if (!loadedCache) return;
+  if (!loadedCache) {
+    tabs.Init();
+    return;
+  }
 
   cache = loadedCache;
 
@@ -404,6 +410,9 @@ function loadCache(loadedCache) {
   //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
   cache.selectedFilters = cache.selectedFilters || [];
   select.SetSelectedValues(cache.selectedFilters);
+
+  tabs.SwitchTab(cache.selectedPagesFilter)
+  setTimeout(() => tabs.Init());
 
   input.SetValue(cache.inputValue);
 

@@ -26,6 +26,10 @@ class Tabs {
 
   /* PUBLIC */
 
+  Init() {
+    this.node.classList.add('tabs_inited');
+  }
+
   SwitchTab(index) {
     this.switchTab(index);
   }

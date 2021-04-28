@@ -221,6 +221,9 @@ button[disabled], input[disabled] {
   background-position-x: calc(var(--tabs-selected-item-index,  -1) * 100%);
   border: 2px solid #F4F4F8;
   border-radius: 6px;
+}
+
+.tabs_inited {
   transition: background-position .15s ease-in-out;
 }
 
