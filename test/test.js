@@ -676,6 +676,7 @@ describe('Cache', function() {
     popup = await openPopup();
 
     await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.toast_visible', { visible: true });
   });
 });
 

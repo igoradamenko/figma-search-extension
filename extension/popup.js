@@ -469,7 +469,7 @@ function processQuickCacheUpdate(updatedCache) {
     cache.notLoadedPagesNumber = updatedCache.notLoadedPagesNumber;
 
     if (cache.inputValue) {
-      // TODO: show toast
+      toast.Show();
     }
   }
 
