@@ -466,8 +466,8 @@ function processQuickCacheUpdate(updatedCache) {
   if (preloadedStateChanged) return;
 
   if (updatedCache.notLoadedPagesNumber !== cache.notLoadedPagesNumber) {
-    cache.notLoadedPagesNumber = updatedCache.notLoadedPagesNumber;
-
+    // do not save new notLoadedPagesNumber to make sure that toast shows until
+    // search results will be updated
     if (cache.inputValue) {
       toast.Show();
     }
