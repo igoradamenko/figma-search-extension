@@ -803,6 +803,34 @@ describe('Pages filter', function() {
   });
 });
 
+describe.only('Toast', function () {
+  it('should hide when clicked', async () => {
+    let popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await closePopup();
+
+    // second page does not contain elements with “widget” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[1];
+    });
+
+    popup = await openPopup();
+
+    await popup.waitForSelector('.toast_visible', { visible: true });
+    await popup.waitForTransitionEnd('#toast');
+
+    await popup.click('#toast');
+
+    await popup.waitForTransitionEnd('#toast');
+    await popup.waitForSelector('.toast_visible', { hidden: true });
+  });
+});
+
 async function openPopup() {
   await page.click('#open-popup-button');
 
