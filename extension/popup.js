@@ -292,7 +292,9 @@ function showResult(data) {
     return;
   }
 
-  list.RenderItems(itemsByGroups);
+  list.RenderItems(itemsByGroups, {
+    view: cache.selectedPagesFilter === Tabs.TAB.ALL_PAGES ? List.VIEW_MODIFIERS.FULL : List.VIEW_MODIFIERS.FILTERED,
+  });
   emptyNotice.Hide();
 }
 

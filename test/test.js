@@ -710,7 +710,7 @@ describe('Pages filter', function() {
     const popup = await openPopup();
 
     await popup.focus('#input');
-    await page.keyboard.type('ui');
+    await page.keyboard.type('ui', { delay: 100 });
 
     await popup.waitForSelector('.list', { visible: true });
 
@@ -735,7 +735,27 @@ describe('Pages filter', function() {
     });
 
     expect(itemsCountNext < itemsCountPrev).eql(true);
-  })
+  });
+
+  it('should not show page names in subtitles Current page selected', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.click('#tabs .tabs__button:not(.tabs__button_selected)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    const firstItemSubtitle = await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-subtitle')`);
+    expect(firstItemSubtitle).eql(null);
+
+    const secondItemSubtitle = (await popup.evaluate(`document.querySelector('.list:nth-child(2) .list__item-subtitle').textContent`)).trim();
+
+    expect(secondItemSubtitle).eql('Widgets');
+  });
 });
 
 async function openPopup() {
