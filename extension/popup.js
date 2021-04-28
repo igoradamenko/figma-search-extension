@@ -232,6 +232,9 @@ function onEmptyNoticeSearchButtonClick() {
 
 function onPagesFilterUpdate(selectedFilter) {
   updateCache({ selectedPagesFilter: selectedFilter });
+
+  if (cache.inputValue.length === 0) return;
+
   rerenderResult();
 }
 

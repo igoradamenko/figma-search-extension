@@ -784,6 +784,22 @@ describe('Pages filter', function() {
 
     expect(secondItemSubtitle).eql('Widgets');
   });
+
+  it('should not trigger empty notice showing when nothing entered', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#tabs .tabs__button:not(.tabs__button_selected)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await popup.waitForSelector('.empty-notice', { hidden: true });
+
+    await popup.click('#tabs .tabs__button:not(.tabs__button_selected)');
+
+    await popup.waitForSelector('.tabs__button_selected + .tabs__button', { visible: true });
+
+    await popup.waitForSelector('.empty-notice', { hidden: true });
+  });
 });
 
 async function openPopup() {
