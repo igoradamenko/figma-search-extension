@@ -10,6 +10,9 @@ let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deep
 
 let groupsOrder;
 
+
+let preloadedStateChanged = false;
+
 // special group in case of adding new types of items by Figma
 // which won't be handled by the extension
 const UNKNOWN_GROUP = 'Unknown';
@@ -101,6 +104,14 @@ function onMessageGet(message) {
     case 'CACHE_EXISTS':
       loadCache(message.data);
       return;
+
+    case 'CACHE_QUICK_UPDATE_COMPLETED':
+      processQuickCacheUpdate(message.data);
+      return;
+
+    case 'CACHE_SLOW_UPDATE_COMPLETED':
+      processSlowCacheUpdate(message.data);
+      return;
   }
 }
 
@@ -120,6 +131,8 @@ function onSelectUpdate(filters) {
 function onInputUpdate(value) {
   console.log('Input changed', value);
 
+  preloadedStateChanged = true;
+
   updateCache({ inputValue: value });
 
   debouncedSendSearchRequest(value);
@@ -131,6 +144,8 @@ function onListScroll(listScrollTop) {
 
 function onDeepSearchButtonClick() {
   console.log('Deep Search Button clicked');
+
+  preloadedStateChanged = true;
 
   input.Disable();
   select.Disable();
@@ -308,7 +323,6 @@ function rerenderResult() {
 
 function buildResultItems(items) {
   if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
-    console.log(cache, items)
     items = items.filter(i => cache.currentPageId === i.pageId);
   }
 
@@ -434,6 +448,31 @@ function loadCache(loadedCache) {
   list.SetScrollTop(cache.listScrollTop);
 }
 
+function processQuickCacheUpdate(updatedCache) {
+  // do not handle it when user changed preloaded state
+  if (preloadedStateChanged) return;
+
+  if (updatedCache.notLoadedPagesNumber !== cache.notLoadedPagesNumber) {
+    cache.notLoadedPagesNumber = updatedCache.notLoadedPagesNumber;
+
+    if (cache.inputValue) {
+      // TODO: show toast
+    }
+  }
+
+  if (updatedCache.currentPageId !== cache.currentPageId) {
+    cache.currentPageId = updatedCache.currentPageId;
+
+  }
+    // TODO: compare pages id and handle it
+}
+
+function processSlowCacheUpdate(updatedCache) {
+  // do not handle it when user changed preloaded state
+  if (preloadedStateChanged) return;
+
+  // TODO: compare results and show toast; but only when it's actual
+}
 
 
 /* HELPERS */
