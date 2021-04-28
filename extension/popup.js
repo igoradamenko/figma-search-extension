@@ -411,6 +411,9 @@ function loadCache(loadedCache) {
   cache.selectedFilters = cache.selectedFilters || [];
   select.SetSelectedValues(cache.selectedFilters);
 
+  // TODO: version before 1.3.0 may not have selectedPagesFilter in cahce
+  //  so we fallback it; it should be removed when all the users migrate to 1.3.0+
+  cache.selectedPagesFilter = cache.selectedPagesFilter || 0;
   tabs.SwitchTab(cache.selectedPagesFilter)
   setTimeout(() => tabs.Init());
 
