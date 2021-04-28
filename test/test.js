@@ -515,6 +515,25 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.empty-notice_visible', { hidden: true });
     await popup.waitForSelector('.list', { visible: true });
   });
+
+  it('should show page empty notice when nothing found on the current page', async () => {
+    // third page does not contain elements with “widget” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[2];
+    });
+
+    const popup = await openPopup();
+
+    await popup.click('#tabs .tabs__button:nth-child(2)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    // TODO: specify notices
+    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+  });
 });
 
 describe('Cache', function() {

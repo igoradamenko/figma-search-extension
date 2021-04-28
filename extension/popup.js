@@ -225,13 +225,24 @@ function handleArrowUp() {
   updateCache({ selectedListItemIndex });
 }
 
-function onEmptyNoticeSearchButtonClick() {
-  updateCache({ selectedFilters: [] });
-  select.SetSelectedValues([]);
-  showResult({
-    searchResult: cache.searchResult,
-    notLoadedPagesNumber: cache.notLoadedPagesNumber,
-  });
+function onEmptyNoticeSearchButtonClick(type) {
+  switch (type) {
+    case EmptyNotice.TYPE.PAGE:
+      updateCache({ selectedPagesFilter: Tabs.TAB.ALL_PAGES });
+      tabs.SwitchTab(Tabs.TAB.ALL_PAGES);
+      break;
+
+    case EmptyNotice.TYPE.CATEGORY:
+    case EmptyNotice.TYPE.CATEGORIES:
+      updateCache({ selectedFilters: [] });
+      select.SetSelectedValues([]);
+      break;
+
+    default:
+      throw new Error('Unexpected Empty Notice type');
+  }
+
+  rerenderResult();
   resetContentState();
 }
 
@@ -241,6 +252,7 @@ function onPagesFilterUpdate(selectedFilter) {
   if (cache.inputValue.length === 0) return;
 
   rerenderResult();
+  // TODO: resetContentState();
 }
 
 function onToastClick() {
@@ -300,18 +312,38 @@ function showResult(data) {
     deepSearchButton.Hide();
   }
 
-  if (!data.searchResult.length) {
+  let items = data.searchResult;
+
+  if (!items.length) {
     list.Clear();
     emptyNotice.Show(EmptyNotice.TYPE.GLOBAL);
     return;
   }
 
-  const itemsByGroups = buildResultItems(data.searchResult);
+  if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
+    items = items.filter(i => cache.currentPageId === i.pageId);
 
-  if (itemsByGroups.every(x => x.items.length === 0)) {
+    if (items.length === 0) {
+      list.Clear();
+      emptyNotice.Show(EmptyNotice.TYPE.PAGE);
+      return;
+    }
+  }
+
+  sortResultItems(items);
+
+  let itemsByGroup = groupItems(items);
+
+  if (!cache.selectedFilters.length) {
+    itemsByGroup = itemsByGroup.filter(x => x.items.length)
+  } else {
+    itemsByGroup = itemsByGroup.filter(x => cache.selectedFilters.includes(x.group))
+  }
+
+  if (itemsByGroup.every(x => x.items.length === 0)) {
     list.Clear();
 
-    if (itemsByGroups.length === 1) {
+    if (itemsByGroup.length === 1) {
       emptyNotice.Show(EmptyNotice.TYPE.CATEGORY);
     } else {
       emptyNotice.Show(EmptyNotice.TYPE.CATEGORIES);
@@ -320,7 +352,7 @@ function showResult(data) {
     return;
   }
 
-  list.RenderItems(itemsByGroups, {
+  list.RenderItems(itemsByGroup, {
     view: cache.selectedPagesFilter === Tabs.TAB.ALL_PAGES ? List.VIEW_MODIFIERS.FULL : List.VIEW_MODIFIERS.FILTERED,
   });
   emptyNotice.Hide();
@@ -334,11 +366,7 @@ function rerenderResult() {
   });
 }
 
-function buildResultItems(items) {
-  if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
-    items = items.filter(i => cache.currentPageId === i.pageId);
-  }
-
+function sortResultItems(items) {
   // mutation here, but we don't want to copy the huge array to prevent perf drop
   items.sort((a, b) => {
     const aGroup = typeToGroup(a.type);
@@ -359,8 +387,10 @@ function buildResultItems(items) {
     }
 
     return a.name.localeCompare(b.name);
-  })
+  });
+}
 
+function groupItems(items) {
   const itemsByGroup = groupsOrder.map(groupName => ({ group: groupName, items: [] }));
 
   items.forEach(item => {
@@ -370,11 +400,7 @@ function buildResultItems(items) {
     groupToPut.items.push(item);
   });
 
-  if (!cache.selectedFilters.length) {
-    return itemsByGroup.filter(x => x.items.length)
-  }
-
-  return itemsByGroup.filter(x => cache.selectedFilters.includes(x.group))
+  return itemsByGroup;
 }
 
 function typeToGroup(type) {
