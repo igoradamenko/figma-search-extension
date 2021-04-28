@@ -89,7 +89,7 @@ describe('Filter', function() {
     const popup = await openPopup();
 
     await popup.focus('#input');
-    await page.keyboard.type('ios');
+    await page.keyboard.type('ios', { delay: 100 });
 
     await popup.waitForSelector('.list', { visible: true });
 
@@ -378,7 +378,7 @@ describe('List', function() {
     const popup = await openPopup();
 
     await popup.focus('#input');
-    await page.keyboard.type('ios');
+    await page.keyboard.type('ios', { delay: 100 });
 
     await popup.waitForSelector('.list', { visible: true });
 
@@ -397,7 +397,7 @@ describe('Empty Notices', function() {
     await popup.focus('#input');
     await page.keyboard.type('фшгравфлоывр');
 
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.empty-notice_type_global.empty-notice_visible', { visible: true });
   });
 
   it('should show global empty notice when one empty group is selected', async () => {
@@ -415,7 +415,7 @@ describe('Empty Notices', function() {
     await popup.click('.select__item[data-item]:nth-child(3)');
     await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page"]', { visible: true });
 
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.empty-notice_type_category.empty-notice_visible', { visible: true });
   });
 
   it('should show global empty notice when two empty groups are selected', async () => {
@@ -439,7 +439,7 @@ describe('Empty Notices', function() {
     await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page, Arrow"]', { visible: true });
 
 
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.empty-notice_type_categories.empty-notice_visible', { visible: true });
   });
 
   it('should show empty group notice when two groups are selected and one of them is empty', async () => {
@@ -461,7 +461,7 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.list__empty-notice', { visible: true });
   });
 
-  it('should change filter to Everything when “Try Search Everything” pressed (one group)', async () => {
+  it('should change filter to Everything when “Everything” pressed (one group)', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -480,13 +480,12 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.empty-notice_visible', { visible: true });
     await popup.click('.empty-notice__text_type_category .empty-notice__search-button');
 
-
     await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everything"');
     await popup.waitForSelector('.empty-notice_visible', { hidden: true });
     await popup.waitForSelector('.list', { visible: true });
   });
 
-  it('should change filter to Everything when “Try Search Everything” pressed (many groups)', async () => {
+  it('should change filter to Everything when “Everything” pressed (many groups)', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -514,6 +513,48 @@ describe('Empty Notices', function() {
     await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everything"');
     await popup.waitForSelector('.empty-notice_visible', { hidden: true });
     await popup.waitForSelector('.list', { visible: true });
+  });
+
+  it('should show page empty notice when nothing found on the current page', async () => {
+    // third page does not contain elements with “widget” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[2];
+    });
+
+    const popup = await openPopup();
+
+    await popup.click('#tabs .tabs__button:nth-child(2)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.empty-notice_type_page.empty-notice_visible', { visible: true });
+  });
+
+  it('should change tab to “All pages” when “Everywhere” pressed', async () => {
+    // third page does not contain elements with “widget” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[2];
+    });
+
+    const popup = await openPopup();
+
+    await popup.click('#tabs .tabs__button:nth-child(2)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.empty-notice_type_page.empty-notice_visible', { visible: true });
+
+    await popup.click('.empty-notice__text_type_page .empty-notice__search-button');
+
+    await popup.waitForSelector('.empty-notice_visible', { hidden: true });
+    await popup.waitForSelector('.list', { visible: true });
+    await popup.waitForSelector('.tabs__button_selected + .tabs__button', { visible: true });
   });
 });
 
@@ -649,6 +690,55 @@ describe('Cache', function() {
 
     await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
   });
+
+  it('should update “Current page” state when it is chosen', async () => {
+    let popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.waitForSelector('.tabs__button_selected + .tabs__button', { visible: true });
+
+    await popup.click('#tabs .tabs__button:nth-child(2)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await closePopup();
+
+    // second page does not contain elements with “widget” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[1];
+    });
+
+    popup = await openPopup();
+
+    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.toast_visible', { visible: true });
+  });
+
+  it('should show toast when search results are updated', async () => {
+    let popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('ui', { delay: 100 });
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await closePopup();
+
+    // third page contain elements with “ui” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[2];
+    });
+
+    popup = await openPopup();
+
+    await popup.waitForSelector('.toast_visible', { visible: true });
+  });
 });
 
 describe('Deep Search', function() {
@@ -756,6 +846,50 @@ describe('Pages filter', function() {
 
     expect(secondItemSubtitle).eql('Widgets');
   });
+
+  it('should not trigger empty notice showing when nothing entered', async () => {
+    const popup = await openPopup();
+
+    await popup.click('#tabs .tabs__button:not(.tabs__button_selected)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await popup.waitForSelector('.empty-notice', { hidden: true });
+
+    await popup.click('#tabs .tabs__button:not(.tabs__button_selected)');
+
+    await popup.waitForSelector('.tabs__button_selected + .tabs__button', { visible: true });
+
+    await popup.waitForSelector('.empty-notice', { hidden: true });
+  });
+});
+
+describe('Toast', function () {
+  it('should hide when clicked', async () => {
+    let popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await closePopup();
+
+    // second page does not contain elements with “widget” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[1];
+    });
+
+    popup = await openPopup();
+
+    await popup.waitForSelector('.toast_visible', { visible: true });
+    await popup.waitForTransitionEnd('#toast');
+
+    await popup.click('#toast');
+
+    await popup.waitForTransitionEnd('#toast');
+    await popup.waitForSelector('.toast_visible', { hidden: true });
+  });
 });
 
 async function openPopup() {
@@ -764,6 +898,8 @@ async function openPopup() {
   await page.waitForSelector('iframe[src]', { visible: true });
 
   const [iframe] = await page.mainFrame().childFrames();
+
+  iframe.waitForTransitionEnd = waitForTransitionEnd.bind(null, iframe);
 
   return iframe;
 }
@@ -797,4 +933,17 @@ async function takeScreenshot() {
   await page.screenshot({ path: path.resolve(__dirname, 'screenshots', filename) });
 
   console.log('Took screenshot:', filename);
+}
+
+function waitForTransitionEnd(parent, element) {
+  return parent.evaluate((element) => {
+    return new Promise((resolve) => {
+      const transition = document.querySelector(element);
+      const onEnd = function () {
+        transition.removeEventListener('transitionend', onEnd);
+        resolve();
+      };
+      transition.addEventListener('transitionend', onEnd);
+    });
+  }, element);
 }

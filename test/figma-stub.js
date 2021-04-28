@@ -28,7 +28,6 @@
 
 figmaFillParents(window.figmaGeneratedStubs, null);
 figmaFillPagesSelection(window.figmaGeneratedStubs);
-figmaFillCurrentPage(window.figmaGeneratedStubs)
 
 window.figmaRootStubs = figmaGenerateNotFullyLoadedPagesStubs(window.figmaGeneratedStubs);
 window.figmaFullyLoadedRootStubs = window.figmaGeneratedStubs;
@@ -55,8 +54,4 @@ function figmaFillParents(figmaNode, parentNode) {
 
 function figmaFillPagesSelection(figmaNode) {
   figmaNode.children.forEach(page => page.selection = []);
-}
-
-function figmaFillCurrentPage(figmaNode) {
-  figmaNode.currentPage = figmaNode.children[0];
 }

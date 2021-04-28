@@ -16,41 +16,17 @@
     case 'DEEP_SEARCH_STARTED':
       processPagesLoad();
       return;
+    case 'CACHE_SENT':
+      processCacheUpdate(data);
+      return;
   }
 
   function processSearch({ searchString }) {
-    const searchResult = figma.root
-      .findAll(item => item.name.toLocaleLowerCase().includes(searchString) && item.type !== 'DOCUMENT')
-      .map(item => {
-        const { id, name, type } = item;
-        const { pageTitle, frameTitle } = findRootParentTitles(item);
-
-        let page = item;
-
-        while (page.type !== 'PAGE') {
-          page = page.parent;
-        }
-
-        return {
-          id,
-          name,
-          loweredName: name.toLocaleLowerCase(),
-          type: type.toLocaleLowerCase().replace(/_/g, '-'),
-          pageTitle,
-          frameTitle,
-          pageId: page.id,
-        }
-      });
-
-    const notLoadedPagesNumber = figma.root.children.filter(x => x.children.length === 0).length;
-
-    console.log('currentPage', figma.currentPage)
-
     sendMessage({
       type: 'SEARCH_COMPLETED',
       data: {
-        searchResult,
-        notLoadedPagesNumber,
+        searchResult: search(searchString),
+        notLoadedPagesNumber: getNotLoadedPagesNumber(),
         currentPageId: figma.currentPage.id,
       }
     });
@@ -102,7 +78,7 @@
       loadedPagesNumber += 1;
       log(loadedPagesNumber, 'pages loaded');
 
-      sendMessage({ type: 'PAGES_LOADED', data: { loaded:loadedPagesNumber , total: pagesToLoad.length } });
+      sendMessage({ type: 'PAGES_LOADED', data: { loaded: loadedPagesNumber , total: pagesToLoad.length } });
 
       if (loadedPagesNumber === pagesToLoad.length) {
         log('All pages loaded');
@@ -144,6 +120,50 @@
     }
   }
 
+  function processCacheUpdate({ searchString }) {
+    sendMessage({
+      type: 'CACHE_QUICK_UPDATE_COMPLETED',
+      data: {
+        notLoadedPagesNumber: getNotLoadedPagesNumber(),
+        currentPageId: figma.currentPage.id,
+      }
+    });
+
+    if (searchString) {
+      sendMessage({
+        type: 'CACHE_SLOW_UPDATE_COMPLETED',
+        data: {
+          searchResult: search(searchString),
+        },
+      });
+    }
+  }
+
+  function search(searchString) {
+    return figma.root
+      .findAll(item => item.name.toLocaleLowerCase().includes(searchString) && item.type !== 'DOCUMENT')
+      .map(item => {
+        const { id, name, type } = item;
+        const { pageTitle, frameTitle } = findRootParentTitles(item);
+
+        let page = item;
+
+        while (page.type !== 'PAGE') {
+          page = page.parent;
+        }
+
+        return {
+          id,
+          name,
+          loweredName: name.toLocaleLowerCase(),
+          type: type.toLocaleLowerCase().replace(/_/g, '-'),
+          pageTitle,
+          frameTitle,
+          pageId: page.id,
+        }
+      });
+  }
+
   function findRootParentTitles(node) {
     let pageNode = node;
     let frameNode = node;
@@ -164,6 +184,10 @@
     }
 
     return result;
+  }
+
+  function getNotLoadedPagesNumber() {
+    return figma.root.children.filter(x => x.children.length === 0).length;
   }
 
   function sendMessage(message) {

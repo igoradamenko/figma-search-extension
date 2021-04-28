@@ -16,6 +16,13 @@ chrome.runtime.onMessage.addListener((message, sender) => {
       data: CACHE,
     });
 
+    runBridge({
+      type: 'CACHE_SENT',
+      data: {
+        searchString: CACHE ? CACHE.inputValue : '',
+      }
+    });
+
     return;
   }
 

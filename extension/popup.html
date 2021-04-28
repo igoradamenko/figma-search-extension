@@ -74,6 +74,12 @@
         class="results"
         id="results"
       ></div>
+
+      <button id="toast" class="toast">
+        Results look outdated.
+        <br>
+        Click here to search again
+      </button>
     </div>
 
     <div class="overlay" id="overlay"></div>
@@ -93,6 +99,12 @@
         Nothing was found<br>
         in these categories.<br>
         Try search <button class="empty-notice__search-button">Everything</button>
+      </p>
+
+      <p class="empty-notice__text empty-notice__text_type_page">
+        Nothing was found<br>
+        on the current page.<br>
+        Try search <button class="empty-notice__search-button">Everywhere</button>
       </p>
     </div>
 
@@ -118,6 +130,7 @@
     <script src="popup/deep-search-preloader.js"></script>
     <script src="popup/deep-search-button.js"></script>
     <script src="popup/tabs.js"></script>
+    <script src="popup/toast.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

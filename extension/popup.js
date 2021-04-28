@@ -6,9 +6,12 @@ if (window.parent.__PATCH_WINDOW_FOR_TESTS__) {
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton, tabs;
+let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton, tabs, toast;
 
 let groupsOrder;
+
+
+let preloadedStateChanged = false;
 
 // special group in case of adding new types of items by Figma
 // which won't be handled by the extension
@@ -64,7 +67,12 @@ function run() {
   tabs = new Tabs({
     node: $('#tabs'),
     onTabSwitch: onPagesFilterUpdate,
-  })
+  });
+
+  toast = new Toast({
+    node: $('#toast'),
+    onClick: onToastClick,
+  });
 
   groupsOrder = [...select.GetValuesOrder(), UNKNOWN_GROUP];
 
@@ -101,6 +109,14 @@ function onMessageGet(message) {
     case 'CACHE_EXISTS':
       loadCache(message.data);
       return;
+
+    case 'CACHE_QUICK_UPDATE_COMPLETED':
+      processQuickCacheUpdate(message.data);
+      return;
+
+    case 'CACHE_SLOW_UPDATE_COMPLETED':
+      processSlowCacheUpdate(message.data);
+      return;
   }
 }
 
@@ -120,6 +136,8 @@ function onSelectUpdate(filters) {
 function onInputUpdate(value) {
   console.log('Input changed', value);
 
+  preloadedStateChanged = true;
+
   updateCache({ inputValue: value });
 
   debouncedSendSearchRequest(value);
@@ -131,6 +149,8 @@ function onListScroll(listScrollTop) {
 
 function onDeepSearchButtonClick() {
   console.log('Deep Search Button clicked');
+
+  preloadedStateChanged = true;
 
   input.Disable();
   select.Disable();
@@ -205,19 +225,39 @@ function handleArrowUp() {
   updateCache({ selectedListItemIndex });
 }
 
-function onEmptyNoticeSearchButtonClick() {
-  updateCache({ selectedFilters: [] });
-  select.SetSelectedValues([]);
-  showResult({
-    searchResult: cache.searchResult,
-    notLoadedPagesNumber: cache.notLoadedPagesNumber,
-  });
+function onEmptyNoticeSearchButtonClick(type) {
+  switch (type) {
+    case EmptyNotice.TYPE.PAGE:
+      updateCache({ selectedPagesFilter: Tabs.TAB.ALL_PAGES });
+      tabs.SwitchTab(Tabs.TAB.ALL_PAGES);
+      break;
+
+    case EmptyNotice.TYPE.CATEGORY:
+    case EmptyNotice.TYPE.CATEGORIES:
+      updateCache({ selectedFilters: [] });
+      select.SetSelectedValues([]);
+      break;
+
+    default:
+      throw new Error('Unexpected Empty Notice type');
+  }
+
+  rerenderResult();
   resetContentState();
 }
 
 function onPagesFilterUpdate(selectedFilter) {
   updateCache({ selectedPagesFilter: selectedFilter });
+
+  if (cache.inputValue.length === 0) return;
+
   rerenderResult();
+  resetContentState();
+}
+
+function onToastClick() {
+  sendSearchRequest(cache.inputValue);
+  toast.Hide();
 }
 
 
@@ -272,18 +312,38 @@ function showResult(data) {
     deepSearchButton.Hide();
   }
 
-  if (!data.searchResult.length) {
+  let items = data.searchResult;
+
+  if (!items.length) {
     list.Clear();
     emptyNotice.Show(EmptyNotice.TYPE.GLOBAL);
     return;
   }
 
-  const itemsByGroups = buildResultItems(data.searchResult);
+  if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
+    items = items.filter(i => cache.currentPageId === i.pageId);
 
-  if (itemsByGroups.every(x => x.items.length === 0)) {
+    if (items.length === 0) {
+      list.Clear();
+      emptyNotice.Show(EmptyNotice.TYPE.PAGE);
+      return;
+    }
+  }
+
+  sortResultItems(items);
+
+  let itemsByGroup = groupItems(items);
+
+  if (!cache.selectedFilters.length) {
+    itemsByGroup = itemsByGroup.filter(x => x.items.length)
+  } else {
+    itemsByGroup = itemsByGroup.filter(x => cache.selectedFilters.includes(x.group))
+  }
+
+  if (itemsByGroup.every(x => x.items.length === 0)) {
     list.Clear();
 
-    if (itemsByGroups.length === 1) {
+    if (itemsByGroup.length === 1) {
       emptyNotice.Show(EmptyNotice.TYPE.CATEGORY);
     } else {
       emptyNotice.Show(EmptyNotice.TYPE.CATEGORIES);
@@ -292,7 +352,7 @@ function showResult(data) {
     return;
   }
 
-  list.RenderItems(itemsByGroups, {
+  list.RenderItems(itemsByGroup, {
     view: cache.selectedPagesFilter === Tabs.TAB.ALL_PAGES ? List.VIEW_MODIFIERS.FULL : List.VIEW_MODIFIERS.FILTERED,
   });
   emptyNotice.Hide();
@@ -306,12 +366,7 @@ function rerenderResult() {
   });
 }
 
-function buildResultItems(items) {
-  if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
-    console.log(cache, items)
-    items = items.filter(i => cache.currentPageId === i.pageId);
-  }
-
+function sortResultItems(items) {
   // mutation here, but we don't want to copy the huge array to prevent perf drop
   items.sort((a, b) => {
     const aGroup = typeToGroup(a.type);
@@ -332,8 +387,10 @@ function buildResultItems(items) {
     }
 
     return a.name.localeCompare(b.name);
-  })
+  });
+}
 
+function groupItems(items) {
   const itemsByGroup = groupsOrder.map(groupName => ({ group: groupName, items: [] }));
 
   items.forEach(item => {
@@ -343,11 +400,7 @@ function buildResultItems(items) {
     groupToPut.items.push(item);
   });
 
-  if (!cache.selectedFilters.length) {
-    return itemsByGroup.filter(x => x.items.length)
-  }
-
-  return itemsByGroup.filter(x => cache.selectedFilters.includes(x.group))
+  return itemsByGroup;
 }
 
 function typeToGroup(type) {
@@ -434,6 +487,35 @@ function loadCache(loadedCache) {
   list.SetScrollTop(cache.listScrollTop);
 }
 
+function processQuickCacheUpdate(updatedCache) {
+  // do not handle it when user changed preloaded state
+  if (preloadedStateChanged) return;
+
+  if (updatedCache.notLoadedPagesNumber !== cache.notLoadedPagesNumber) {
+    // do not save new notLoadedPagesNumber to make sure that toast shows until
+    // search results will be updated
+    if (cache.inputValue) {
+      toast.Show();
+    }
+  }
+
+  if (updatedCache.currentPageId !== cache.currentPageId) {
+    cache.currentPageId = updatedCache.currentPageId;
+
+    if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
+      rerenderResult();
+    }
+  }
+}
+
+function processSlowCacheUpdate(updatedCache) {
+  // do not handle it when user changed preloaded state
+  if (preloadedStateChanged) return;
+
+  if (updatedCache.searchResult.length !== cache.searchResult.length) {
+    toast.Show();
+  }
+}
 
 
 /* HELPERS */
