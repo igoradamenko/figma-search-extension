@@ -406,9 +406,6 @@ function loadCache(loadedCache) {
 
   cache = loadedCache;
 
-  // TODO: versions before 1.1.0 may not have selectedFilters in cache
-  //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
-  cache.selectedFilters = cache.selectedFilters || [];
   select.SetSelectedValues(cache.selectedFilters);
 
   // TODO: version before 1.3.0 may not have selectedPagesFilter in cahce
