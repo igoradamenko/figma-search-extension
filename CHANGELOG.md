@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.1 (28.04.2021)
+
+Fixed → symbol rendering in some browsers.
+
+
 ## 1.3.0 (28.04.2021)
 
 Now it's a bit easier to distinguish items because:
