@@ -54,6 +54,8 @@
         if (this.__listeners['currentpagechange']) {
           this.__listeners['currentpagechange'].forEach(f => f());
         }
+
+        this.__currentPage = value;
       },
       get currentPage() {
         return this.__currentPage;
