@@ -650,7 +650,7 @@ describe('Cache', function() {
     await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
   });
 
-  it('should update current page state when it is chosen', async () => {
+  it('should update “Current page” state when it is chosen', async () => {
     let popup = await openPopup();
 
     await popup.focus('#input');
@@ -676,6 +676,26 @@ describe('Cache', function() {
     popup = await openPopup();
 
     await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.toast_visible', { visible: true });
+  });
+
+  it('should show toast when search results are updated', async () => {
+    let popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('ui', { delay: 100 });
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await closePopup();
+
+    // third page contain elements with “ui” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[2];
+    });
+
+    popup = await openPopup();
+
     await popup.waitForSelector('.toast_visible', { visible: true });
   });
 });
@@ -803,7 +823,7 @@ describe('Pages filter', function() {
   });
 });
 
-describe.only('Toast', function () {
+describe('Toast', function () {
   it('should hide when clicked', async () => {
     let popup = await openPopup();
 

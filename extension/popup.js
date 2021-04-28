@@ -486,7 +486,9 @@ function processSlowCacheUpdate(updatedCache) {
   // do not handle it when user changed preloaded state
   if (preloadedStateChanged) return;
 
-  // TODO: compare results and show toast; but only when it's actual
+  if (updatedCache.searchResult.length !== cache.searchResult.length) {
+    toast.Show();
+  }
 }
 
 
