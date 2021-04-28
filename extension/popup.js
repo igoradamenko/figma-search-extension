@@ -6,7 +6,7 @@ if (window.parent.__PATCH_WINDOW_FOR_TESTS__) {
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton, tabs;
+let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton, tabs, toast;
 
 let groupsOrder;
 
@@ -67,7 +67,12 @@ function run() {
   tabs = new Tabs({
     node: $('#tabs'),
     onTabSwitch: onPagesFilterUpdate,
-  })
+  });
+
+  toast = new Toast({
+    node: $('#toast'),
+    onClick: onToastClick,
+  });
 
   groupsOrder = [...select.GetValuesOrder(), UNKNOWN_GROUP];
 
@@ -236,6 +241,11 @@ function onPagesFilterUpdate(selectedFilter) {
   if (cache.inputValue.length === 0) return;
 
   rerenderResult();
+}
+
+function onToastClick() {
+  sendSearchRequest(cache.inputValue);
+  toast.Hide();
 }
 
 

@@ -384,6 +384,28 @@ button[disabled], input[disabled] {
   color: #0A86D9;
 }
 
+.toast {
+  position: fixed;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  margin: 0 auto;
+  padding: 8px 12px;
+  transform: translateY(calc(100% + 12px));
+  text-align: center;
+  font-size: 12px;
+  line-height: 15px;
+  background: #18A0FB;
+  border-radius: 6px;
+  color: #FFFFFF;
+  transition: transform .15s ease-out;
+}
+
+.toast_visible {
+  transform: translateY(0px);
+}
+
 .results {
   padding: 0 0 6px;
 }
