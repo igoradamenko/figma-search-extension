@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.0 (28.04.2021)
+
+Now it's a bit easier to distinguish items because:
+
+1. Every item has a subtitle formed as “Page name → Root frame name”.
+
+2. It's possible to search only on the current page using new shiny page filter.
+
+Also there was a small bug which caused the document node occur in search results under “Unknown” section. Now it fixed.
+
+
 ## 1.2.1 (01.04.2021)
 
 A bunch of bugfixes!
