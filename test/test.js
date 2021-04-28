@@ -810,6 +810,8 @@ async function openPopup() {
 
   const [iframe] = await page.mainFrame().childFrames();
 
+  iframe.waitForTransitionEnd = waitForTransitionEnd.bind(null, iframe);
+
   return iframe;
 }
 
@@ -842,4 +844,17 @@ async function takeScreenshot() {
   await page.screenshot({ path: path.resolve(__dirname, 'screenshots', filename) });
 
   console.log('Took screenshot:', filename);
+}
+
+function waitForTransitionEnd(parent, element) {
+  return parent.evaluate((element) => {
+    return new Promise((resolve) => {
+      const transition = document.querySelector(element);
+      const onEnd = function () {
+        transition.removeEventListener('transitionend', onEnd);
+        resolve();
+      };
+      transition.addEventListener('transitionend', onEnd);
+    });
+  }, element);
 }
