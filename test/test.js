@@ -89,7 +89,7 @@ describe('Filter', function() {
     const popup = await openPopup();
 
     await popup.focus('#input');
-    await page.keyboard.type('ios');
+    await page.keyboard.type('ios', { delay: 100 });
 
     await popup.waitForSelector('.list', { visible: true });
 
@@ -378,7 +378,7 @@ describe('List', function() {
     const popup = await openPopup();
 
     await popup.focus('#input');
-    await page.keyboard.type('ios');
+    await page.keyboard.type('ios', { delay: 100 });
 
     await popup.waitForSelector('.list', { visible: true });
 
