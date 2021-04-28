@@ -403,6 +403,10 @@ button[disabled], input[disabled] {
   transition: transform .15s ease-out;
 }
 
+.toast:hover {
+  background: #0687DD;
+}
+
 .toast_visible {
   transform: translateY(0px);
 }
