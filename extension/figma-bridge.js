@@ -25,6 +25,12 @@
         const { id, name, type } = item;
         const { pageTitle, frameTitle } = findRootParentTitles(item);
 
+        let page = item;
+
+        while (page.type !== 'PAGE') {
+          page = page.parent;
+        }
+
         return {
           id,
           name,
@@ -32,12 +38,22 @@
           type: type.toLocaleLowerCase().replace(/_/g, '-'),
           pageTitle,
           frameTitle,
+          pageId: page.id,
         }
       });
 
     const notLoadedPagesNumber = figma.root.children.filter(x => x.children.length === 0).length;
 
-    sendMessage({ type: 'SEARCH_COMPLETED', data: { searchResult, notLoadedPagesNumber } });
+    console.log('currentPage', figma.currentPage)
+
+    sendMessage({
+      type: 'SEARCH_COMPLETED',
+      data: {
+        searchResult,
+        notLoadedPagesNumber,
+        currentPageId: figma.currentPage.id,
+      }
+    });
   }
 
   function processFocus({ itemId }) {

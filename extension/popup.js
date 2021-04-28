@@ -83,6 +83,7 @@ function onMessageGet(message) {
       updateCache({
         searchResult: message.data.searchResult,
         notLoadedPagesNumber: message.data.notLoadedPagesNumber,
+        currentPageId: message.data.currentPageId,
       });
       showResult(message.data);
       resetContentState();
@@ -391,6 +392,7 @@ let cache = {
   listScrollTop: 0,
   selectedFilters: [],
   selectedPagesFilter: Tabs.TAB.ALL_PAGES,
+  currentPageId: '',
 };
 
 function updateCache(obj) {
