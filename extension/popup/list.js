@@ -100,7 +100,7 @@ class List {
     }
   }
 
-  buildGroupMarkup(name, items, { hideHeadline = false } = {}) {
+  buildGroupMarkup(name, items, { hideHeadline = false, view = List.VIEW_MODIFIERS.FULL } = {}) {
     const headline = hideHeadline ? '' : `<div class="list__headline">${name}</div>`;
     let list;
 
@@ -108,12 +108,16 @@ class List {
       const listItems = items.map(i => {
         let subtitle = '';
 
-        if (i.pageTitle) {
+        if (view === List.VIEW_MODIFIERS.FULL && i.pageTitle) {
           subtitle += i.pageTitle;
         }
 
         if (i.frameTitle) {
-          subtitle += `&nbsp;→ ${i.frameTitle}`;
+          if (view === List.VIEW_MODIFIERS.FULL) {
+            subtitle += '&nbsp;→ ';
+          }
+
+          subtitle += i.frameTitle
         }
 
         return `
@@ -135,9 +139,9 @@ class List {
     return `<div class="list">${headline}${list}</div>`;
   }
 
-  buildListMarkup(itemsByGroup) {
+  buildListMarkup(itemsByGroup, mods) {
     return itemsByGroup
-      .map(x => this.buildGroupMarkup(x.group, x.items, { hideHeadline: itemsByGroup.length === 1 }))
+      .map(x => this.buildGroupMarkup(x.group, x.items, { hideHeadline: itemsByGroup.length === 1, ...mods }))
       .join('');
   }
 
@@ -165,8 +169,8 @@ class List {
     return this.itemsNodes.length === 0;
   }
 
-  RenderItems(itemsByGroup) {
-    this.listNode.innerHTML = this.buildListMarkup(itemsByGroup);
+  RenderItems(itemsByGroup, mods = {}) {
+    this.listNode.innerHTML = this.buildListMarkup(itemsByGroup, mods);
     this.itemsNodes = $$('.list__item', this.listNode);
 
     this.resetState();
@@ -220,4 +224,9 @@ class List {
   SetScrollTop(position) {
     this.containerNode.scrollTop = position;
   }
+}
+
+List.VIEW_MODIFIERS = {
+  FULL: 'full',
+  FILTERED: 'filtered',
 }

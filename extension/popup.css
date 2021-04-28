@@ -1,5 +1,5 @@
 :root {
-  --search-height: 74px;
+  --search-height: 112px;
 }
 
 @font-face {
@@ -81,6 +81,10 @@ button[disabled], input[disabled] {
   display: flex;
 }
 
+.search__tabs {
+  margin-top: 12px;
+}
+
 .deep-search-button {
   position: relative;
   flex-shrink: 0;
@@ -134,10 +138,6 @@ button[disabled], input[disabled] {
 
 .input:focus {
   outline: none;
-}
-
-.select {
-
 }
 
 .select__button {
@@ -211,6 +211,36 @@ button[disabled], input[disabled] {
 
 .select_open .select__body {
   display: block;
+}
+
+.tabs {
+  display: flex;
+  background-color: #F4F4F8;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='152' height='23' fill='none'%3E%3Crect width='152' height='23' fill='%23fff' rx='4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position-x: calc(var(--tabs-selected-item-index,  -1) * 100%);
+  border: 2px solid #F4F4F8;
+  border-radius: 6px;
+}
+
+.tabs_inited {
+  transition: background-position .15s ease-in-out;
+}
+
+.tabs__button {
+  flex-grow: 1;
+  padding: 4px;
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.tabs__button_selected {
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.tabs__button:not(.tabs__button_selected):hover {
+  color: #737388;
 }
 
 .deep-search-preloader {

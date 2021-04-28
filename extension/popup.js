@@ -6,7 +6,7 @@ if (window.parent.__PATCH_WINDOW_FOR_TESTS__) {
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton;
+let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton, tabs;
 
 let groupsOrder;
 
@@ -61,6 +61,11 @@ function run() {
     onClick: onDeepSearchButtonClick,
   });
 
+  tabs = new Tabs({
+    node: $('#tabs'),
+    onTabSwitch: onPagesFilterUpdate,
+  })
+
   groupsOrder = [...select.GetValuesOrder(), UNKNOWN_GROUP];
 
   sendMessage({ type: 'POPUP_OPEN' });
@@ -78,6 +83,7 @@ function onMessageGet(message) {
       updateCache({
         searchResult: message.data.searchResult,
         notLoadedPagesNumber: message.data.notLoadedPagesNumber,
+        currentPageId: message.data.currentPageId,
       });
       showResult(message.data);
       resetContentState();
@@ -107,10 +113,7 @@ function onSelectUpdate(filters) {
 
   if (cache.inputValue.length === 0) return;
 
-  showResult({
-    searchResult: cache.searchResult,
-    notLoadedPagesNumber: cache.notLoadedPagesNumber,
-  });
+  rerenderResult();
   resetContentState();
 }
 
@@ -212,6 +215,11 @@ function onEmptyNoticeSearchButtonClick() {
   resetContentState();
 }
 
+function onPagesFilterUpdate(selectedFilter) {
+  updateCache({ selectedPagesFilter: selectedFilter });
+  rerenderResult();
+}
+
 
 /* SEARCH */
 
@@ -258,7 +266,7 @@ function showResult(data) {
     return;
   }
 
-  if (data.notLoadedPagesNumber && !cache.didDeepSearch) {
+  if (data.notLoadedPagesNumber && !cache.didDeepSearch && cache.selectedPagesFilter === Tabs.TAB.ALL_PAGES) {
     deepSearchButton.Show();
   } else {
     deepSearchButton.Hide();
@@ -284,11 +292,26 @@ function showResult(data) {
     return;
   }
 
-  list.RenderItems(itemsByGroups);
+  list.RenderItems(itemsByGroups, {
+    view: cache.selectedPagesFilter === Tabs.TAB.ALL_PAGES ? List.VIEW_MODIFIERS.FULL : List.VIEW_MODIFIERS.FILTERED,
+  });
   emptyNotice.Hide();
 }
 
+function rerenderResult() {
+  showResult({
+    searchResult: cache.searchResult,
+    notLoadedPagesNumber: cache.notLoadedPagesNumber,
+    currentPageId: cache.currentPageId,
+  });
+}
+
 function buildResultItems(items) {
+  if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
+    console.log(cache, items)
+    items = items.filter(i => cache.currentPageId === i.pageId);
+  }
+
   // mutation here, but we don't want to copy the huge array to prevent perf drop
   items.sort((a, b) => {
     const aGroup = typeToGroup(a.type);
@@ -367,6 +390,8 @@ let cache = {
   selectedListItemIndex: undefined,
   listScrollTop: 0,
   selectedFilters: [],
+  selectedPagesFilter: Tabs.TAB.ALL_PAGES,
+  currentPageId: '',
 };
 
 function updateCache(obj) {
@@ -379,14 +404,20 @@ function updateCache(obj) {
 }
 
 function loadCache(loadedCache) {
-  if (!loadedCache) return;
+  if (!loadedCache) {
+    tabs.Init();
+    return;
+  }
 
   cache = loadedCache;
 
-  // TODO: versions before 1.1.0 may not have selectedFilters in cache
-  //  so we fallback it; it should be removed when all the users migrate to 1.1.0+
-  cache.selectedFilters = cache.selectedFilters || [];
   select.SetSelectedValues(cache.selectedFilters);
+
+  // TODO: version before 1.3.0 may not have selectedPagesFilter in cache
+  //  so we fallback it; it should be removed when all the users migrate to 1.3.0+
+  cache.selectedPagesFilter = cache.selectedPagesFilter || 0;
+  tabs.SwitchTab(cache.selectedPagesFilter)
+  setTimeout(() => tabs.Init());
 
   input.SetValue(cache.inputValue);
 
@@ -394,10 +425,7 @@ function loadCache(loadedCache) {
 
   input.SelectAll();
 
-  showResult({
-    searchResult: cache.searchResult,
-    notLoadedPagesNumber: cache.notLoadedPagesNumber,
-  });
+  rerenderResult();
 
   if (typeof cache.selectedListItemIndex !== 'undefined') {
     list.PseudoFocusItemByIndex(cache.selectedListItemIndex);

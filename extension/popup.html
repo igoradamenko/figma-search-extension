@@ -33,14 +33,14 @@
 
       <div class="search__filter select" id="select">
         <button class="select__button">
-          <span class="select__button-text">Everywhere</span><!--
+          <span class="select__button-text">Everything</span><!--
      --><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" class="select__arrow">
           <path fill="none" d="M1 3.5l3 3 3-3"/>
         </svg>
         </button>
 
         <div class="select__body">
-          <div class="select__item" data-all>Everywhere</div>
+          <div class="select__item" data-all>Everything</div>
           <div class="select__separator"></div>
           <div class="select__item" data-item>Page</div>
           <div class="select__item" data-item>Frame</div>
@@ -62,6 +62,11 @@
           </div>
         </div>
       </div>
+
+      <div class="search__tabs tabs" id="tabs" style="--tabs-selected-item-index: 0">
+        <button class="tabs__button tabs__button_selected" data-item>All pages</button>
+        <button class="tabs__button" data-item>Current page</button>
+      </div>
     </div>
 
     <div class="content" id="content">
@@ -81,13 +86,13 @@
       <p class="empty-notice__text empty-notice__text_type_category">
         Nothing was found<br>
         in this category.<br>
-        Try search <button class="empty-notice__search-button">Everywhere</button>
+        Try search <button class="empty-notice__search-button">Everything</button>
       </p>
 
       <p class="empty-notice__text empty-notice__text_type_categories">
         Nothing was found<br>
         in these categories.<br>
-        Try search <button class="empty-notice__search-button">Everywhere</button>
+        Try search <button class="empty-notice__search-button">Everything</button>
       </p>
     </div>
 
@@ -112,6 +117,7 @@
     <script src="popup/global-preloader.js"></script>
     <script src="popup/deep-search-preloader.js"></script>
     <script src="popup/deep-search-button.js"></script>
+    <script src="popup/tabs.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

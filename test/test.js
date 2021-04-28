@@ -135,7 +135,7 @@ describe('Filter', function() {
 
     await popup.waitForSelector('#select button', { visible: true });
 
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Everywhere"]', { visible: true });
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Everything"]', { visible: true });
 
     await popup.click('#select button');
 
@@ -175,7 +175,7 @@ describe('Filter', function() {
     expect(itemsCountNext).eql(1);
   });
 
-  it('should select “everywhere“ when all the items are selected', async () => {
+  it('should select “Everything“ when all the items are selected', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -196,7 +196,7 @@ describe('Filter', function() {
 
     await popup.click(notSelectedItemsSelector);
     await popup.waitForFunction(`document.querySelectorAll("${notSelectedItemsSelector}").length === ${itemsCount}`);
-    await popup.waitForFunction(`document.querySelector(".select__item_selected").textContent === "Everywhere"`);
+    await popup.waitForFunction(`document.querySelector(".select__item_selected").textContent === "Everything"`);
   });
 
   it('should close when Esc pressed', async () => {
@@ -461,7 +461,7 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.list__empty-notice', { visible: true });
   });
 
-  it('should change filter to Everywhere when “Try Search Everywhere” pressed (one group)', async () => {
+  it('should change filter to Everything when “Try Search Everything” pressed (one group)', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -481,12 +481,12 @@ describe('Empty Notices', function() {
     await popup.click('.empty-notice__text_type_category .empty-notice__search-button');
 
 
-    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everywhere"');
+    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everything"');
     await popup.waitForSelector('.empty-notice_visible', { hidden: true });
     await popup.waitForSelector('.list', { visible: true });
   });
 
-  it('should change filter to Everywhere when “Try Search Everywhere” pressed (many groups)', async () => {
+  it('should change filter to Everything when “Try Search Everything” pressed (many groups)', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -511,7 +511,7 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.empty-notice_visible', { visible: true });
     await popup.click('.empty-notice__text_type_categories .empty-notice__search-button');
 
-    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everywhere"');
+    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everything"');
     await popup.waitForSelector('.empty-notice_visible', { hidden: true });
     await popup.waitForSelector('.list', { visible: true });
   });
@@ -633,6 +633,22 @@ describe('Cache', function() {
 
     await popup.waitForFunction(`document.querySelector('.select__button-text').textContent === 'Page'`);
   });
+
+  it('should restore tabs state', async () => {
+    let popup = await openPopup();
+
+    await popup.waitForSelector('.tabs__button_selected + .tabs__button', { visible: true });
+
+    await popup.click('#tabs .tabs__button:nth-child(2)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await closePopup();
+
+    popup = await openPopup();
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+  });
 });
 
 describe('Deep Search', function() {
@@ -686,6 +702,59 @@ describe('Deep Search', function() {
     });
 
     expect(itemsCountNext > itemsCountPrev).eql(true);
+  });
+});
+
+describe('Pages filter', function() {
+  it('should filter results when Current page selected', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('ui', { delay: 100 });
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.waitForSelector('.deep-search-button_visible', { visible: true });
+    await popup.click('.deep-search-button_visible');
+
+    await popup.waitForSelector('.deep-search-preloader_visible', { visible: true });
+    await popup.waitForSelector('.deep-search-preloader_visible', { hidden: true });
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemsCountPrev = await popup.evaluate(() => {
+      return document.querySelectorAll('.list__item').length;
+    });
+
+    await popup.click('#tabs .tabs__button:not(.tabs__button_selected)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    const itemsCountNext = await popup.evaluate(() => {
+      return document.querySelectorAll('.list__item').length;
+    });
+
+    expect(itemsCountNext < itemsCountPrev).eql(true);
+  });
+
+  it('should not show page names in subtitles Current page selected', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.click('#tabs .tabs__button:not(.tabs__button_selected)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    const firstItemSubtitle = await popup.evaluate(`document.querySelector('.list:nth-child(1) .list__item-subtitle')`);
+    expect(firstItemSubtitle).eql(null);
+
+    const secondItemSubtitle = (await popup.evaluate(`document.querySelector('.list:nth-child(2) .list__item-subtitle').textContent`)).trim();
+
+    expect(secondItemSubtitle).eql('Widgets');
   });
 });
 
