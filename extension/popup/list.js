@@ -114,7 +114,7 @@ class List {
 
         if (i.frameTitle) {
           if (view === List.VIEW_MODIFIERS.FULL) {
-            subtitle += '&nbsp;→ ';
+            subtitle += '&nbsp;&#8594; '; // &#8594; is →; otherwise browsers dont want to show it
           }
 
           subtitle += i.frameTitle
