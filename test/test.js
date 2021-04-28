@@ -397,7 +397,7 @@ describe('Empty Notices', function() {
     await popup.focus('#input');
     await page.keyboard.type('фшгравфлоывр');
 
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.empty-notice_type_global.empty-notice_visible', { visible: true });
   });
 
   it('should show global empty notice when one empty group is selected', async () => {
@@ -415,7 +415,7 @@ describe('Empty Notices', function() {
     await popup.click('.select__item[data-item]:nth-child(3)');
     await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page"]', { visible: true });
 
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.empty-notice_type_category.empty-notice_visible', { visible: true });
   });
 
   it('should show global empty notice when two empty groups are selected', async () => {
@@ -439,7 +439,7 @@ describe('Empty Notices', function() {
     await popup.waitForXPath('//*[@id="select"]/button/span[text()="Page, Arrow"]', { visible: true });
 
 
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.empty-notice_type_categories.empty-notice_visible', { visible: true });
   });
 
   it('should show empty group notice when two groups are selected and one of them is empty', async () => {
@@ -461,7 +461,7 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.list__empty-notice', { visible: true });
   });
 
-  it('should change filter to Everything when “Try Search Everything” pressed (one group)', async () => {
+  it('should change filter to Everything when “Everything” pressed (one group)', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -480,13 +480,12 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.empty-notice_visible', { visible: true });
     await popup.click('.empty-notice__text_type_category .empty-notice__search-button');
 
-
     await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everything"');
     await popup.waitForSelector('.empty-notice_visible', { hidden: true });
     await popup.waitForSelector('.list', { visible: true });
   });
 
-  it('should change filter to Everything when “Try Search Everything” pressed (many groups)', async () => {
+  it('should change filter to Everything when “Everything” pressed (many groups)', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -531,9 +530,10 @@ describe('Empty Notices', function() {
     await popup.focus('#input');
     await page.keyboard.type('widget');
 
-    // TODO: specify notices
-    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+    await popup.waitForSelector('.empty-notice_type_page.empty-notice_visible', { visible: true });
   });
+
+  // TODO: add test for Evetywhrere button
 });
 
 describe('Cache', function() {
