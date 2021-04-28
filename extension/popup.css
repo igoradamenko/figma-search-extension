@@ -369,7 +369,8 @@ button[disabled], input[disabled] {
 
 .empty-notice_type_global.empty-notice_visible .empty-notice__text_type_global,
 .empty-notice_type_category.empty-notice_visible .empty-notice__text_type_category,
-.empty-notice_type_categories.empty-notice_visible .empty-notice__text_type_categories {
+.empty-notice_type_categories.empty-notice_visible .empty-notice__text_type_categories,
+.empty-notice_type_page.empty-notice_visible .empty-notice__text_type_page {
   display: block;
 }
 

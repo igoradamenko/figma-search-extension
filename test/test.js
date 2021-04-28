@@ -533,7 +533,29 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.empty-notice_type_page.empty-notice_visible', { visible: true });
   });
 
-  // TODO: add test for Evetywhrere button
+  it('should change tab to “All pages” when “Everywhere” pressed', async () => {
+    // third page does not contain elements with “widget” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[2];
+    });
+
+    const popup = await openPopup();
+
+    await popup.click('#tabs .tabs__button:nth-child(2)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.empty-notice_type_page.empty-notice_visible', { visible: true });
+
+    await popup.click('.empty-notice__text_type_page .empty-notice__search-button');
+
+    await popup.waitForSelector('.empty-notice_visible', { hidden: true });
+    await popup.waitForSelector('.list', { visible: true });
+    await popup.waitForSelector('.tabs__button_selected + .tabs__button', { visible: true });
+  });
 });
 
 describe('Cache', function() {
