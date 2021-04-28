@@ -705,6 +705,39 @@ describe('Deep Search', function() {
   });
 });
 
+describe('Pages filter', function() {
+  it('should filter results when Current page selected', async () => {
+    const popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('ui');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.waitForSelector('.deep-search-button_visible', { visible: true });
+    await popup.click('.deep-search-button_visible');
+
+    await popup.waitForSelector('.deep-search-preloader_visible', { visible: true });
+    await popup.waitForSelector('.deep-search-preloader_visible', { hidden: true });
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    const itemsCountPrev = await popup.evaluate(() => {
+      return document.querySelectorAll('.list__item').length;
+    });
+
+    await popup.click('#tabs .tabs__button:not(.tabs__button_selected)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    const itemsCountNext = await popup.evaluate(() => {
+      return document.querySelectorAll('.list__item').length;
+    });
+
+    expect(itemsCountNext < itemsCountPrev).eql(true);
+  })
+});
+
 async function openPopup() {
   await page.click('#open-popup-button');
 

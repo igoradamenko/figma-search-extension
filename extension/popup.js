@@ -217,16 +217,7 @@ function onEmptyNoticeSearchButtonClick() {
 
 function onPagesFilterUpdate(selectedFilter) {
   updateCache({ selectedPagesFilter: selectedFilter });
-
-  switch (selectedFilter) {
-    case Tabs.TAB.ALL_PAGES:
-      console.log('all pages selected');
-      return;
-
-    case Tabs.TAB.CURRENT_PAGE:
-      console.log('current page selected');
-      return;
-  }
+  rerenderResult();
 }
 
 
@@ -309,10 +300,16 @@ function rerenderResult() {
   showResult({
     searchResult: cache.searchResult,
     notLoadedPagesNumber: cache.notLoadedPagesNumber,
+    currentPageId: cache.currentPageId,
   });
 }
 
 function buildResultItems(items) {
+  if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
+    console.log(cache, items)
+    items = items.filter(i => cache.currentPageId === i.pageId);
+  }
+
   // mutation here, but we don't want to copy the huge array to prevent perf drop
   items.sort((a, b) => {
     const aGroup = typeToGroup(a.type);
