@@ -6,7 +6,7 @@ if (window.parent.__PATCH_WINDOW_FOR_TESTS__) {
 
 const debouncedSendSearchRequest = debounce(sendSearchRequest, 400);
 
-let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton;
+let select, input, list, emptyNotice, globalPreloader, deepSearchPreloader, deepSearchButton, tabs;
 
 let groupsOrder;
 
@@ -60,6 +60,11 @@ function run() {
     node: $('#deep-search-button'),
     onClick: onDeepSearchButtonClick,
   });
+
+  tabs = new Tabs({
+    node: $('#tabs'),
+    onTabSwitch: onPagesFilterUpdate,
+  })
 
   groupsOrder = [...select.GetValuesOrder(), UNKNOWN_GROUP];
 
@@ -210,6 +215,18 @@ function onEmptyNoticeSearchButtonClick() {
     notLoadedPagesNumber: cache.notLoadedPagesNumber,
   });
   resetContentState();
+}
+
+function onPagesFilterUpdate(selectedFilter) {
+  switch (selectedFilter) {
+    case Tabs.TAB.ALL_PAGES:
+      console.log('all pages selected');
+      return;
+
+    case Tabs.TAB.CURRENT_PAGE:
+      console.log('current page selected');
+      return;
+  }
 }
 
 
