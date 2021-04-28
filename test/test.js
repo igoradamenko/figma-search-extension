@@ -633,6 +633,22 @@ describe('Cache', function() {
 
     await popup.waitForFunction(`document.querySelector('.select__button-text').textContent === 'Page'`);
   });
+
+  it('should restore tabs state', async () => {
+    let popup = await openPopup();
+
+    await popup.waitForSelector('.tabs__button_selected + .tabs__button', { visible: true });
+
+    await popup.click('#tabs .tabs__button:nth-child(2)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await closePopup();
+
+    popup = await openPopup();
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+  });
 });
 
 describe('Deep Search', function() {
