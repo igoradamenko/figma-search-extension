@@ -135,7 +135,7 @@ describe('Filter', function() {
 
     await popup.waitForSelector('#select button', { visible: true });
 
-    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Everywhere"]', { visible: true });
+    await popup.waitForXPath('//*[@id="select"]/button/span[text()="Everything"]', { visible: true });
 
     await popup.click('#select button');
 
@@ -175,7 +175,7 @@ describe('Filter', function() {
     expect(itemsCountNext).eql(1);
   });
 
-  it('should select “everywhere“ when all the items are selected', async () => {
+  it('should select “Everything“ when all the items are selected', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -196,7 +196,7 @@ describe('Filter', function() {
 
     await popup.click(notSelectedItemsSelector);
     await popup.waitForFunction(`document.querySelectorAll("${notSelectedItemsSelector}").length === ${itemsCount}`);
-    await popup.waitForFunction(`document.querySelector(".select__item_selected").textContent === "Everywhere"`);
+    await popup.waitForFunction(`document.querySelector(".select__item_selected").textContent === "Everything"`);
   });
 
   it('should close when Esc pressed', async () => {
@@ -461,7 +461,7 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.list__empty-notice', { visible: true });
   });
 
-  it('should change filter to Everywhere when “Try Search Everywhere” pressed (one group)', async () => {
+  it('should change filter to Everything when “Try Search Everything” pressed (one group)', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -481,12 +481,12 @@ describe('Empty Notices', function() {
     await popup.click('.empty-notice__text_type_category .empty-notice__search-button');
 
 
-    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everywhere"');
+    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everything"');
     await popup.waitForSelector('.empty-notice_visible', { hidden: true });
     await popup.waitForSelector('.list', { visible: true });
   });
 
-  it('should change filter to Everywhere when “Try Search Everywhere” pressed (many groups)', async () => {
+  it('should change filter to Everything when “Try Search Everything” pressed (many groups)', async () => {
     const popup = await openPopup();
 
     await popup.click('#select button');
@@ -511,7 +511,7 @@ describe('Empty Notices', function() {
     await popup.waitForSelector('.empty-notice_visible', { visible: true });
     await popup.click('.empty-notice__text_type_categories .empty-notice__search-button');
 
-    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everywhere"');
+    await popup.waitForFunction('document.querySelector(".select__button-text").textContent === "Everything"');
     await popup.waitForSelector('.empty-notice_visible', { hidden: true });
     await popup.waitForSelector('.list', { visible: true });
   });

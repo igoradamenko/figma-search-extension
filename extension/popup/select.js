@@ -115,7 +115,7 @@ class Select {
 
   updateSelectorButtonText() {
     if (!this.selectedValues.length) {
-      this.buttonTextNode.innerHTML = 'Everywhere';
+      this.buttonTextNode.innerHTML = 'Everything';
       return;
     }
 
