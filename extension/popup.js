@@ -252,7 +252,7 @@ function onPagesFilterUpdate(selectedFilter) {
   if (cache.inputValue.length === 0) return;
 
   rerenderResult();
-  // TODO: resetContentState();
+  resetContentState();
 }
 
 function onToastClick() {

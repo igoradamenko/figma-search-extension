@@ -9,4 +9,3 @@
 - Do not hide group names when Everywhere is selected
 - Add badge with Chrome Web Store rating.
 - Implement fuzzy search? https://fusejs.io/
-- Improve empty notices when nothing is found on current page but there is something on others
