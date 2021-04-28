@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.3.2 (28.04.2021)
+
+This release contains some important fixes of 1.3.0 “consistency issues”:
+
+1. Previously “Current page” view was not updated when, well, current page was changed. Now it is.
+
+2. Before simple switch between tabs led to showing “Not found“ notice. Now it does not.
+
+3. It was not possible to be sure that the cached data were “fresh”. Now handy Toast is shown in case of outdated results.
+
+4. Finally, it was not possible to distinguish “too strict filter” notice from “nothing on this page”. Now it's possible.
+
+
 ## 1.3.1 (28.04.2021)
 
 Fixed → symbol rendering in some browsers.
