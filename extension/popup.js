@@ -112,10 +112,7 @@ function onSelectUpdate(filters) {
 
   if (cache.inputValue.length === 0) return;
 
-  showResult({
-    searchResult: cache.searchResult,
-    notLoadedPagesNumber: cache.notLoadedPagesNumber,
-  });
+  rerenderResult();
   resetContentState();
 }
 
@@ -277,7 +274,7 @@ function showResult(data) {
     return;
   }
 
-  if (data.notLoadedPagesNumber && !cache.didDeepSearch) {
+  if (data.notLoadedPagesNumber && !cache.didDeepSearch && cache.selectedPagesFilter === Tabs.TAB.ALL_PAGES) {
     deepSearchButton.Show();
   } else {
     deepSearchButton.Hide();
@@ -305,6 +302,13 @@ function showResult(data) {
 
   list.RenderItems(itemsByGroups);
   emptyNotice.Hide();
+}
+
+function rerenderResult() {
+  showResult({
+    searchResult: cache.searchResult,
+    notLoadedPagesNumber: cache.notLoadedPagesNumber,
+  });
 }
 
 function buildResultItems(items) {
@@ -420,10 +424,7 @@ function loadCache(loadedCache) {
 
   input.SelectAll();
 
-  showResult({
-    searchResult: cache.searchResult,
-    notLoadedPagesNumber: cache.notLoadedPagesNumber,
-  });
+  rerenderResult();
 
   if (typeof cache.selectedListItemIndex !== 'undefined') {
     list.PseudoFocusItemByIndex(cache.selectedListItemIndex);
