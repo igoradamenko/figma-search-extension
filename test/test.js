@@ -649,6 +649,34 @@ describe('Cache', function() {
 
     await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
   });
+
+  it('should update current page state when it is chosen', async () => {
+    let popup = await openPopup();
+
+    await popup.focus('#input');
+    await page.keyboard.type('widget');
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await popup.waitForSelector('.tabs__button_selected + .tabs__button', { visible: true });
+
+    await popup.click('#tabs .tabs__button:nth-child(2)');
+
+    await popup.waitForSelector('.tabs__button + .tabs__button_selected', { visible: true });
+
+    await popup.waitForSelector('.list', { visible: true });
+
+    await closePopup();
+
+    // second page does not contain elements with “widget” in their names
+    await page.evaluate(() => {
+      figma.currentPage = figma.root.children[1];
+    });
+
+    popup = await openPopup();
+
+    await popup.waitForSelector('.empty-notice_visible', { visible: true });
+  });
 });
 
 describe('Deep Search', function() {

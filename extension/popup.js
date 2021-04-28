@@ -463,8 +463,10 @@ function processQuickCacheUpdate(updatedCache) {
   if (updatedCache.currentPageId !== cache.currentPageId) {
     cache.currentPageId = updatedCache.currentPageId;
 
+    if (cache.selectedPagesFilter === Tabs.TAB.CURRENT_PAGE) {
+      rerenderResult();
+    }
   }
-    // TODO: compare pages id and handle it
 }
 
 function processSlowCacheUpdate(updatedCache) {
